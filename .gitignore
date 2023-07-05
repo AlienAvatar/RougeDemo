@@ -3,7 +3,9 @@ DerivedDataCache
 Intermediate
 Saved
 .vscode
+.vsconfig
 .vs
+.idea
 *.VC.db
 *.opensdf
 *.opendb
