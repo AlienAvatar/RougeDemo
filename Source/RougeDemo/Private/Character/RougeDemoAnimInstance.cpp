@@ -33,7 +33,7 @@ void URougeDemoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Speed = Velocity.Size();
 
 	bIsAccelerating = RougeDemoCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f ? true : false;
-
+	bIsAir = RougeDemoCharacter->GetCharacterMovement()->IsFalling();
 	PitchOffset = RougeDemoCharacter->GetAO_Pitch();
 	YawOffset = RougeDemoCharacter->GetAO_Yaw();
 	//UE_LOG(LogTemp,Warning,TEXT("YawOffset[%f]"),YawOffset);

@@ -36,4 +36,7 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
 	float YawOffset;
 
+	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
+	bool bIsAir;
+
 };
