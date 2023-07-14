@@ -4,6 +4,10 @@
 #include "Character/RougeDemoAnimInstance.h"
 
 #include "Character/RougeDemoCharacter.h"
+#include "Curves/CurveVector.h"
+#include "Enum/EGait.h"
+#include "Enum/EMovementState.h"
+#include "Enum/ERotationMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -28,7 +32,7 @@ void URougeDemoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	}
 
-	FVector Velocity = RougeDemoCharacter->GetVelocity();
+	Velocity = RougeDemoCharacter->GetVelocity();
 	Velocity.Z = 0.f;
 	Speed = Velocity.Size();
 
@@ -38,4 +42,231 @@ void URougeDemoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	YawOffset = RougeDemoCharacter->GetAO_Yaw();
 	//UE_LOG(LogTemp,Warning,TEXT("YawOffset[%f]"),YawOffset);
 	//UE_LOG(LogTemp,Warning,TEXT("PitchOffset[%f]"),PitchOffset);
+	Acceleration = RougeDemoCharacter->GetAcceleration();
+	MovementState = RougeDemoCharacter->GetMovementState();
+	bIsMoving = RougeDemoCharacter->GetIsMoving();
+	bHasMovementInput = RougeDemoCharacter->GetHasMovementInput();
+	
+	/*CharacterRotationLastFrame = CharacterRotation;
+	CharacterRotation = RougeDemoCharacter->GetActorRotation();
+	const FRotator Delta = UKismetMathLibrary::NormalizedDeltaRotator(CharacterRotation,CharacterRotationLastFrame);
+	const float Target = Delta.Yaw / DeltaSeconds;
+	const float Interp = FMath::FInterpTo(Lean,Target,DeltaSeconds,6.f);
+	Lean = FMath::Clamp(Interp,-90.f,90.f);*/
+	
+	UpdateLayerValues(DeltaSeconds);
+
+	//UE_LOG(LogTemp,Warning,TEXT("MovementState[%s]"),*UEnum::GetValueAsString(MovementState));
+	
+	switch (MovementState)
+	{
+	case EMovementState::EMS_None:
+		break;
+	case EMovementState::EMS_Grounded:
+		bShouldMove = ShouldMoveCheck();
+		if(bShouldMove)
+		{
+			UpdateMovementValues(DeltaSeconds);
+			UpdateRotationValues();
+		}
+		break;
+	case EMovementState::EMS_InAir:
+		break;
+	case EMovementState::EMS_Mantiling:
+		break;
+	case EMovementState::EMS_RagDoll:
+		break;
+	}
+	
+}
+
+void URougeDemoAnimInstance::UpdateLayerValues(float DeltaTime)
+{
+	EnableAimOffset = UKismetMathLibrary::Lerp(1.f,0.f,GetCurveValue("Mask_AimOffset"));
+	BasePoseN = GetCurveValue("BasePose_N");
+	BasePoseCLF = GetCurveValue("BasePose_CLF");
+	SpineAdd = GetCurveValue("Layering_Spine_Add");
+	HeadAdd = GetCurveValue("Layering_Head_Add");
+	ArmLAdd = GetCurveValue("Layering_Arm_L_Add");
+	ArmRAdd = GetCurveValue("Layering_Arm_R_Add");
+	HandR = GetCurveValue("Layering_Hand_R");
+	HandL = GetCurveValue("Layering_Hand_L");
+	HandL = GetCurveValue("Layering_Hand_L");
+	//本地空间转换为骨骼空间
+	ArmLLS = GetCurveValue("Layering_Arm_L_LS");
+	ArmLMS = 1 - UKismetMathLibrary::FFloor(ArmLLS);
+	ArmRLS = GetCurveValue("Layering_Arm_R_LS");
+	ArmRMS = 1 - UKismetMathLibrary::FFloor(ArmRLS);
+}
+
+void URougeDemoAnimInstance::UpdateAimingValues()
+{
+}
+
+void URougeDemoAnimInstance::UpdateRotationValues()
+{
+	if(YawOffsetFBCurve == nullptr || YawOffsetLRCurve == nullptr) return;
+	MovementDirection = CalculateMovementDirection();
+	
+	const FRotator VelocityRotator = FRotationMatrix::MakeFromX(Velocity).Rotator();
+	const FRotator ControlRotator = RougeDemoCharacter->GetControlRotation();
+	const float DeltaRotatorYaw = UKismetMathLibrary::NormalizedDeltaRotator(VelocityRotator,ControlRotator).Yaw;
+	FYaw = YawOffsetFBCurve->GetVectorValue(DeltaRotatorYaw).X;
+	BYaw = YawOffsetFBCurve->GetVectorValue(DeltaRotatorYaw).Y;
+	LYaw = YawOffsetLRCurve->GetVectorValue(DeltaRotatorYaw).X;
+	RYaw = YawOffsetLRCurve->GetVectorValue(DeltaRotatorYaw).Y;
+}
+
+FVector URougeDemoAnimInstance::CalculateRelativeAccelerationAmount()
+{
+	if(RougeDemoCharacter == nullptr){ return FVector(); }
+
+	const float MaxAcceleration = RougeDemoCharacter->GetCharacterMovement()->GetMaxAcceleration();
+	FVector MaxAccelerationVector = UKismetMathLibrary::Vector_ClampSizeMax(
+		Acceleration,
+		MaxAcceleration
+	);
+	MaxAccelerationVector /=  MaxAcceleration;
+
+	const FQuat Quaternion = RougeDemoCharacter->GetActorRotation().Quaternion();
+	const FVector Result = UKismetMathLibrary::Quat_UnrotateVector(
+		Quaternion,
+		MaxAccelerationVector
+	);
+	return Result;
+}
+
+EMovementDirection URougeDemoAnimInstance::CalculateMovementDirection()
+{
+	EMovementDirection Result = EMovementDirection::EMD_Forward;
+	switch (RotationMode)
+	{
+	case ERotationMode::ERM_VelocityDirection:
+		break;
+	case ERotationMode::ERM_LookingDirection:
+	case ERotationMode::ERM_Aiming:
+		Result = EMovementDirection::EMD_Forward;
+	}
+	return Result;
+}
+
+void URougeDemoAnimInstance::UpdateMovementValues(float DeltaTime)
+{
+	//设置速度方向
+	VelocityBlend = InterpVelocityBlend(VelocityBlend,CalculateVelocityBlend(),VelocityBlendInterpSpeed,DeltaTime);
+
+	//设置倾斜
+	RelativeAccelerationAmount = CalculateRelativeAccelerationAmount();
+	FVector2D TargetLeanAmount(RelativeAccelerationAmount.Y,RelativeAccelerationAmount.X);
+	LeanAmount = InterpLeanAmount(LeanAmount,TargetLeanAmount,GroundedLeanInterpSpeed,DeltaTime);
+
+	WalkRunBlend = CalculateWalkRunBlend();
+	StrideBlend = CalculateStrideBlend();
+	StandingPlayRate = CalculateStandingPlayRate();
+	UE_LOG(LogTemp,Warning,TEXT("StrideBlend[%f]"),StrideBlend);
+	
+}
+
+float URougeDemoAnimInstance::CalculateStrideBlend()
+{
+	if(StrideBlendNWalkCurve == nullptr || StrideBlendNRunCurve == nullptr) return -1.f;
+	const float WalkCurveValue = StrideBlendNWalkCurve->GetFloatValue(Speed);
+	const float RunCurveValue = StrideBlendNRunCurve->GetFloatValue(Speed);
+	const float Alpha = GetAnimCurveClamped(TEXT("Weight_Gait"),-1.f,0.f,1.f);
+	const float Result = UKismetMathLibrary::Lerp(
+		WalkCurveValue,
+		RunCurveValue,
+		Alpha
+	);
+	return Result;
+}
+
+float URougeDemoAnimInstance::GetAnimCurveClamped(FName Name, float Bias, float ClampMin, float ClampMax)
+{
+	return UKismetMathLibrary::Clamp(
+			GetCurveValue(Name) + Bias,
+			ClampMin,
+			ClampMax
+			);
+}
+
+float URougeDemoAnimInstance::CalculateWalkRunBlend()
+{
+	switch (Gait)
+	{
+	case EGait::EG_Walking:
+		return 0.f;
+	case EGait::EG_Running:
+	case EGait::ERM_Sprinting:
+		return 1.f;
+	default:
+		UE_LOG(LogTemp,Error,TEXT("Gait not set value"))
+	}
+	return -1.f;
+}
+
+FVelocityBlend URougeDemoAnimInstance::CalculateVelocityBlend()
+{
+	FVelocityBlend ResultVelocityBlend;
+	UKismetMathLibrary::Vector_Normalize(Velocity,0.1f);
+	FQuat ActorRotationQuat = RougeDemoCharacter->GetActorRotation().Quaternion();
+	//UnrotateVector 速度方向绕着原点（ActorLocation)逆时针旋转ActorRotation
+	const FVector LocRelativeVelocityDir = UKismetMathLibrary::Quat_UnrotateVector(
+		ActorRotationQuat,
+		Velocity
+	);
+
+	const float Sum = LocRelativeVelocityDir.X + LocRelativeVelocityDir.Y + LocRelativeVelocityDir.Z;
+
+	const FVector RelativeDirection = LocRelativeVelocityDir / Sum;
+	//计算速度分量上的大小，0代表当前分量上没有速度，1代表分量上速度最大
+	ResultVelocityBlend.F = UKismetMathLibrary::Clamp(RelativeDirection.X, 0.f, 1.f);
+	ResultVelocityBlend.B = UKismetMathLibrary::Abs(UKismetMathLibrary::Clamp(RelativeDirection.X, -1.f, 0.f));
+	ResultVelocityBlend.L = UKismetMathLibrary::Abs(UKismetMathLibrary::Clamp(RelativeDirection.Y, -1.f, 0.f));
+	ResultVelocityBlend.R = UKismetMathLibrary::Clamp(RelativeDirection.X, 0.f, 1.f);
+	return ResultVelocityBlend;
+}
+
+FVelocityBlend URougeDemoAnimInstance::InterpVelocityBlend(FVelocityBlend Current,FVelocityBlend Target,float InterpSpeed,float DeltaTime)
+{
+	FVelocityBlend ResultVelocityBlend;
+	ResultVelocityBlend.F = UKismetMathLibrary::FInterpTo(Current.F,Target.F,DeltaTime,InterpSpeed);
+	ResultVelocityBlend.B = UKismetMathLibrary::FInterpTo(Current.B,Target.B,DeltaTime,InterpSpeed);
+	ResultVelocityBlend.L = UKismetMathLibrary::FInterpTo(Current.L,Target.L,DeltaTime,InterpSpeed);
+	ResultVelocityBlend.R = UKismetMathLibrary::FInterpTo(Current.R,Target.R,DeltaTime,InterpSpeed);
+	return ResultVelocityBlend;
+}
+
+FVector2D URougeDemoAnimInstance::InterpLeanAmount(FVector2D Current, FVector2D Target, float InterpSpeed, float DeltaTime)
+{
+	FVector2D ResultLeanAmount;
+	ResultLeanAmount.X = UKismetMathLibrary::FInterpTo(Current.X, Target.X, InterpSpeed, DeltaTime);
+	ResultLeanAmount.Y = UKismetMathLibrary::FInterpTo(Current.Y, Target.Y, InterpSpeed, DeltaTime);
+	return ResultLeanAmount;
+}
+
+float URougeDemoAnimInstance::CalculateStandingPlayRate()
+{
+	float ResultPlayRate = 0.f;
+	float WalkSpeedRatio = Speed / AnimatedWalkSpeed;
+	float RunSpeedRatio = Speed / AnimatedRunSpeed;
+	float Alpha = GetAnimCurveClamped(TEXT("Weight_Gait"),-1.f,0.f,1.f);
+	float Ratio = UKismetMathLibrary::Lerp(
+		WalkSpeedRatio,
+		RunSpeedRatio,
+		Alpha
+	);
+	float ComponentZ = GetOwningComponent()->GetComponentScale().Z;
+	ResultPlayRate =
+		UKismetMathLibrary::Clamp(
+		Ratio / StrideBlend / ComponentZ,
+		0.f,
+		3.f
+	);
+	return ResultPlayRate;
+}
+
+bool URougeDemoAnimInstance::ShouldMoveCheck()
+{
+	return (bIsMoving && bHasMovementInput) || Speed > 150.f;
 }

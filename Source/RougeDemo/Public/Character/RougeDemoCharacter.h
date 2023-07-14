@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Enum/EMovementState.h"
 #include "RougeDemoCharacter.generated.h"
 
 class UCameraComponent;
@@ -26,7 +27,7 @@ protected:
 	void MoveRight(float Value);
 	void Turn(float Value);
 	void LookUp(float Value);
-
+	void OnBeginPlay();
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -41,6 +42,31 @@ private:
 	FRotator CurrentRotation;
 	FRotator StartRotation;
 	void AimOffset(float DeltaTime);
+
+	void SetEssentialValues(float DeltaTime);
+	
+	FVector CalculateAcceleration();
+
+	void CacheValues();
+
+	FVector PreviousVelocity;
+
+	//加速度
+	FVector Acceleration;
+
+	EMovementState MovementState;
+
+	bool bIsMoving;
+
+	float Speed;
+
+	FRotator LastVelocityRotation;
+
+	float MovementInputAmount;
+
+	bool bHasMovementInput;
+
+	FRotator LastMovementInputRotation;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -50,4 +76,9 @@ public:
 
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
+	FORCEINLINE FVector GetAcceleration() const { return Acceleration; }
+	FORCEINLINE EMovementState GetMovementState() const { return MovementState; }
+	FORCEINLINE bool GetIsMoving() const { return bIsMoving; }
+	FORCEINLINE bool GetHasMovementInput() const { return bHasMovementInput; }
+	
 };
