@@ -53,7 +53,15 @@ private:
 	bool bIsMoving;
 
 	bool bHasMovementInput;
+
+	//Lean
+	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
+	FVector2D LeanAmount;
+
+	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
+	bool bShouldMove;
 	
+	FRotator AimingRotation;
 	//CurveValue
 	UPROPERTY(BlueprintReadOnly, Category=CurveValue, meta=(AllowPrivateAccess = "true"))
 	float BasePoseN;
@@ -98,10 +106,8 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category=CurveValue, meta=(AllowPrivateAccess = "true"))
 	float ArmRMS;
 
-	//Lean
-	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
-	FVector2D LeanAmount;
 
+	
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;
 	FRotator DeltaRotation;
@@ -119,6 +125,7 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
 	float WalkRunBlend;
 
+	//[0,1] StrideBlend[0,1] 混合步伐，0代表步伐没动，0.5代表伸出半步，1代表1步
 	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
 	float StrideBlend;
 
@@ -140,13 +147,14 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
 	float RYaw;
 
+	//移动方向
 	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
 	EMovementDirection MovementDirection;
 
 	ERotationMode RotationMode;
-
-	bool bShouldMove;
-	//移动姿态
+	
+	//移动姿态 Walking,Running,Sprinting
+	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
 	EGait Gait;
 	
 	//曲线
@@ -164,10 +172,12 @@ private:
 private:
 	void UpdateLayerValues(float DeltaTime);
 
+	void UpdateCharacterInfo(float DeltaTime);
+	
 	void UpdateAimingValues();
 
 	void UpdateRotationValues();
-	
+
 	FVector CalculateRelativeAccelerationAmount();
 
 	EMovementDirection CalculateMovementDirection();
@@ -197,6 +207,10 @@ private:
 
 	//检查Character是否可以移动
 	bool ShouldMoveCheck();
+
+	EMovementDirection CalculateQuadrant(EMovementDirection Current,float FR_Threshold,float FL_Threshold,float BR_Threshold,float BL_Threshold,float Buffer,float Angle);
+
+	bool AngleInRange(float Angle,float MinAngle,float MaxAngle,float Buffer,bool bIncreaseBuffer);
 protected:
 	
 };
