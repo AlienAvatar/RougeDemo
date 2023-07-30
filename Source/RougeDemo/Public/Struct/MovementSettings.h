@@ -1,12 +1,13 @@
 ﻿#pragma once
 
+#include"Engine/Datatable.h"
 #include "MovementSettings.generated.h"
 
 class UCurveVector;
 class UCurveFloat;
 
 USTRUCT(BlueprintType)
-struct FMovementSettings
+struct FMovementSettings : public FTableRowBase
 {
 	GENERATED_BODY()
 

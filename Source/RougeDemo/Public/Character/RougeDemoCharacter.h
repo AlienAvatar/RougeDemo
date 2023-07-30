@@ -3,11 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "GameFramework/Character.h"
 #include "Enum/EMovementState.h"
 #include "Enum/EGait.h"
+#include "Enum/EOverlayState.h"
 #include "Enum/ERotationMode.h"
+#include "Enum/EStance.h"
 #include "Struct/MovementSettings.h"
+#include "Struct/MovementSettingsState.h"
 #include "RougeDemoCharacter.generated.h"
 
 class UCameraComponent;
@@ -22,18 +26,7 @@ public:
 	// Sets default values for this character's properties
 	ARougeDemoCharacter();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
-	void MoveForward(float Value);
-	void MoveRight(float Value);
-	void Turn(float Value);
-	void LookUp(float Value);
-	void OnBeginPlay();
-
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=MovementSystem)
-	FMovementSettings CurrentMovementSettings;
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -53,7 +46,7 @@ private:
 	
 	FVector CalculateAcceleration();
 
-	void CacheValues();
+	void CacheValues(float DeltaTime);
 
 	FVector PreviousVelocity;
 
@@ -75,23 +68,30 @@ private:
 
 	FRotator LastMovementInputRotation;
 
-	EGait Gait;
-	EGait DesiredGait;
+	//初始化角色State
+	EGait Gait = EGait::EG_Walking;
+	EGait DesiredGait = EGait::EG_Running;
 	EGait AllowedGait;
 	EGait ActualGait;
+	EOverlayState OverlayState = EOverlayState::EOS_Default;
 
+	ERotationMode DesiredRotationMode = ERotationMode::ERM_VelocityDirection;
+	ERotationMode RotationMode;
+
+	EStance DesiredStance;
+	EStance Stance = EStance::ES_Standing;
 	//更新角色移动属性
 	void UpdateCharacterMovement(float DeltaTime);
 
 	//获取当前状态下可执行的Gait状态
 	EGait GetAllowedGait();
 
-	ERotationMode RotationMode;
-
 	EGait GetActualGait();
 
 	void UpdateDynamicMovementSettings();
 
+	FMovementSettings GetTargetMovementSettings();
+	
 	void UpdateGroundedRotation(float DeltaTime);
 
 	bool CanUpdateMovingRotation();
@@ -116,6 +116,54 @@ private:
 	float GetAnimCurveValue(FName CurveName);
 
 	FRotator AimingRotation;
+
+	//播放翻滚Root Motion Montage动画
+	void RollEvent();
+
+	//从Table中读取数据保存到Struct中
+	void SetMovementModel();
+
+	FMovementSettingsState* MovementData;
+
+	EMovementState PrevMovementState;
+
+	//每帧更新布娃娃的状态
+	void RagdollUpdate(float DeltaTime);
+
+	//最后一帧布娃娃速度
+	FVector LastRagdollVelocity;
+
+	void SetActorLocationDuringRagdoll();
+
+	FVector TargetRagdollLocation;
+
+	bool RagdollFaceUp;
+
+	FRotator TargetRagdollRotation;
+
+	//检测布娃娃是否着地
+	bool RagdollOnGround;
+
+	void SetActorLocationAndRotationFromTarget(FVector NewLocation,FRotator NewRotation,bool bSweep,bool bTeleport);
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	void MoveForward(float Value);
+	void MoveRight(float Value);
+	void Turn(float Value);
+	void LookUp(float Value);
+	void OnBeginPlay();
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=MovementSystem)
+	FMovementSettings CurrentMovementSettings;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Anim")
+	UAnimMontage* AnimMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UDataTable* MovementModelDataTable;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -132,4 +180,8 @@ public:
 	FORCEINLINE EGait GetGait() const { return Gait; }
 	FORCEINLINE float GetSpeed() const { return Speed; }
 	FORCEINLINE FRotator GetAimingRotation() const { return AimingRotation; }
+	FORCEINLINE EMovementState GetPrevMovementState() const { return PrevMovementState; }
+	FORCEINLINE EStance GetStance() const { return Stance; }
+	FORCEINLINE EOverlayState GetOverlayState() const { return OverlayState; }
+	FORCEINLINE ERotationMode GetRotationMode() const {return RotationMode; }
 };

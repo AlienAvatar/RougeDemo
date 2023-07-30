@@ -7,7 +7,6 @@
 #include "Curves/CurveVector.h"
 #include "Enum/EGait.h"
 #include "Enum/EMovementState.h"
-#include "Enum/ERotationMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -103,11 +102,16 @@ void URougeDemoAnimInstance::UpdateCharacterInfo(float DeltaTime)
 	
 	MovementState = RougeDemoCharacter->GetMovementState();
 	Gait = RougeDemoCharacter->GetGait();
-	
+	PrevMovementState = RougeDemoCharacter->GetPrevMovementState();
+	RotationMode = RougeDemoCharacter->GetRotationMode();
+	Stance = RougeDemoCharacter->GetStance();
+	OverlayState = RougeDemoCharacter->GetOverlayState();
 }
 
-void URougeDemoAnimInstance::UpdateAimingValues()
+void URougeDemoAnimInstance::UpdateAimingValues(float DeltaTime)
 {
+	SmoothedAimingRotation = UKismetMathLibrary::RInterpTo(SmoothedAimingRotation,AimingRotation,DeltaTime,SmoothedAimingRotationInterpSpeed);
+	
 }
 
 void URougeDemoAnimInstance::UpdateRotationValues()
@@ -115,7 +119,8 @@ void URougeDemoAnimInstance::UpdateRotationValues()
 	if(YawOffsetFBCurve == nullptr || YawOffsetLRCurve == nullptr) return;
 	MovementDirection = CalculateMovementDirection();
 	
-	const FRotator VelocityRotator = FRotationMatrix::MakeFromX(Velocity).Rotator();
+	//const FRotator VelocityRotator = FRotationMatrix::MakeFromX(Velocity).Rotator();
+	const FRotator VelocityRotator = UKismetMathLibrary::MakeRotFromX(Velocity);
 	const FRotator ControlRotator = RougeDemoCharacter->GetControlRotation();
 	const float DeltaRotatorYaw = UKismetMathLibrary::NormalizedDeltaRotator(VelocityRotator,ControlRotator).Yaw;
 	FYaw = YawOffsetFBCurve->GetVectorValue(DeltaRotatorYaw).X;
@@ -181,7 +186,8 @@ void URougeDemoAnimInstance::UpdateMovementValues(float DeltaTime)
 	StandingPlayRate = CalculateStandingPlayRate();
 
 	//Debug Message
-	UE_LOG(LogTemp,Warning,TEXT("StrideBlend[%f]"),StrideBlend);
+	//UE_LOG(LogTemp,Warning,TEXT("StrideBlend[%f]"),StrideBlend);
+	UE_LOG(LogTemp,Warning,TEXT("StandingPlayRate[%f]"),StandingPlayRate);
 	//UE_LOG(LogTemp,Warning,TEXT("WalkRunBlend[%f]"),WalkRunBlend);
 	//UE_LOG(LogTemp,Warning,TEXT("VelocityBlend F[%f]"),VelocityBlend.F);
 	//UE_LOG(LogTemp,Warning,TEXT("Gait[%s]"),*UEnum::GetValueAsString(Gait));
@@ -198,12 +204,12 @@ float URougeDemoAnimInstance::CalculateStrideBlend()
 	const float WalkCurveValue = StrideBlendNWalkCurve->GetFloatValue(Speed);
 	const float RunCurveValue = StrideBlendNRunCurve->GetFloatValue(Speed);
 	const float Alpha = GetAnimCurveClamped(TEXT("Weight_Gait"),-1.f,0.f,1.f);
-	UE_LOG(LogTemp,Warning,TEXT("Alpha[%f]"),Alpha);
+	
+	/*UE_LOG(LogTemp,Warning,TEXT("Alpha[%f]"),Alpha);
 	UE_LOG(LogTemp,Warning,TEXT("WalkCurveValue[%f]"),WalkCurveValue);
 	UE_LOG(LogTemp,Warning,TEXT("RunCurveValue[%f]"),RunCurveValue);
-	
 	float WeightGait = GetCurveValue(TEXT("Weight_Gait"));
-	UE_LOG(LogTemp,Warning,TEXT("WeightGait[%f]"),WeightGait);
+	UE_LOG(LogTemp,Warning,TEXT("WeightGait[%f]"),WeightGait);*/
 	
 	const float Result = UKismetMathLibrary::Lerp(
 		WalkCurveValue,
@@ -229,7 +235,7 @@ float URougeDemoAnimInstance::CalculateWalkRunBlend()
 	case EGait::EG_Walking:
 		return 0.f;
 	case EGait::EG_Running:
-	case EGait::ERM_Sprinting:
+	case EGait::EG_Sprinting:
 		return 1.f;
 	default:
 		UE_LOG(LogTemp,Error,TEXT("Gait not set value"))
@@ -280,15 +286,15 @@ FVector2D URougeDemoAnimInstance::InterpLeanAmount(FVector2D Current, FVector2D 
 float URougeDemoAnimInstance::CalculateStandingPlayRate()
 {
 	float ResultPlayRate = 0.f;
-	float WalkSpeedRatio = Speed / AnimatedWalkSpeed;
-	float RunSpeedRatio = Speed / AnimatedRunSpeed;
-	float Alpha = GetAnimCurveClamped(TEXT("Weight_Gait"),-1.f,0.f,1.f);
-	float Ratio = UKismetMathLibrary::Lerp(
+	const float WalkSpeedRatio = Speed / AnimatedWalkSpeed;
+	const float RunSpeedRatio = Speed / AnimatedRunSpeed;
+	const float Alpha = GetAnimCurveClamped(TEXT("Weight_Gait"),-1.f,0.f,1.f);
+	const float Ratio = UKismetMathLibrary::Lerp(
 		WalkSpeedRatio,
 		RunSpeedRatio,
 		Alpha
 	);
-	float ComponentZ = GetOwningComponent()->GetComponentScale().Z;
+	const float ComponentZ = GetOwningComponent()->GetComponentScale().Z;
 	ResultPlayRate =
 		UKismetMathLibrary::Clamp(
 		Ratio / StrideBlend / ComponentZ,

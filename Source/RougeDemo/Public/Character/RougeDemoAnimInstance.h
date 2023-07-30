@@ -8,6 +8,8 @@
 #include "Enum/ERotationMode.h"
 #include "Enum/EGait.h"
 #include "Enum/EMovementState.h"
+#include "Enum/EOverlayState.h"
+#include "Enum/EStance.h"
 #include "Struct/VelocityBlend.h"
 #include "RougeDemoAnimInstance.generated.h"
 
@@ -48,8 +50,6 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
 	FVector Velocity;
 
-	EMovementState MovementState;
-
 	bool bIsMoving;
 
 	bool bHasMovementInput;
@@ -62,6 +62,26 @@ private:
 	bool bShouldMove;
 	
 	FRotator AimingRotation;
+
+	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
+	EOverlayState OverlayState;
+
+	//移动姿态 Walking,Running,Sprinting
+	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
+	EGait Gait;
+
+	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
+	EMovementState MovementState;
+
+	//暂时无用
+	EMovementState PrevMovementState;
+
+	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
+	ERotationMode RotationMode;
+
+	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
+	EStance Stance;
+	
 	//CurveValue
 	UPROPERTY(BlueprintReadOnly, Category=CurveValue, meta=(AllowPrivateAccess = "true"))
 	float BasePoseN;
@@ -106,8 +126,6 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category=CurveValue, meta=(AllowPrivateAccess = "true"))
 	float ArmRMS;
 
-
-	
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;
 	FRotator DeltaRotation;
@@ -121,6 +139,8 @@ private:
 	float VelocityBlendInterpSpeed = 12.f;
 	float AnimatedWalkSpeed = 150.f;
 	float AnimatedRunSpeed = 350.f;
+	float SmoothedAimingRotationInterpSpeed = 10.f;
+	
 	//Grounded Movement
 	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
 	float WalkRunBlend;
@@ -151,11 +171,12 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
 	EMovementDirection MovementDirection;
 
-	ERotationMode RotationMode;
-	
-	//移动姿态 Walking,Running,Sprinting
+	//平滑旋转
 	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
-	EGait Gait;
+	FRotator SmoothedAimingRotation;
+
+	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
+	FVector2D SmoothedAimingAngle;
 	
 	//曲线
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category=BlendCurve, meta=(AllowPrivateAccess = "true"))
@@ -174,7 +195,7 @@ private:
 
 	void UpdateCharacterInfo(float DeltaTime);
 	
-	void UpdateAimingValues();
+	void UpdateAimingValues(float DeltaTime);
 
 	void UpdateRotationValues();
 
