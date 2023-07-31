@@ -156,6 +156,7 @@ private:
 	float AnimatedRunSpeed = 350.f;
 	float SmoothedAimingRotationInterpSpeed = 10.f;
 	float InputYawOffsetInterpSpeed = 8.f;
+	float AnimatedCrouchSpeed = 150.f;
 	
 	//Grounded Movement
 	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
@@ -165,9 +166,14 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
 	float StrideBlend;
 
+	//站立idle->Walk->Run动画的播放速率
 	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
 	float StandingPlayRate = 1.f;
 
+	//蹲伏idle->Walk动画的播放速率
+	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
+	float CrouchingPlayRate = 1.f;
+	
 	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
 	FVelocityBlend VelocityBlend;
 
@@ -235,6 +241,9 @@ private:
 	//计算Walk/Run 0代表Walk， 1代表Run/Sprint
 	float CalculateWalkRunBlend();
 
+	//通过将角色的速度除以动画速度来计算蹲伏播放率。这个值需要与站立播放率分开，以提高运动时从蹲到站的混合
+	float CalculateCrouchingPlayRate();
+	
 	//计算VelocityBlend 此值表示Player在每个方向上的速度量
 	FVelocityBlend CalculateVelocityBlend();
 

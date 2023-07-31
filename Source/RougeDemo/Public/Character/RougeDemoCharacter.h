@@ -154,6 +154,11 @@ private:
 
 	UAnimMontage* GetGetUpAnimation();
 
+	//蹲伏事件
+	void CrouchAction();
+
+	//防止重复输入，每次输入都有间隔时间（CD)
+	void MultiTapInput(float ResetTime);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

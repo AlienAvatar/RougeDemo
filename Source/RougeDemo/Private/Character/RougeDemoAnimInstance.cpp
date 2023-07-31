@@ -37,7 +37,8 @@ void URougeDemoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	const float Target = Delta.Yaw / DeltaSeconds;
 	const float Interp = FMath::FInterpTo(Lean,Target,DeltaSeconds,6.f);
 	Lean = FMath::Clamp(Interp,-90.f,90.f);*/
-	
+
+	//每帧进行更新
 	UpdateLayerValues(DeltaSeconds);
 	UpdateCharacterInfo(DeltaSeconds);
 	UpdateAimingValues(DeltaSeconds);
@@ -313,6 +314,13 @@ float URougeDemoAnimInstance::CalculateWalkRunBlend()
 		UE_LOG(LogTemp,Error,TEXT("Gait not set value"))
 	}
 	return -1.f;
+}
+
+float URougeDemoAnimInstance::CalculateCrouchingPlayRate()
+{
+	const float SkeletonScaleZ = GetOwningComponent()->GetRelativeScale3D().Z;
+	const float PlayRateValue = Speed / AnimatedCrouchSpeed / StrideBlend / SkeletonScaleZ;
+	return UKismetMathLibrary::Clamp(PlayRateValue,0.f,2.f);
 }
 
 FVelocityBlend URougeDemoAnimInstance::CalculateVelocityBlend()

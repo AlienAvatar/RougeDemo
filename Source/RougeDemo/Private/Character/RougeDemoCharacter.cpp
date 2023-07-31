@@ -270,6 +270,32 @@ UAnimMontage* ARougeDemoCharacter::GetGetUpAnimation()
 	
 }
 
+void ARougeDemoCharacter::CrouchAction()
+{
+	//检查角色是否是着地状态
+	if(MovementState == EMovementState::EMS_Grounded)
+	{
+		//检查角色是否是站姿
+		switch (Stance)
+		{
+		case EStance::ES_Standing:
+			Stance = EStance::ES_Crouching;
+			Crouch();
+			break;
+		case EStance::ES_Crouching:
+			Stance = EStance::ES_Standing;
+			UnCrouch();
+			break;
+		default:
+			UE_LOG(LogTemp,Warning,TEXT("Can't setting stance,please check it"))
+		}
+	}
+}
+
+void ARougeDemoCharacter::MultiTapInput(float ResetTime)
+{
+}
+
 void ARougeDemoCharacter::UpdateDynamicMovementSettings()
 {
 	//根据DataTable中的数据设置属性
@@ -632,6 +658,7 @@ void ARougeDemoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&ARougeDemoCharacter::Jump);
 	PlayerInputComponent->BindAction("RagdollAction",IE_Pressed,this,&ARougeDemoCharacter::RagdollAction);
+	PlayerInputComponent->BindAction("Crouch",IE_Pressed,this,&ARougeDemoCharacter::CrouchAction);
 	
 	PlayerInputComponent->BindAxis("MoveForward",this,&ARougeDemoCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight",this,&ARougeDemoCharacter::MoveRight);
