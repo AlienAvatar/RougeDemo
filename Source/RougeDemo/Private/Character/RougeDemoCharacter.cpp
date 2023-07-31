@@ -101,6 +101,9 @@ void ARougeDemoCharacter::Tick(float DeltaTime)
 	default:
 		UE_LOG(LogTemp,Error,TEXT("No MovementState setting, Please check it."));
 	}
+
+	//DebugMessage
+	//UE_LOG(LogTemp,Warning,TEXT("LastRagdollVelocity[%f]"),LastRagdollVelocity.Size());
 }
 
 void ARougeDemoCharacter::RagdollUpdate(float DeltaTime)
@@ -108,7 +111,7 @@ void ARougeDemoCharacter::RagdollUpdate(float DeltaTime)
 	LastRagdollVelocity = GetMesh()->GetPhysicsLinearVelocity(FName("root"));
 
 	//使用布娃娃的速度来缩放布娃娃骨骼关节
-	float OutVelocityValue = UKismetMathLibrary::MapRangeClamped(
+	const float OutVelocityValue = UKismetMathLibrary::MapRangeClamped(
 		LastRagdollVelocity.Size(),
 		0.f,
 		1000.f,
@@ -132,11 +135,12 @@ void ARougeDemoCharacter::SetActorLocationDuringRagdoll()
 	TargetRagdollLocation = GetMesh()->GetSocketLocation(FName("pelvis"));
 
 	//设置布娃娃的目标Rotation
-	RagdollFaceUp = GetMesh()->GetSocketLocation(FName("pelvis")).X < 0;
-	float TargetRagdollRotationYaw = RagdollFaceUp ? GetMesh()->GetSocketLocation(FName("pelvis")).Z - 180.f : GetMesh()->GetSocketLocation(FName("pelvis")).Z;
+	bRagdollFaceUp = GetMesh()->GetSocketRotation(FName("pelvis")).Roll < 0.f;
+	float TargetRagdollRotationYaw = bRagdollFaceUp ? GetMesh()->GetSocketRotation(FName("pelvis")).Yaw - 180.f : GetMesh()->GetSocketRotation(FName("pelvis")).Yaw;
 	TargetRagdollRotation = FRotator(0.f,TargetRagdollRotationYaw,0.f);
 
 	//防止胶囊体一半穿过地面
+	//从目标位置向下追踪以抵消目标位置，防止当布娃娃躺在地上时胶囊的下半部分穿过地板
 	const FVector Start = TargetRagdollLocation;
 	const float EndZ = TargetRagdollLocation.Z - GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	const FVector End = FVector(TargetRagdollLocation.X,TargetRagdollLocation.Y,EndZ);
@@ -149,8 +153,8 @@ void ARougeDemoCharacter::SetActorLocationDuringRagdoll()
 		ECollisionChannel::ECC_Visibility
 	);
 
-	RagdollOnGround = HitResult.bBlockingHit;
-	if(RagdollOnGround)
+	bRagdollOnGround = HitResult.bBlockingHit;
+	if(bRagdollOnGround)
 	{
 		float CapsuleLocationZ = GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - FMath::Abs(HitResult.ImpactPoint.Z - HitResult.TraceStart.Z);
 		float NewLocationZ = TargetRagdollLocation.Z + CapsuleLocationZ + 2.f;
@@ -170,6 +174,100 @@ void ARougeDemoCharacter::SetActorLocationAndRotationFromTarget(FVector NewLocat
 		NewLocation,
 		NewRotation
 	);
+}
+
+void ARougeDemoCharacter::RagdollAction()
+{
+	switch (MovementState)
+	{
+	case EMovementState::EMS_None:
+	case EMovementState::EMS_Grounded:
+	case EMovementState::EMS_Mantiling:
+	case EMovementState::EMS_InAir:
+		RagdollStart();
+		break;
+	case EMovementState::EMS_RagDoll:
+		RagdollEnd();
+		break;
+	}
+}
+
+void ARougeDemoCharacter::RagdollStart()
+{
+	GetCharacterMovement()->SetMovementMode(MOVE_None,0);
+	MovementState = EMovementState::EMS_RagDoll;
+
+	//取消碰撞
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionObjectType(ECC_PhysicsBody);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	const FName InBoneName = UKismetSystemLibrary::MakeLiteralName(FName("pelvis"));
+	GetMesh()->SetAllBodiesBelowSimulatePhysics(InBoneName,true,true);
+
+	//停止所有蒙太奇动画
+	URougeDemoAnimInstance* AnimInstance = Cast<URougeDemoAnimInstance>(GetMesh()->GetAnimInstance());
+	if(AnimInstance)
+	{
+		AnimInstance->Montage_Stop(0.2f);
+	}
+}
+
+void ARougeDemoCharacter::RagdollEnd()
+{
+	MovementState = EMovementState::EMS_Grounded;
+	URougeDemoAnimInstance* AnimInstance = Cast<URougeDemoAnimInstance>(GetMesh()->GetAnimInstance());
+	if(AnimInstance)
+	{
+		//保存当前姿势的快照
+		AnimInstance->SavePoseSnapshot(FName("RagdollPose"));
+
+		//检测当前布娃娃形态是否着地
+		if(bRagdollOnGround)
+		{
+			GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+			UAnimMontage* GetUpAnim = GetGetUpAnimation();
+			if(GetUpAnim)
+			{
+				AnimInstance->Montage_Play(GetUpAnim,1.f);
+			}
+		}else
+		{
+			GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+			GetCharacterMovement()->Velocity = LastRagdollVelocity;
+		}
+
+		//重新启用胶囊碰撞，并在网格上禁用物理模拟
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		GetMesh()->SetCollisionObjectType(ECC_Pawn);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		GetMesh()->SetAllBodiesSimulatePhysics(false);
+	}
+}
+
+UAnimMontage* ARougeDemoCharacter::GetGetUpAnimation()
+{
+	if(bRagdollFaceUp)
+	{
+		switch (OverlayState)
+		{
+		case EOverlayState::EOS_Default:
+			return GetUpFrontDefault;
+		default:
+			UE_LOG(LogTemp,Warning,TEXT("Can't setting Getup Montage Anim"));
+			return nullptr;
+		}
+	}else
+	{
+		switch (OverlayState)
+		{
+		case EOverlayState::EOS_Default:
+			return GetUpBackDefault;
+		default:
+			UE_LOG(LogTemp,Warning,TEXT("Can't setting Getup Montage Anim"));
+			return nullptr;
+		}
+	}
+	
 }
 
 void ARougeDemoCharacter::UpdateDynamicMovementSettings()
@@ -533,6 +631,7 @@ void ARougeDemoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&ARougeDemoCharacter::Jump);
+	PlayerInputComponent->BindAction("RagdollAction",IE_Pressed,this,&ARougeDemoCharacter::RagdollAction);
 	
 	PlayerInputComponent->BindAxis("MoveForward",this,&ARougeDemoCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight",this,&ARougeDemoCharacter::MoveRight);

@@ -137,14 +137,22 @@ private:
 
 	FVector TargetRagdollLocation;
 
-	bool RagdollFaceUp;
+	bool bRagdollFaceUp;
 
 	FRotator TargetRagdollRotation;
 
 	//检测布娃娃是否着地
-	bool RagdollOnGround;
+	bool bRagdollOnGround;
 
 	void SetActorLocationAndRotationFromTarget(FVector NewLocation,FRotator NewRotation,bool bSweep,bool bTeleport);
+
+	void RagdollAction();
+
+	void RagdollStart();
+
+	void RagdollEnd();
+
+	UAnimMontage* GetGetUpAnimation();
 
 protected:
 	// Called when the game starts or when spawned
@@ -164,6 +172,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UDataTable* MovementModelDataTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=GetUpAnimation)
+	UAnimMontage* GetUpFrontDefault;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=GetUpAnimation)
+	UAnimMontage* GetUpBackDefault;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

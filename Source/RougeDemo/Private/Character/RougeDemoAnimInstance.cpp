@@ -40,7 +40,7 @@ void URougeDemoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	
 	UpdateLayerValues(DeltaSeconds);
 	UpdateCharacterInfo(DeltaSeconds);
-	
+	UpdateAimingValues(DeltaSeconds);
 	
 	switch (MovementState)
 	{
@@ -59,6 +59,7 @@ void URougeDemoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	case EMovementState::EMS_Mantiling:
 		break;
 	case EMovementState::EMS_RagDoll:
+		UpdateRagdollValues();
 		break;
 	}
 	
@@ -99,6 +100,7 @@ void URougeDemoAnimInstance::UpdateCharacterInfo(float DeltaTime)
 	bIsMoving = RougeDemoCharacter->GetIsMoving();
 	bHasMovementInput = RougeDemoCharacter->GetHasMovementInput();
 	AimingRotation = RougeDemoCharacter->GetControlRotation();
+	MovementInput = RougeDemoCharacter->GetCharacterMovement()->GetCurrentAcceleration();
 	
 	MovementState = RougeDemoCharacter->GetMovementState();
 	Gait = RougeDemoCharacter->GetGait();
@@ -110,8 +112,62 @@ void URougeDemoAnimInstance::UpdateCharacterInfo(float DeltaTime)
 
 void URougeDemoAnimInstance::UpdateAimingValues(float DeltaTime)
 {
+	//平滑处理角色旋转，即使镜头旋转速度比当前Actor Rotation快，也能平滑处理，不受当前角色的旋转变化影响
 	SmoothedAimingRotation = UKismetMathLibrary::RInterpTo(SmoothedAimingRotation,AimingRotation,DeltaTime,SmoothedAimingRotationInterpSpeed);
-	
+
+	//计算AimingRotation和ActorRotation的差值，包括平滑差值
+	const FRotator DeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(AimingRotation,RougeDemoCharacter->GetActorRotation());
+	AimingAngle = FVector2D(DeltaRotator.Yaw,DeltaRotator.Pitch);
+	const FRotator SmoothDeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(SmoothedAimingRotation,RougeDemoCharacter->GetActorRotation());
+	SmoothedAimingAngle = FVector2D(SmoothDeltaRotator.Yaw,SmoothDeltaRotator.Pitch);
+
+	//VelocityDirection
+	if(RotationMode == ERotationMode::ERM_VelocityDirection)
+	{
+		if(bHasMovementInput)
+		{
+			const FRotator MoveInputRotator = FRotationMatrix::MakeFromX(MovementInput).Rotator(); // 使用MakeFromX函数并提供X方向来纠正倾斜得到的旋转
+			const FRotator MoveInputDeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(MoveInputRotator,RougeDemoCharacter->GetActorRotation());
+			float Target = UKismetMathLibrary::MapRangeClamped(
+				MoveInputDeltaRotator.Yaw,
+				-180.f,
+				180.f,
+				0.f,
+				1.f
+			);
+
+			InputYawOffsetTime = UKismetMathLibrary::FInterpTo(
+				InputYawOffsetTime,
+				Target,
+				InputYawOffsetInterpSpeed,
+				DeltaTime
+			);
+		}
+	}
+
+	//将瞄准偏移的Yaw分成3次，左，中，右，分别用这3个值对瞄准偏移进行混合，既保证瞄准响应（相机移动），也能平滑过渡
+	LeftYawTime = UKismetMathLibrary::MapRangeClamped(
+		FMath::Abs(SmoothedAimingAngle.X),
+		0.f,
+		180.f,
+		0.5f,
+		0.f
+	);
+	RightYawTime = UKismetMathLibrary::MapRangeClamped(
+		FMath::Abs(SmoothedAimingAngle.X),
+		0.f,
+		180.f,
+		0.5f,
+		1.f
+	);
+	//人物面朝前方
+	ForwardYawTime = UKismetMathLibrary::MapRangeClamped(
+		SmoothedAimingAngle.X,
+		180.f,
+		180.f,
+		0.f,
+		1.f
+	);
 }
 
 void URougeDemoAnimInstance::UpdateRotationValues()
@@ -127,6 +183,19 @@ void URougeDemoAnimInstance::UpdateRotationValues()
 	BYaw = YawOffsetFBCurve->GetVectorValue(DeltaRotatorYaw).Y;
 	LYaw = YawOffsetLRCurve->GetVectorValue(DeltaRotatorYaw).X;
 	RYaw = YawOffsetLRCurve->GetVectorValue(DeltaRotatorYaw).Y;
+}
+
+void URougeDemoAnimInstance::UpdateRagdollValues()
+{
+	const float RagdollVelocity = GetOwningComponent()->GetPhysicsLinearVelocity(FName("root")).Size();
+	
+	FlailRate = UKismetMathLibrary::MapRangeClamped(
+		RagdollVelocity,
+		0.f,
+		1000.f,
+		0.f,
+		1.f
+	);
 }
 
 FVector URougeDemoAnimInstance::CalculateRelativeAccelerationAmount()
@@ -187,7 +256,8 @@ void URougeDemoAnimInstance::UpdateMovementValues(float DeltaTime)
 
 	//Debug Message
 	//UE_LOG(LogTemp,Warning,TEXT("StrideBlend[%f]"),StrideBlend);
-	UE_LOG(LogTemp,Warning,TEXT("StandingPlayRate[%f]"),StandingPlayRate);
+	//UE_LOG(LogTemp,Warning,TEXT("StandingPlayRate[%f]"),StandingPlayRate);
+	//UE_LOG(LogTemp,Warning,TEXT("EnableAimOffset[%f]"),EnableAimOffset);
 	//UE_LOG(LogTemp,Warning,TEXT("WalkRunBlend[%f]"),WalkRunBlend);
 	//UE_LOG(LogTemp,Warning,TEXT("VelocityBlend F[%f]"),VelocityBlend.F);
 	//UE_LOG(LogTemp,Warning,TEXT("Gait[%s]"),*UEnum::GetValueAsString(Gait));
@@ -195,6 +265,8 @@ void URougeDemoAnimInstance::UpdateMovementValues(float DeltaTime)
 	//UE_LOG(LogTemp,Warning,TEXT("MovementDirection[%s]"),*UEnum::GetValueAsString(MovementDirection));
 	//UE_LOG(LogTemp,Warning,TEXT("YawOffset[%f]"),YawOffset);
 	//UE_LOG(LogTemp,Warning,TEXT("PitchOffset[%f]"),PitchOffset);
+	//UE_LOG(LogTemp,Warning,TEXT("PitchOffset[%f]"),PitchOffset);
+	//UE_LOG(LogTemp,Warning,TEXT("FlailRate[%f]"),FlailRate);
 }
 
 float URougeDemoAnimInstance::CalculateStrideBlend()

@@ -52,8 +52,23 @@ private:
 
 	bool bIsMoving;
 
+	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
 	bool bHasMovementInput;
 
+	FVector MovementInput;
+
+	UPROPERTY(BlueprintReadOnly, Category=AimingValue, meta=(AllowPrivateAccess = "true"))
+	float InputYawOffsetTime;
+
+	UPROPERTY(BlueprintReadOnly, Category=AimingValue, meta=(AllowPrivateAccess = "true"))
+	float LeftYawTime;
+
+	UPROPERTY(BlueprintReadOnly, Category=AimingValue, meta=(AllowPrivateAccess = "true"))
+	float RightYawTime;
+
+	UPROPERTY(BlueprintReadOnly, Category=AimingValue, meta=(AllowPrivateAccess = "true"))
+	float ForwardYawTime;
+	
 	//Lean
 	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
 	FVector2D LeanAmount;
@@ -140,6 +155,7 @@ private:
 	float AnimatedWalkSpeed = 150.f;
 	float AnimatedRunSpeed = 350.f;
 	float SmoothedAimingRotationInterpSpeed = 10.f;
+	float InputYawOffsetInterpSpeed = 8.f;
 	
 	//Grounded Movement
 	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
@@ -190,15 +206,20 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category=BlendCurve, meta=(AllowPrivateAccess = "true"))
 	UCurveVector* YawOffsetLRCurve;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category=Ragdoll, meta=(AllowPrivateAccess = "true"))
+	float FlailRate;
 private:
 	void UpdateLayerValues(float DeltaTime);
 
 	void UpdateCharacterInfo(float DeltaTime);
 	
 	void UpdateAimingValues(float DeltaTime);
-
+	
 	void UpdateRotationValues();
 
+	void UpdateRagdollValues();
+	
 	FVector CalculateRelativeAccelerationAmount();
 
 	EMovementDirection CalculateMovementDirection();
@@ -232,6 +253,8 @@ private:
 	EMovementDirection CalculateQuadrant(EMovementDirection Current,float FR_Threshold,float FL_Threshold,float BR_Threshold,float BL_Threshold,float Buffer,float Angle);
 
 	bool AngleInRange(float Angle,float MinAngle,float MaxAngle,float Buffer,bool bIncreaseBuffer);
+	
+	FVector2D AimingAngle;
 protected:
 	
 };
