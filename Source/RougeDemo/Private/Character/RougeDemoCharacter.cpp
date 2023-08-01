@@ -6,6 +6,8 @@
 #include "Camera/CameraComponent.h"
 #include "Character/RougeDemoAnimInstance.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/CombatComponent.h"
+#include "Components/LockOnComponent.h"
 #include "Curves/CurveVector.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
@@ -37,6 +39,9 @@ ARougeDemoCharacter::ARougeDemoCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
 
+	LockOnComp = CreateDefaultSubobject<ULockOnComponent>(TEXT("LockOnComp"));
+	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComp"));
+	
 	MovementState = EMovementState::EMS_Grounded;
 }
 
@@ -294,6 +299,14 @@ void ARougeDemoCharacter::CrouchAction()
 
 void ARougeDemoCharacter::MultiTapInput(float ResetTime)
 {
+}
+
+void ARougeDemoCharacter::LockOnAction()
+{
+	if(LockOnComp)
+	{
+		LockOnComp->ToggleLockOn();
+	}
 }
 
 void ARougeDemoCharacter::UpdateDynamicMovementSettings()
@@ -659,6 +672,7 @@ void ARougeDemoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&ARougeDemoCharacter::Jump);
 	PlayerInputComponent->BindAction("RagdollAction",IE_Pressed,this,&ARougeDemoCharacter::RagdollAction);
 	PlayerInputComponent->BindAction("Crouch",IE_Pressed,this,&ARougeDemoCharacter::CrouchAction);
+	PlayerInputComponent->BindAction("LockOn",IE_Pressed,this,&ARougeDemoCharacter::LockOnAction);
 	
 	PlayerInputComponent->BindAxis("MoveForward",this,&ARougeDemoCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight",this,&ARougeDemoCharacter::MoveRight);

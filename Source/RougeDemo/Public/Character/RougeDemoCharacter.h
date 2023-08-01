@@ -14,6 +14,8 @@
 #include "Struct/MovementSettingsState.h"
 #include "RougeDemoCharacter.generated.h"
 
+class UCombatComponent;
+class ULockOnComponent;
 class UCameraComponent;
 class USpringArmComponent;
 
@@ -35,6 +37,12 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	UCameraComponent* FollowCamera;
 
+	UPROPERTY(VisibleAnywhere, Category = Component)
+	ULockOnComponent* LockOnComp;
+
+	UPROPERTY(VisibleAnywhere, Category = Component)
+	UCombatComponent* CombatComp;
+	
 	float AO_Pitch;
 	float AO_Yaw;
 
@@ -159,6 +167,9 @@ private:
 
 	//防止重复输入，每次输入都有间隔时间（CD)
 	void MultiTapInput(float ResetTime);
+
+	//锁敌事件
+	void LockOnAction();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -183,6 +194,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=GetUpAnimation)
 	UAnimMontage* GetUpBackDefault;
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
