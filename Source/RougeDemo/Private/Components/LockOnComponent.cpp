@@ -3,9 +3,14 @@
 
 #include "Components/LockOnComponent.h"
 
+#include "AI/BaseAI.h"
 #include "Blueprint/UserWidget.h"
 #include "Character/RougeDemoCharacter.h"
+#include "Engine/Canvas.h"
 #include "HUD/LockOnWidget.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+
 
 // Sets default values for this component's properties
 ULockOnComponent::ULockOnComponent()
@@ -31,18 +36,20 @@ void ULockOnComponent::Initialize()
 {
 	//只有玩家才能锁定
 	PlayerRougeDemoCharacter = Cast<ARougeDemoCharacter>(GetOwner());
-	if(PlayerRougeDemoCharacter && MarketWidgetClass)
+
+	//自动锁敌的一个方法，无法把Widget移动到Enemy上
+	/*if(PlayerRougeDemoCharacter && MarketWidgetClass)
 	{
 		//创建锁敌UI
 		MarketWidget = Cast<ULockOnWidget>(CreateWidget(GetWorld(),MarketWidgetClass));
 		MarketWidget->AddToViewport();
-	}
+	}*/
 }
 
 void ULockOnComponent::SelectTarget()
 {
 	//查找范围的敌人
-	TArray<FHitResult> OutHits = SearchTargets();
+	TArray<FHitResult> OutHits = SearchTargets(); 
 	for(FHitResult Hit: OutHits)
 	{
 		//对范围的友军不进行锁敌
@@ -63,6 +70,9 @@ void ULockOnComponent::SelectTarget()
 			BackTargetDistance = RadarRange;
 			for(AActor* Enemy : Enemies)
 			{
+				//清除已经锁敌Enemy的Market
+				ClearMarket(Enemy,false);
+				
 				//将Player和Enemy做点乘，如果大于0，证明敌人在Player前方，反之在后方
 				if(PlayerRougeDemoCharacter->GetHorizontalDotProductTo(Enemy) > 0.f)
 				{
@@ -87,11 +97,14 @@ void ULockOnComponent::SelectTarget()
 			if(TempFrontTarget)
 			{
 				LockOnTarget = TempFrontTarget;
-				MarketWidget->ToggleMarket(LockOnTarget);
+				ClearMarket(TempFrontTarget,true);
+				
+				//MarketWidget->ToggleMarket(LockOnTarget);
 			}else if(TempBackTarget)
 			{
 				LockOnTarget = TempBackTarget;
-				MarketWidget->ToggleMarket(LockOnTarget);
+				ClearMarket(TempFrontTarget,true);
+				//MarketWidget->ToggleMarket(LockOnTarget);
 			}else
 			{
 				UE_LOG(LogTemp,Warning, TEXT("No target in current range or can't lock on target."));
@@ -104,7 +117,7 @@ void ULockOnComponent::SelectTarget()
 	{
 		LockOnTarget = nullptr;
 		//取消UI
-		MarketWidget->ToggleMarket(LockOnTarget);
+		//MarketWidget->ToggleMarket(LockOnTarget);
 	}
 }
 
@@ -118,11 +131,15 @@ TArray<FHitResult> ULockOnComponent::SearchTargets()
 		const FVector End = PlayerRougeDemoCharacter->GetActorLocation();
 
 		FCollisionQueryParams CollisionParams;
-		CollisionParams.AddIgnoredActor(PlayerRougeDemoCharacter); // 可根据需要添加需要忽略的其他物体
-
+		TArray<AActor*> IgnoreArr;
+		IgnoreArr.Add(PlayerRougeDemoCharacter);
+		CollisionParams.AddIgnoredActors(IgnoreArr); // 可根据需要添加需要忽略的其他物体
+		
 		//FQuat::Identity 单位四元数
-		GetWorld()->SweepMultiByChannel(OutHits, Start, End, FQuat::Identity, ECC_Visibility,
-		   FCollisionShape::MakeSphere(RadarRange), CollisionParams);
+		GetWorld()->SweepMultiByChannel(OutHits, Start, End, FQuat::Identity, ECC_Pawn,
+			FCollisionShape::MakeSphere(RadarRange), CollisionParams);
+
+		DrawDebugSphere(GetWorld(),Start,RadarRange,-1,FColor::Green);
 	}else
 	{
 		UE_LOG(LogTemp,Warning,TEXT("Player is nullptr,please check again"));
@@ -134,8 +151,8 @@ TArray<FHitResult> ULockOnComponent::SearchTargets()
 AActor* ULockOnComponent::IdentifyTeam(FHitResult Hit)
 {
 	AActor* HitActor = Hit.GetActor();
-	//比较Actor Tags，如果是同一队伍，则不进行锁敌
-	if(PlayerRougeDemoCharacter->Tags[0] != HitActor->Tags[0])
+	//比较Actor Tags，如果是同一队伍，则不进行锁敌 Floor会报错
+	if(PlayerRougeDemoCharacter && HitActor && HitActor->Tags.Num() > 0 && PlayerRougeDemoCharacter->Tags[0] != HitActor->Tags[0])
 	{
 		const FVector Start = PlayerRougeDemoCharacter->GetActorLocation();
 		const FVector End = HitActor->GetActorLocation();
@@ -146,6 +163,8 @@ AActor* ULockOnComponent::IdentifyTeam(FHitResult Hit)
 		FCollisionQueryParams CollisionQueryParams;
 		CollisionQueryParams.AddIgnoredActors(InIgnoreActors);
 		FHitResult HitResult;
+		
+		DrawDebugLine(GetWorld(),Start,End,FColor::Red,true);
 		if(!GetWorld()->LineTraceSingleByChannel(HitResult,Start,End,ECC_Visibility,CollisionQueryParams))
 		{
 			return HitActor;
@@ -153,6 +172,103 @@ AActor* ULockOnComponent::IdentifyTeam(FHitResult Hit)
 	}
 	
 	return nullptr;
+}
+
+void ULockOnComponent::SetControlRotationTowardTarget()
+{
+	if(LockOnTarget)
+	{
+		const FVector Start = PlayerRougeDemoCharacter->GetActorLocation();
+		const FVector Target = LockOnTarget->GetActorLocation();
+
+		UKismetMathLibrary::FindLookAtRotation(
+			Start,
+			Target
+		);
+	}
+}
+
+void ULockOnComponent::ActivateLockOnScreenPositionBased()
+{
+	TArray<FHitResult> OutHits = SearchTargets();
+	for(FHitResult Hit: OutHits)
+	{
+		//对范围的友军不进行锁敌
+		AActor* HitActor = IdentifyTeam(Hit);
+		if(HitActor)
+		{
+			Enemies.AddUnique(HitActor);
+		}
+	}
+
+	if(Enemies.IsValidIndex(0))
+	{
+		FVector2D ViewPortSize;
+		if(GEngine)
+		{
+			GEngine->GameViewport->GetViewportSize(ViewPortSize);
+		}
+		ScreenCenterPosition = ViewPortSize / 2;
+
+		float LocalTargetScreenDistance = 10000.f;
+
+		for(auto Enemy : Enemies)
+		{
+			if(Enemy->WasRecentlyRendered(0.2f))
+			{
+				const FVector EnemyLocation = Enemy->GetActorLocation();
+				const APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(),0);
+				if(PlayerController)
+				{
+					FVector2D EnemyScreenPosition;
+					//将3D坐标转换为2D坐标
+					UGameplayStatics::ProjectWorldToScreen(PlayerController,EnemyLocation,EnemyScreenPosition,false);
+					if((ScreenCenterPosition - EnemyScreenPosition).Size() < LocalTargetScreenDistance)
+					{
+						LocalTargetScreenDistance = (ScreenCenterPosition - EnemyScreenPosition).Size();
+						TempScreenTarget = Enemy;
+					}
+				}
+
+				//Clear ALl Market
+			}
+		}
+
+		//激活UI并锁定
+		if(TempScreenTarget)
+		{
+			LockOnTarget = TempScreenTarget;
+			MarketWidget->ToggleMarket(LockOnTarget);
+		}else
+		{
+			LockOnTarget = nullptr;
+			MarketWidget->ToggleMarket(LockOnTarget);
+		}
+	}else
+	{
+		LockOnTarget = nullptr;
+		//取消UI
+		MarketWidget->ToggleMarket(LockOnTarget);
+	}
+}
+
+void ULockOnComponent::DrawPoint(FVector2D Position, FLinearColor Color, float Size)
+{
+	UCanvas* Canvas = GetWorld()->GetCanvasForDrawMaterialToRenderTarget();
+
+	if (Canvas)
+	{
+		
+	}
+}
+
+void ULockOnComponent::ClearMarket(AActor* AIActor, bool bLockOn)
+{
+	ABaseAI* BaseAI = Cast<ABaseAI>(AIActor);
+	if(BaseAI)
+	{
+		BaseAI->ToggleMarket(bLockOn);
+	}
 }
 
 // Called every frame
@@ -175,11 +291,8 @@ void ULockOnComponent::ActivateLockOn()
 		
 	}else
 	{
+		bIsLockOn = true;
 		SelectTarget();
-		if(LockOnTarget)
-		{
-			bIsLockOn = true;
-		}
 	}
 }
 
@@ -188,13 +301,18 @@ void ULockOnComponent::DeactivateLockOn()
 	if(bIsAutoTargeting)
 	{
 		bIsLockOn = false;
+		
 		LockOnTarget = nullptr;
-		MarketWidget->ToggleMarket(LockOnTarget);
+		//MarketWidget->ToggleMarket(LockOnTarget);
+
+		
 	}else
 	{
 		bIsLockOn = false;
+		ClearMarket(LockOnTarget,false);
 		LockOnTarget = nullptr;
-		MarketWidget->ToggleMarket(LockOnTarget);
+		
+		//MarketWidget->ToggleMarket(LockOnTarget);
 	}
 }
 

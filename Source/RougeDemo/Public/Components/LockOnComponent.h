@@ -63,15 +63,30 @@ private:
 
 	AActor* IdentifyTeam(FHitResult Hit);
 
-	//前方优先级
-	bool bHasFrontPriority;
+	//默认为前方优先级
+	bool bHasFrontPriority = true;
 
 	UPROPERTY()
 	AActor* TempFrontTarget;
 
 	UPROPERTY()
 	AActor* TempBackTarget;
-	
+
+	//一直面向敌人
+	void SetControlRotationTowardTarget();
+
+	void ActivateLockOnScreenPositionBased();
+
+	FVector2D ScreenCenterPosition;
+
+	UPROPERTY()
+	AActor* TempScreenTarget;
+
+	//Debug Point
+	void DrawPoint(FVector2D Position, FLinearColor Color, float Size);
+
+	//Clear Market
+	void ClearMarket(AActor* AIActor,bool bLockOn);
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
