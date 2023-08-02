@@ -17,7 +17,7 @@ ULockOnComponent::ULockOnComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
@@ -139,7 +139,7 @@ TArray<FHitResult> ULockOnComponent::SearchTargets()
 		GetWorld()->SweepMultiByChannel(OutHits, Start, End, FQuat::Identity, ECC_Pawn,
 			FCollisionShape::MakeSphere(RadarRange), CollisionParams);
 
-		DrawDebugSphere(GetWorld(),Start,RadarRange,-1,FColor::Green);
+		DrawDebugSphere(GetWorld(),Start,RadarRange,1,FColor::Green);
 	}else
 	{
 		UE_LOG(LogTemp,Warning,TEXT("Player is nullptr,please check again"));
@@ -164,7 +164,7 @@ AActor* ULockOnComponent::IdentifyTeam(FHitResult Hit)
 		CollisionQueryParams.AddIgnoredActors(InIgnoreActors);
 		FHitResult HitResult;
 		
-		DrawDebugLine(GetWorld(),Start,End,FColor::Red,true);
+		//DrawDebugLine(GetWorld(),Start,End,FColor::Red,true);
 		if(!GetWorld()->LineTraceSingleByChannel(HitResult,Start,End,ECC_Visibility,CollisionQueryParams))
 		{
 			return HitActor;
@@ -181,10 +181,21 @@ void ULockOnComponent::SetControlRotationTowardTarget()
 		const FVector Start = PlayerRougeDemoCharacter->GetActorLocation();
 		const FVector Target = LockOnTarget->GetActorLocation();
 
-		UKismetMathLibrary::FindLookAtRotation(
+		const FRotator PlayerLookToTargetRotation = UKismetMathLibrary::FindLookAtRotation(
 			Start,
 			Target
 		);
+
+		const FRotator CurrentRotation = PlayerRougeDemoCharacter->GetInstigator()->GetControlRotation();
+		FRotator InterpRotation = UKismetMathLibrary::RInterpTo(
+			CurrentRotation,
+			PlayerLookToTargetRotation,
+			UGameplayStatics::GetWorldDeltaSeconds(GetWorld()),
+			RotationThickness
+		);
+
+		const FRotator ActorRotation(0.f,InterpRotation.Yaw,0.f);
+		PlayerRougeDemoCharacter->SetActorRotation(ActorRotation);
 	}
 }
 
@@ -271,12 +282,28 @@ void ULockOnComponent::ClearMarket(AActor* AIActor, bool bLockOn)
 	}
 }
 
+void ULockOnComponent::ExistTarget()
+{
+	if(PlayerRougeDemoCharacter && LockOnTarget)
+	{
+		float Distance = PlayerRougeDemoCharacter->GetDistanceTo(LockOnTarget);
+		if(Distance > RadarRange)
+		{
+			DeactivateLockOn();
+		}
+	}else
+	{
+		DeactivateLockOn();
+	}
+}
+
 // Called every frame
 void ULockOnComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	SetControlRotationTowardTarget();
 }
 
 void ULockOnComponent::ToggleLockOn()
@@ -293,6 +320,20 @@ void ULockOnComponent::ActivateLockOn()
 	{
 		bIsLockOn = true;
 		SelectTarget();
+
+		//将该组件的tick函数设置为启用
+		SetComponentTickEnabled(true);
+
+		//检测目标,开启TimerHandle
+		GetWorld()->GetTimerManager().SetTimer(
+			ExistTargetTimer,
+			this,
+			&ULockOnComponent::ExistTarget,
+			0.5f,
+			true
+		);
+		//设置为二维移动
+		PlayerRougeDemoCharacter->bUseControllerRotationYaw = true;
 	}
 }
 
@@ -313,6 +354,13 @@ void ULockOnComponent::DeactivateLockOn()
 		LockOnTarget = nullptr;
 		
 		//MarketWidget->ToggleMarket(LockOnTarget);
+		//将该组件的tick函数设置为启用
+		SetComponentTickEnabled(false);
+
+		//关闭TimerHandle
+		GetWorld()->GetTimerManager().ClearTimer(ExistTargetTimer);
+		//设置为二维移动
+		PlayerRougeDemoCharacter->bUseControllerRotationYaw = false;
 	}
 }
 

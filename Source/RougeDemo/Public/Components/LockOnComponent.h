@@ -87,6 +87,12 @@ private:
 
 	//Clear Market
 	void ClearMarket(AActor* AIActor,bool bLockOn);
+
+	float RotationThickness = 500.f;
+
+	FTimerHandle ExistTargetTimer;
+
+	void ExistTarget();
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
