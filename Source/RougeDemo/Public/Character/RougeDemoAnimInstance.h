@@ -99,6 +99,9 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
 	float Direction;
+
+	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
+	bool bLockOn;
 	
 	//CurveValue
 	UPROPERTY(BlueprintReadOnly, Category=CurveValue, meta=(AllowPrivateAccess = "true"))

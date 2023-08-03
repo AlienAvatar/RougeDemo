@@ -216,4 +216,5 @@ public:
 	FORCEINLINE EStance GetStance() const { return Stance; }
 	FORCEINLINE EOverlayState GetOverlayState() const { return OverlayState; }
 	FORCEINLINE ERotationMode GetRotationMode() const {return RotationMode; }
+	ULockOnComponent* GetLockOnComp() const { return LockOnComp; }
 };

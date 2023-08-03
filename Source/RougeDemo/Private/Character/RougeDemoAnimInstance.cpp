@@ -5,6 +5,7 @@
 
 #include "KismetAnimationLibrary.h"
 #include "Character/RougeDemoCharacter.h"
+#include "Components/LockOnComponent.h"
 #include "Curves/CurveVector.h"
 #include "Enum/EGait.h"
 #include "Enum/EMovementState.h"
@@ -104,6 +105,7 @@ void URougeDemoAnimInstance::UpdateCharacterInfo(float DeltaTime)
 	AimingRotation = RougeDemoCharacter->GetControlRotation();
 	MovementInput = RougeDemoCharacter->GetCharacterMovement()->GetCurrentAcceleration();
 	Direction = UKismetAnimationLibrary::CalculateDirection(Velocity,RougeDemoCharacter->GetActorRotation());
+	bLockOn = RougeDemoCharacter->GetLockOnComp()->GetIsLockOn();
 	
 	MovementState = RougeDemoCharacter->GetMovementState();
 	Gait = RougeDemoCharacter->GetGait();

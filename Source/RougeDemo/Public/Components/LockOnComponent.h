@@ -102,4 +102,6 @@ public:
 	bool bIsAutoTargeting = false;
 
 	void ToggleLockOn();
+
+	FORCEINLINE bool GetIsLockOn() const { return bIsLockOn; }
 };
