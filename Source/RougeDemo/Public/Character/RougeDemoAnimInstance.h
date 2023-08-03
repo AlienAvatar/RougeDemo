@@ -96,6 +96,9 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
 	EStance Stance;
+
+	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
+	float Direction;
 	
 	//CurveValue
 	UPROPERTY(BlueprintReadOnly, Category=CurveValue, meta=(AllowPrivateAccess = "true"))

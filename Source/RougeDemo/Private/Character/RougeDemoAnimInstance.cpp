@@ -3,6 +3,7 @@
 
 #include "Character/RougeDemoAnimInstance.h"
 
+#include "KismetAnimationLibrary.h"
 #include "Character/RougeDemoCharacter.h"
 #include "Curves/CurveVector.h"
 #include "Enum/EGait.h"
@@ -102,6 +103,7 @@ void URougeDemoAnimInstance::UpdateCharacterInfo(float DeltaTime)
 	bHasMovementInput = RougeDemoCharacter->GetHasMovementInput();
 	AimingRotation = RougeDemoCharacter->GetControlRotation();
 	MovementInput = RougeDemoCharacter->GetCharacterMovement()->GetCurrentAcceleration();
+	Direction = UKismetAnimationLibrary::CalculateDirection(Velocity,RougeDemoCharacter->GetActorRotation());
 	
 	MovementState = RougeDemoCharacter->GetMovementState();
 	Gait = RougeDemoCharacter->GetGait();
