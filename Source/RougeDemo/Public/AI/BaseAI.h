@@ -19,7 +19,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	UWidgetComponent* TargetWidget;
-	
+
+	bool bCanBeExecuted;
+
+	bool NormalEnemies;
+
+	bool BossEnemies;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

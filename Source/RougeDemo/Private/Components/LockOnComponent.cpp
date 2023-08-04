@@ -4,7 +4,6 @@
 #include "Components/LockOnComponent.h"
 
 #include "AI/BaseAI.h"
-#include "Blueprint/UserWidget.h"
 #include "Character/RougeDemoCharacter.h"
 #include "Engine/Canvas.h"
 #include "HUD/LockOnWidget.h"

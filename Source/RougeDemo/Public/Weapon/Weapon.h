@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
+class UStaticMeshComponent;
+
 UCLASS()
 class ROUGEDEMO_API AWeapon : public AActor
 {
@@ -15,11 +17,15 @@ public:
 	// Sets default values for this actor's properties
 	AWeapon();
 
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void Fire();
+
+	UPROPERTY(EditDefaultsOnly)
+	UStaticMeshComponent* WeaponMesh;
 	
 public:	
 	// Called every frame
