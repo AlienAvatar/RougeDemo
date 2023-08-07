@@ -102,7 +102,7 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
 	bool bLockOn;
-	
+
 	//CurveValue
 	UPROPERTY(BlueprintReadOnly, Category=CurveValue, meta=(AllowPrivateAccess = "true"))
 	float BasePoseN;
@@ -153,13 +153,12 @@ private:
 
 	FVector Acceleration;
 
-	FVector RelativeAccelerationAmount;
-
 	//Config
 	float GroundedLeanInterpSpeed = 4.f;
 	float VelocityBlendInterpSpeed = 12.f;
-	float AnimatedWalkSpeed = 150.f;
-	float AnimatedRunSpeed = 350.f;
+	float AnimatedWalkSpeed = 200.f;
+	float AnimatedRunSpeed = 400.f;
+	float AnimatedSprintSpeed = 600.f;
 	float SmoothedAimingRotationInterpSpeed = 10.f;
 	float InputYawOffsetInterpSpeed = 8.f;
 	float AnimatedCrouchSpeed = 150.f;
@@ -205,6 +204,9 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
 	FVector2D SmoothedAimingAngle;
+
+	UPROPERTY(BlueprintReadOnly, Category=AnimGround, meta=(AllowPrivateAccess = "true"))
+	FVector RelativeAccelerationAmount;
 	
 	//曲线
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category=BlendCurve, meta=(AllowPrivateAccess = "true"))

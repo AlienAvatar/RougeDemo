@@ -20,16 +20,18 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	UWidgetComponent* TargetWidget;
 
-	bool bCanBeExecuted;
+	bool bCanBeExecuted = true;
 
 	bool NormalEnemies;
 
 	bool BossEnemies;
+
+	float ToughnessValue;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

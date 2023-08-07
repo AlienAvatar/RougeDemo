@@ -14,6 +14,7 @@
 #include "Struct/MovementSettingsState.h"
 #include "RougeDemoCharacter.generated.h"
 
+class URougeDemoAnimInstance;
 class UCombatComponent;
 class ULockOnComponent;
 class UCameraComponent;
@@ -170,6 +171,16 @@ private:
 
 	//锁敌事件
 	void LockOnAction();
+
+	//true 禁止玩家所有输入，false，玩家可以输入
+	bool bDisableInput;
+
+	void AttackAction();
+
+	void TestAction();
+
+	UPROPERTY()
+	URougeDemoAnimInstance* RougeDemoAnimInstance;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -195,7 +206,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=GetUpAnimation)
 	UAnimMontage* GetUpBackDefault;
 
-
+	UPROPERTY(EditAnywhere,Category=Test)
+	UAnimMontage* TestAnimMontage;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -217,4 +229,7 @@ public:
 	FORCEINLINE EOverlayState GetOverlayState() const { return OverlayState; }
 	FORCEINLINE ERotationMode GetRotationMode() const {return RotationMode; }
 	ULockOnComponent* GetLockOnComp() const { return LockOnComp; }
+	void SetDisableInput(bool bNewDisableInput);
+	UCombatComponent* GetComponent() const { return CombatComp; }
+	bool GetIsKatana() const;
 };

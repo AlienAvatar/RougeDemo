@@ -4,8 +4,10 @@
 #include "Components/CombatComponent.h"
 
 #include "AI/BaseAI.h"
+#include "Character/RougeDemoAnimInstance.h"
 #include "Character/RougeDemoCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Enum/EState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Weapon/Weapon.h"
 
@@ -54,12 +56,28 @@ void UCombatComponent::Attack()
 		}else
 		{
 			//地面攻击
-			//判断是否可以攻击，如在某些状态下不能攻击
-			if(!AttackBoolDisabled())
+			//判断是否可以攻击，如在游泳状态下不能攻击
+			if(CheckAttackState())
 			{
-				if(bIsInCombat)
+				//是否在战斗中
+				if(!bIsInCombat)
 				{
+					const FVector Start = RougeDemoCharacter->GetActorLocation();
+					const FVector End = Start + RougeDemoCharacter->GetActorForwardVector() * 150.f;
 					
+					FHitResult HitResult;
+					bool bTraceChannel = GetWorld()->LineTraceSingleByChannel(HitResult,Start,End,ECC_Pawn);
+					//判断前方是否有敌人
+					if(bTraceChannel)
+					{
+						const AActor* LocalHitActor = HitResult.GetActor();
+						//检测敌人是否在玩家前方
+						if(LocalHitActor->GetDotProductTo(RougeDemoCharacter) > 0.25)
+						{
+							//实施处决效果
+							FinisherTimerTrigger();
+						}
+					}
 				}else
 				{
 					
@@ -67,23 +85,15 @@ void UCombatComponent::Attack()
 			}
 		}
 	}
-	
-	
-	
-
-	//判断是否正在攻击，是否处于攻击间隔中
-
 	//检查武器Slot
-
-	//判断攻击类型 物理，魔法
-
-	
 }
 
-bool UCombatComponent::AttackBoolDisabled()
+bool UCombatComponent::CheckAttackState()
 {
-	
-	return false;
+	if(RougeDemoCharacter == nullptr) { return false; }
+
+	bool result = RougeDemoCharacter->GetCharacterMovement()->IsSwimming();
+	return !result;
 }
 
 
@@ -116,9 +126,49 @@ void UCombatComponent::FinisherTimerTrigger()
 			//判断Enmey的状态，是Idle而不是Falling
 			ExecutionEnemyRef = Cast<ABaseAI>(HitResult.GetActor());
 
-			
+			if(ExecutionEnemyRef->bCanBeExecuted && IsIdleAndFalling())
+			{
+				OnFinisherStart();
+			}else
+			{
+				//普通攻击
+				
+			}
 		}
 	}
+}
+
+void UCombatComponent::OnFinisherStart()
+{
+	if(ExecutionEnemyRef)
+	{
+		//停止敌人角色移动
+		ExecutionEnemyRef->GetCharacterMovement()->DisableMovement();
+		//停止敌人角色动画
+		ExecutionEnemyRef->StopAnimMontage();
+		//停止玩家所有输入
+		RougeDemoCharacter->SetDisableInput(true);
+		//关闭目标的锁定UI
+		ExecutionEnemyRef->ToggleMarket(false);
+
+		URougeDemoAnimInstance* AnimInstance = Cast<URougeDemoAnimInstance>(RougeDemoCharacter->GetMesh()->GetAnimInstance());
+		if(AnimInstance)
+		{
+			//播放处决动画
+			if(FinisherMontage)
+			{
+				AnimInstance->Montage_Play(FinisherMontage);
+			}
+		}
+		
+	}
+}
+
+bool UCombatComponent::IsIdleAndFalling()
+{
+	if(RougeDemoCharacter == nullptr) return false;
+
+	return !RougeDemoCharacter->GetCharacterMovement()->IsFalling();
 }
 
 // Called every frame

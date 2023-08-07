@@ -261,7 +261,7 @@ void URougeDemoAnimInstance::UpdateMovementValues(float DeltaTime)
 
 	//Debug Message
 	//UE_LOG(LogTemp,Warning,TEXT("StrideBlend[%f]"),StrideBlend);
-	//UE_LOG(LogTemp,Warning,TEXT("StandingPlayRate[%f]"),StandingPlayRate);
+	UE_LOG(LogTemp,Warning,TEXT("StandingPlayRate[%f]"),StandingPlayRate);
 	//UE_LOG(LogTemp,Warning,TEXT("EnableAimOffset[%f]"),EnableAimOffset);
 	//UE_LOG(LogTemp,Warning,TEXT("WalkRunBlend[%f]"),WalkRunBlend);
 	//UE_LOG(LogTemp,Warning,TEXT("VelocityBlend F[%f]"),VelocityBlend.F);
@@ -369,19 +369,28 @@ FVector2D URougeDemoAnimInstance::InterpLeanAmount(FVector2D Current, FVector2D 
 
 float URougeDemoAnimInstance::CalculateStandingPlayRate()
 {
-	float ResultPlayRate = 0.f;
 	const float WalkSpeedRatio = Speed / AnimatedWalkSpeed;
 	const float RunSpeedRatio = Speed / AnimatedRunSpeed;
-	const float Alpha = GetAnimCurveClamped(TEXT("Weight_Gait"),-1.f,0.f,1.f);
-	const float Ratio = UKismetMathLibrary::Lerp(
+	const float SprintSpeedRation = Speed / AnimatedSprintSpeed;
+	const float WalkRunAlpha = GetAnimCurveClamped(TEXT("Weight_Gait"),-1.f,0.f,1.f);
+	const float WalkRunRatio = UKismetMathLibrary::Lerp(
 		WalkSpeedRatio,
 		RunSpeedRatio,
-		Alpha
+		WalkRunAlpha
 	);
+	
+	const float RunSprintAlpha = GetAnimCurveClamped(TEXT("Weight_Gait"),-2.f,0.f,1.f);
+	const float RunSprintRatio = UKismetMathLibrary::Lerp(
+			WalkRunRatio,
+			SprintSpeedRation,
+			RunSprintAlpha
+		);
+	
+	//查看骨骼是否有伸缩
 	const float ComponentZ = GetOwningComponent()->GetComponentScale().Z;
-	ResultPlayRate =
+	const float ResultPlayRate =
 		UKismetMathLibrary::Clamp(
-		Ratio / StrideBlend / ComponentZ,
+		RunSprintRatio / StrideBlend / ComponentZ,
 		0.f,
 		3.f
 	);

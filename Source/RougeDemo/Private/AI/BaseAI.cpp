@@ -12,7 +12,7 @@ ABaseAI::ABaseAI()
 	PrimaryActorTick.bCanEverTick = true;
 
 	TargetWidget =  CreateDefaultSubobject<UWidgetComponent>(TEXT("TargetWidget"));
-	TargetWidget->SetupAttachment(RootComponent);
+	TargetWidget->SetupAttachment(GetMesh());
 	
 	//TargetWidget->SetVisibility(false);
 }

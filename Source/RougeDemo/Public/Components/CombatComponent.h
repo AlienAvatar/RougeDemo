@@ -11,6 +11,7 @@
 class ABaseAI;
 class AWeapon;
 class ARougeDemoCharacter;
+class UAnimMontage;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ROUGEDEMO_API UCombatComponent : public UActorComponent
@@ -30,13 +31,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AWeapon> CurrentWeaponClass;
 
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* FinisherMontage;
+	
 private:
 	//是否在战斗中
 	bool bIsInCombat = false;
 	
-	void Attack();
-
-	bool AttackBoolDisabled();
+	bool CheckAttackState();
 
 	UPROPERTY()
 	ARougeDemoCharacter* RougeDemoCharacter;
@@ -48,14 +50,24 @@ private:
 
 	ECombatType CombatType;
 
-	//处决触发
-	void FinisherTimerTrigger();
-
 	UPROPERTY(VisibleAnywhere)
 	ABaseAI* ExecutionEnemyRef;
+
+	//处决触发
+	void FinisherTimerTrigger();
+	
+	//处决开始
+	void OnFinisherStart();
+
+	bool IsIdleAndFalling();
+
+	//bool ApplyRiosteEffect(float Duration,AActor* Applier,float Damage);
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	void Attack();
+
+	//是否拔刀 true 已经拔刀 false 未拔刀
+	bool bIsKatana;
 };

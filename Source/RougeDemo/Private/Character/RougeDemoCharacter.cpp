@@ -45,6 +45,8 @@ ARougeDemoCharacter::ARougeDemoCharacter()
 	MovementState = EMovementState::EMS_Grounded;
 }
 
+
+
 // Called when the game starts or when spawned
 void ARougeDemoCharacter::BeginPlay()
 {
@@ -58,6 +60,8 @@ void ARougeDemoCharacter::OnBeginPlay()
 	//确保动画更新在Character后
 	GetMesh()->AddTickPrerequisiteActor(this);
 
+	//设置动画实例
+	RougeDemoAnimInstance = Cast<URougeDemoAnimInstance>(GetMesh()->GetAnimInstance());
 	//设置默认状态
 	Gait = DesiredGait;
 	RotationMode = DesiredRotationMode;
@@ -210,21 +214,19 @@ void ARougeDemoCharacter::RagdollStart()
 	GetMesh()->SetAllBodiesBelowSimulatePhysics(InBoneName,true,true);
 
 	//停止所有蒙太奇动画
-	URougeDemoAnimInstance* AnimInstance = Cast<URougeDemoAnimInstance>(GetMesh()->GetAnimInstance());
-	if(AnimInstance)
+	if(RougeDemoAnimInstance)
 	{
-		AnimInstance->Montage_Stop(0.2f);
+		RougeDemoAnimInstance->Montage_Stop(0.2f);
 	}
 }
 
 void ARougeDemoCharacter::RagdollEnd()
 {
 	MovementState = EMovementState::EMS_Grounded;
-	URougeDemoAnimInstance* AnimInstance = Cast<URougeDemoAnimInstance>(GetMesh()->GetAnimInstance());
-	if(AnimInstance)
+	if(RougeDemoAnimInstance)
 	{
 		//保存当前姿势的快照
-		AnimInstance->SavePoseSnapshot(FName("RagdollPose"));
+		RougeDemoAnimInstance->SavePoseSnapshot(FName("RagdollPose"));
 
 		//检测当前布娃娃形态是否着地
 		if(bRagdollOnGround)
@@ -233,7 +235,7 @@ void ARougeDemoCharacter::RagdollEnd()
 			UAnimMontage* GetUpAnim = GetGetUpAnimation();
 			if(GetUpAnim)
 			{
-				AnimInstance->Montage_Play(GetUpAnim,1.f);
+				RougeDemoAnimInstance->Montage_Play(GetUpAnim,1.f);
 			}
 		}else
 		{
@@ -299,6 +301,7 @@ void ARougeDemoCharacter::CrouchAction()
 
 void ARougeDemoCharacter::MultiTapInput(float ResetTime)
 {
+	
 }
 
 void ARougeDemoCharacter::LockOnAction()
@@ -488,7 +491,6 @@ float ARougeDemoCharacter::GetAnimCurveValue(FName CurveName)
 
 void ARougeDemoCharacter::RollEvent()
 {
-	URougeDemoAnimInstance* RougeDemoAnimInstance = Cast<URougeDemoAnimInstance>(GetMesh()->GetAnimInstance());
 	if(RougeDemoAnimInstance && AnimMontage)
 	{
 		RougeDemoAnimInstance->Montage_Play(AnimMontage,1.15);
@@ -663,6 +665,31 @@ void ARougeDemoCharacter::CacheValues(float DeltaTime)
 	PreviousAimYaw = GetControlRotation().Yaw;
 }
 
+void ARougeDemoCharacter::AttackAction()
+{
+	if(CombatComp)
+	{
+		CombatComp->Attack();
+	}
+}
+
+void ARougeDemoCharacter::TestAction()
+{
+	if(CombatComp == nullptr){ return;}
+
+	if(OverlayState == EOverlayState::EOS_Katana)
+	{
+		OverlayState = EOverlayState::EOS_Default;
+	}else
+	{
+		if(TestAnimMontage)
+		{
+			CombatComp->bIsKatana = true;
+			OverlayState = EOverlayState::EOS_Katana;
+			RougeDemoAnimInstance->Montage_Play(TestAnimMontage);
+		}
+	}
+}
 
 // Called to bind functionality to input
 void ARougeDemoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -673,10 +700,22 @@ void ARougeDemoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	PlayerInputComponent->BindAction("RagdollAction",IE_Pressed,this,&ARougeDemoCharacter::RagdollAction);
 	PlayerInputComponent->BindAction("Crouch",IE_Pressed,this,&ARougeDemoCharacter::CrouchAction);
 	PlayerInputComponent->BindAction("LockOn",IE_Pressed,this,&ARougeDemoCharacter::LockOnAction);
+	PlayerInputComponent->BindAction("Attack",IE_Pressed,this,&ARougeDemoCharacter::AttackAction);
+	PlayerInputComponent->BindAction("Test",IE_Pressed,this,&ARougeDemoCharacter::TestAction);
 	
 	PlayerInputComponent->BindAxis("MoveForward",this,&ARougeDemoCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight",this,&ARougeDemoCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("Turn",this,&ARougeDemoCharacter::Turn);
 	PlayerInputComponent->BindAxis("LookUp",this,&ARougeDemoCharacter::LookUp);
+}
+
+void ARougeDemoCharacter::SetDisableInput(bool bNewDisableInput)
+{
+	bDisableInput = bNewDisableInput;
+}
+
+bool ARougeDemoCharacter::GetIsKatana() const
+{
+	return CombatComp->bIsKatana;
 }
 
