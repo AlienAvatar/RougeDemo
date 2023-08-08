@@ -43,7 +43,7 @@ private:
 	UPROPERTY()
 	ARougeDemoCharacter* RougeDemoCharacter;
 
-	void EquipWeapon();
+	void SpawnWeapon();
 
 	UPROPERTY()
 	AWeapon* CurrentWeapon;
@@ -68,6 +68,7 @@ public:
 
 	void Attack();
 
-	//是否拔刀 true 已经拔刀 false 未拔刀
-	bool bIsKatana;
+	void EquipWeapon();
+	
+	void UnArmWeapon();
 };

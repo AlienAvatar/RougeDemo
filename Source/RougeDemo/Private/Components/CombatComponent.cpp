@@ -41,7 +41,7 @@ void UCombatComponent::BeginPlay()
 
 void UCombatComponent::Initialize()
 {
-	EquipWeapon();
+		//SpawnWeapon();
 }
 
 void UCombatComponent::Attack()
@@ -96,15 +96,43 @@ bool UCombatComponent::CheckAttackState()
 	return !result;
 }
 
-
-void UCombatComponent::EquipWeapon()
+void UCombatComponent::SpawnWeapon()
 {
 	if(RougeDemoCharacter == nullptr) return;
 	if(CurrentWeaponClass)
 	{
-		const USkeletalMeshSocket* HandSocket = RougeDemoCharacter->GetMesh()->GetSocketByName(FName("R_Weapon_Socket"));
+		const USkeletalMeshSocket* HandSocket = RougeDemoCharacter->GetMesh()->GetSocketByName(FName("R_Weapon_KatanaBack_Socket"));
 		const FTransform RightHandTransform = HandSocket->GetSocketTransform(RougeDemoCharacter->GetMesh());
 		CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(CurrentWeaponClass,RightHandTransform);
+		if(HandSocket)
+		{
+			HandSocket->AttachActor(CurrentWeapon,RougeDemoCharacter->GetMesh());
+		}
+	}
+}
+
+
+void UCombatComponent::EquipWeapon()
+{
+	if(RougeDemoCharacter == nullptr) return;
+	if(CurrentWeapon)
+	{
+		const USkeletalMeshSocket* HandSocket = RougeDemoCharacter->GetMesh()->GetSocketByName(FName("R_Weapon_Katana_Socket"));
+		const FTransform RightHandTransform = HandSocket->GetSocketTransform(RougeDemoCharacter->GetMesh());
+		if(HandSocket)
+		{
+			HandSocket->AttachActor(CurrentWeapon,RougeDemoCharacter->GetMesh());
+		}
+	}
+}
+
+void UCombatComponent::UnArmWeapon()
+{
+	if(RougeDemoCharacter == nullptr) return;
+	if(CurrentWeapon)
+	{
+		const USkeletalMeshSocket* HandSocket = RougeDemoCharacter->GetMesh()->GetSocketByName(FName("R_Weapon_KatanaBack_Socket"));
+		const FTransform RightHandTransform = HandSocket->GetSocketTransform(RougeDemoCharacter->GetMesh());
 		if(HandSocket)
 		{
 			HandSocket->AttachActor(CurrentWeapon,RougeDemoCharacter->GetMesh());

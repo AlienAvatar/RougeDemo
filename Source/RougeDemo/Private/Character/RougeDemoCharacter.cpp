@@ -47,6 +47,7 @@ ARougeDemoCharacter::ARougeDemoCharacter()
 
 
 
+
 // Called when the game starts or when spawned
 void ARougeDemoCharacter::BeginPlay()
 {
@@ -83,6 +84,60 @@ void ARougeDemoCharacter::OnBeginPlay()
 	TargetRotation = GetActorRotation();
 	LastVelocityRotation = GetActorRotation();
 	LastMovementInputRotation = GetActorRotation();
+
+	GetWorld()->GetTimerManager().SetTimer(
+		RollTimerHandle,
+		this,
+		&ARougeDemoCharacter::RollTimerHandlerCallback,
+		0.01f,
+		true
+	);
+}
+
+void ARougeDemoCharacter::StartSprint()
+{
+	bIsSprint = true;
+	CameraBoom->CameraLagSpeed = 5.f;
+	
+}
+
+void ARougeDemoCharacter::StopSprint()
+{
+	bIsSprint = false;
+	CameraBoom->CameraLagSpeed = 10.f;
+}
+
+void ARougeDemoCharacter::RollAction()
+{
+	//前
+	if(UKismetMathLibrary::InRange_FloatFloat(DeltaDirectRotation.Yaw,-45.f,45.f,true,true))
+	{
+		if(F_RollMontage)
+		{
+			RougeDemoAnimInstance->Montage_Play(F_RollMontage,1.5f);
+		}
+	//左
+	}else if(UKismetMathLibrary::InRange_FloatFloat(DeltaDirectRotation.Yaw,-135.f,-45.f,true,true))
+	{
+		if(L_RollMontage)
+		{
+			RougeDemoAnimInstance->Montage_Play(L_RollMontage,1.5f);
+		}
+	//右
+	}else if(UKismetMathLibrary::InRange_FloatFloat(DeltaDirectRotation.Yaw,45.f,135.f,true,true))
+	{
+		if(R_RollMontage)
+		{
+			RougeDemoAnimInstance->Montage_Play(R_RollMontage,1.5f);
+		}
+	//后
+	}else
+	{
+		if(B_RollMontage)
+		{
+			RougeDemoAnimInstance->Montage_Play(B_RollMontage,1.5f);
+		}
+	}
 }
 
 // Called every frame
@@ -110,9 +165,10 @@ void ARougeDemoCharacter::Tick(float DeltaTime)
 	default:
 		UE_LOG(LogTemp,Error,TEXT("No MovementState setting, Please check it."));
 	}
-
+	
 	//DebugMessage
 	//UE_LOG(LogTemp,Warning,TEXT("LastRagdollVelocity[%f]"),LastRagdollVelocity.Size());
+	//UE_LOG(LogTemp,Warning,TEXT("DeltaRotation[%f]"),DeltaDirectRotation.Yaw);
 }
 
 void ARougeDemoCharacter::RagdollUpdate(float DeltaTime)
@@ -174,6 +230,18 @@ void ARougeDemoCharacter::SetActorLocationDuringRagdoll()
 	{
 		SetActorLocationAndRotationFromTarget(TargetRagdollLocation,TargetRagdollRotation,false, false);
 	}
+}
+
+void ARougeDemoCharacter::RollTimerHandlerCallback()
+{
+	//八方向
+	const FRotator ControlRotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
+	const FVector ControlForwardVector = UKismetMathLibrary::GetForwardVector(ControlRotation);
+	const FVector ControlRightVector = UKismetMathLibrary::GetRightVector(ControlRotation);
+	const FVector DirectionVector = MoveF * ControlForwardVector + MoveR * ControlRightVector;
+
+	const FRotator DirectionRotator = DirectionVector.Rotation();
+	DeltaDirectRotation = UKismetMathLibrary::NormalizedDeltaRotator(GetActorRotation(),DirectionRotator);
 }
 
 void ARougeDemoCharacter::SetActorLocationAndRotationFromTarget(FVector NewLocation,FRotator NewRotation,bool bSweep,bool bTeleport)
@@ -575,6 +643,7 @@ void ARougeDemoCharacter::MoveForward(float Value)
 		const FVector Direction(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X));
 		AddMovementInput(2 * Direction,Value);	 
 	}
+	MoveF = Value;
 }
 
 void ARougeDemoCharacter::MoveRight(float Value)
@@ -585,6 +654,8 @@ void ARougeDemoCharacter::MoveRight(float Value)
 		const FVector Direction(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y));
 		AddMovementInput(2 * Direction,Value);
 	}
+
+	MoveR = Value;
 }
 
 void ARougeDemoCharacter::Turn(float Value)
@@ -673,35 +744,19 @@ void ARougeDemoCharacter::AttackAction()
 	}
 }
 
-void ARougeDemoCharacter::TestAction()
-{
-	if(CombatComp == nullptr){ return;}
-
-	if(OverlayState == EOverlayState::EOS_Katana)
-	{
-		OverlayState = EOverlayState::EOS_Default;
-	}else
-	{
-		if(TestAnimMontage)
-		{
-			CombatComp->bIsKatana = true;
-			OverlayState = EOverlayState::EOS_Katana;
-			RougeDemoAnimInstance->Montage_Play(TestAnimMontage);
-		}
-	}
-}
-
 // Called to bind functionality to input
 void ARougeDemoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&ARougeDemoCharacter::Jump);
+	//PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&ARougeDemoCharacter::Jump);
 	PlayerInputComponent->BindAction("RagdollAction",IE_Pressed,this,&ARougeDemoCharacter::RagdollAction);
 	PlayerInputComponent->BindAction("Crouch",IE_Pressed,this,&ARougeDemoCharacter::CrouchAction);
 	PlayerInputComponent->BindAction("LockOn",IE_Pressed,this,&ARougeDemoCharacter::LockOnAction);
 	PlayerInputComponent->BindAction("Attack",IE_Pressed,this,&ARougeDemoCharacter::AttackAction);
-	PlayerInputComponent->BindAction("Test",IE_Pressed,this,&ARougeDemoCharacter::TestAction);
+	PlayerInputComponent->BindAction("Sprint",IE_Pressed,this,&ARougeDemoCharacter::StartSprint);
+	PlayerInputComponent->BindAction("Sprint",IE_Released,this,&ARougeDemoCharacter::StopSprint);
+	PlayerInputComponent->BindAction("Roll",IE_Pressed,this,&ARougeDemoCharacter::RollAction);
 	
 	PlayerInputComponent->BindAxis("MoveForward",this,&ARougeDemoCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight",this,&ARougeDemoCharacter::MoveRight);
@@ -714,8 +769,5 @@ void ARougeDemoCharacter::SetDisableInput(bool bNewDisableInput)
 	bDisableInput = bNewDisableInput;
 }
 
-bool ARougeDemoCharacter::GetIsKatana() const
-{
-	return CombatComp->bIsKatana;
-}
+
 

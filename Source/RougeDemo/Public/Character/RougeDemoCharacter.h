@@ -40,9 +40,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Component)
 	ULockOnComponent* LockOnComp;
-
-	UPROPERTY(VisibleAnywhere, Category = Component)
-	UCombatComponent* CombatComp;
 	
 	float AO_Pitch;
 	float AO_Yaw;
@@ -66,8 +63,6 @@ private:
 
 	bool bIsMoving;
 
-	float Speed;
-
 	FRotator LastVelocityRotation;
 
 	//[0,1]，0代表没有输入，1代表输入最大
@@ -82,8 +77,7 @@ private:
 	EGait DesiredGait = EGait::EG_Running;
 	EGait AllowedGait;
 	EGait ActualGait;
-	EOverlayState OverlayState = EOverlayState::EOS_Default;
-
+	
 	ERotationMode DesiredRotationMode = ERotationMode::ERM_VelocityDirection;
 	ERotationMode RotationMode;
 
@@ -177,10 +171,9 @@ private:
 
 	void AttackAction();
 
-	void TestAction();
+	FTimerHandle RollTimerHandle;
 
-	UPROPERTY()
-	URougeDemoAnimInstance* RougeDemoAnimInstance;
+	void RollTimerHandlerCallback();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -206,9 +199,43 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=GetUpAnimation)
 	UAnimMontage* GetUpBackDefault;
 
-	UPROPERTY(EditAnywhere,Category=Test)
-	UAnimMontage* TestAnimMontage;
-public:	
+	EOverlayState OverlayState = EOverlayState::EOS_Default;
+
+	UPROPERTY(VisibleAnywhere, Category = Component)
+	UCombatComponent* CombatComp;
+
+	float Speed;
+
+	UPROPERTY()
+	URougeDemoAnimInstance* RougeDemoAnimInstance;
+
+	void StartSprint();
+
+	void StopSprint();
+
+	bool bIsSprint = false;
+
+	void RollAction();
+
+	UPROPERTY(EditDefaultsOnly,Category=MovementSystem)
+	UAnimMontage* F_RollMontage;
+
+	UPROPERTY(EditDefaultsOnly,Category=MovementSystem)
+	UAnimMontage* B_RollMontage;
+
+	UPROPERTY(EditDefaultsOnly,Category=MovementSystem)
+	UAnimMontage* L_RollMontage;
+
+	UPROPERTY(EditDefaultsOnly,Category=MovementSystem)
+	UAnimMontage* R_RollMontage;
+
+	float MoveF;
+
+	float MoveR;
+
+	FRotator DeltaDirectRotation;
+	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -231,5 +258,4 @@ public:
 	ULockOnComponent* GetLockOnComp() const { return LockOnComp; }
 	void SetDisableInput(bool bNewDisableInput);
 	UCombatComponent* GetComponent() const { return CombatComp; }
-	bool GetIsKatana() const;
 };
