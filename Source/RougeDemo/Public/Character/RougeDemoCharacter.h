@@ -201,7 +201,7 @@ protected:
 
 	EOverlayState OverlayState = EOverlayState::EOS_Default;
 
-	UPROPERTY(VisibleAnywhere, Category = Component)
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = Component)
 	UCombatComponent* CombatComp;
 
 	float Speed;
@@ -234,6 +234,9 @@ protected:
 	float MoveR;
 
 	FRotator DeltaDirectRotation;
+
+	//控制蒙太奇播放
+	bool bCanPlayMontage = true;
 	
 public:
 	// Called every frame

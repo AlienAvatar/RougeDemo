@@ -43,8 +43,6 @@ private:
 	UPROPERTY()
 	ARougeDemoCharacter* RougeDemoCharacter;
 
-	void SpawnWeapon();
-
 	UPROPERTY()
 	AWeapon* CurrentWeapon;
 
@@ -68,7 +66,12 @@ public:
 
 	void Attack();
 
+	UFUNCTION(BlueprintCallable)
+	void SpawnWeapon();
+
+	UFUNCTION(BlueprintCallable)
 	void EquipWeapon();
-	
+
+	UFUNCTION(BlueprintCallable)
 	void UnArmWeapon();
 };

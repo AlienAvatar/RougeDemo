@@ -31,4 +31,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	FORCEINLINE UStaticMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
+	
 };

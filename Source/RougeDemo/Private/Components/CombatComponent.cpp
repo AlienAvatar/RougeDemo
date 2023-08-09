@@ -41,7 +41,7 @@ void UCombatComponent::BeginPlay()
 
 void UCombatComponent::Initialize()
 {
-		//SpawnWeapon();
+	SpawnWeapon();
 }
 
 void UCombatComponent::Attack()
@@ -101,13 +101,8 @@ void UCombatComponent::SpawnWeapon()
 	if(RougeDemoCharacter == nullptr) return;
 	if(CurrentWeaponClass)
 	{
-		const USkeletalMeshSocket* HandSocket = RougeDemoCharacter->GetMesh()->GetSocketByName(FName("R_Weapon_KatanaBack_Socket"));
-		const FTransform RightHandTransform = HandSocket->GetSocketTransform(RougeDemoCharacter->GetMesh());
-		CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(CurrentWeaponClass,RightHandTransform);
-		if(HandSocket)
-		{
-			HandSocket->AttachActor(CurrentWeapon,RougeDemoCharacter->GetMesh());
-		}
+		CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(CurrentWeaponClass);
+		CurrentWeapon->AttachToComponent(RougeDemoCharacter->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,FName("R_Weapon_UnArmKatana_Socket"));
 	}
 }
 
@@ -117,12 +112,8 @@ void UCombatComponent::EquipWeapon()
 	if(RougeDemoCharacter == nullptr) return;
 	if(CurrentWeapon)
 	{
-		const USkeletalMeshSocket* HandSocket = RougeDemoCharacter->GetMesh()->GetSocketByName(FName("R_Weapon_Katana_Socket"));
-		const FTransform RightHandTransform = HandSocket->GetSocketTransform(RougeDemoCharacter->GetMesh());
-		if(HandSocket)
-		{
-			HandSocket->AttachActor(CurrentWeapon,RougeDemoCharacter->GetMesh());
-		}
+		CurrentWeapon->AttachToComponent(RougeDemoCharacter->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,FName("R_Weapon_Katana_Socket"));
+		CurrentWeapon->GetWeaponMesh()->SetVisibility(true);
 	}
 }
 
@@ -131,12 +122,8 @@ void UCombatComponent::UnArmWeapon()
 	if(RougeDemoCharacter == nullptr) return;
 	if(CurrentWeapon)
 	{
-		const USkeletalMeshSocket* HandSocket = RougeDemoCharacter->GetMesh()->GetSocketByName(FName("R_Weapon_KatanaBack_Socket"));
-		const FTransform RightHandTransform = HandSocket->GetSocketTransform(RougeDemoCharacter->GetMesh());
-		if(HandSocket)
-		{
-			HandSocket->AttachActor(CurrentWeapon,RougeDemoCharacter->GetMesh());
-		}
+		CurrentWeapon->AttachToComponent(RougeDemoCharacter->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,FName("R_Weapon_KatanaAndScabbard_Socket"));
+		CurrentWeapon->GetWeaponMesh()->SetVisibility(false);
 	}
 }
 

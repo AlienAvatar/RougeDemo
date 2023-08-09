@@ -28,7 +28,6 @@ void APlayerKatanaCharacter::TestAction()
 	if(OverlayState == EOverlayState::EOS_Katana)
 	{
 		OverlayState = EOverlayState::EOS_Default;
-		CombatComp->UnArmWeapon();
 		
 		//检查播放蒙太奇动画
 		if(bCanPlayMontage)
@@ -60,7 +59,6 @@ void APlayerKatanaCharacter::TestAction()
 		}
 	}else
 	{
-		CombatComp->EquipWeapon();
 		OverlayState = EOverlayState::EOS_Katana;
 
 		if(bCanPlayMontage)

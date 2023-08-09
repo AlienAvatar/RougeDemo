@@ -11,6 +11,7 @@ AWeapon::AWeapon()
 
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
 	RootComponent = WeaponMesh;
+
 }
 
 // Called when the game starts or when spawned

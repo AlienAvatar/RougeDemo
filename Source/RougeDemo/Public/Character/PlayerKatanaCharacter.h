@@ -39,8 +39,7 @@ protected:
 	UPROPERTY(EditAnywhere,Category=Combat)
 	UStaticMeshComponent* KatanaMeshComp;
 	
-	//控制蒙太奇播放
-	bool bCanPlayMontage = true;
+
 	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
