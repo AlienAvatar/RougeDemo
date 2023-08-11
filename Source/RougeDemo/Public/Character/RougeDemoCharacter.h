@@ -237,9 +237,6 @@ protected:
 
 	FRotator DeltaDirectRotation;
 
-	//控制蒙太奇播放
-	bool bCanPlayMontage = true;
-	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -264,4 +261,8 @@ public:
 	void SetDisableInput(bool bNewDisableInput);
 	UCombatComponent* GetCombatComponent() const { return CombatComp; }
 	URougeDemoAnimInstance* GetAnimationInstance() const { return RougeDemoAnimInstance; }
+
+	//控制蒙太奇播放
+	UPROPERTY(BlueprintReadWrite)
+	bool bCanPlayMontage = true;
 };

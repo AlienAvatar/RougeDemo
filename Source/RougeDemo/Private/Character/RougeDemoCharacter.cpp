@@ -97,6 +97,7 @@ void ARougeDemoCharacter::OnBeginPlay()
 	LastVelocityRotation = GetActorRotation();
 	LastMovementInputRotation = GetActorRotation();
 
+	//翻滚TimerHandle
 	GetWorld()->GetTimerManager().SetTimer(
 		RollTimerHandle,
 		this,
@@ -104,6 +105,37 @@ void ARougeDemoCharacter::OnBeginPlay()
 		0.01f,
 		true
 	);
+}
+
+// Called every frame
+void ARougeDemoCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	//AimOffset(DeltaTime);
+	
+	SetEssentialValues(DeltaTime);
+	CacheValues(DeltaTime);
+	
+	switch (MovementState)
+	{
+	case EMovementState::EMS_Grounded:
+		UpdateCharacterMovement(DeltaTime);
+		//UpdateGroundedRotation(DeltaTime);
+		break;
+	case EMovementState::EMS_InAir:
+		//To Do Something In Air
+		break;
+	case EMovementState::EMS_RagDoll:
+		RagdollUpdate(DeltaTime);
+		break;
+	default:
+		UE_LOG(LogTemp,Error,TEXT("No MovementState setting, Please check it."));
+	}
+	
+	//DebugMessage
+	//UE_LOG(LogTemp,Warning,TEXT("LastRagdollVelocity[%f]"),LastRagdollVelocity.Size());
+	//UE_LOG(LogTemp,Warning,TEXT("DeltaRotation[%f]"),DeltaDirectRotation.Yaw);
 }
 
 void ARougeDemoCharacter::StartSprint()
@@ -152,36 +184,7 @@ void ARougeDemoCharacter::RollAction()
 	}
 }
 
-// Called every frame
-void ARougeDemoCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
-	//AimOffset(DeltaTime);
-	
-	SetEssentialValues(DeltaTime);
-	CacheValues(DeltaTime);
-	
-	switch (MovementState)
-	{
-	case EMovementState::EMS_Grounded:
-		UpdateCharacterMovement(DeltaTime);
-		UpdateGroundedRotation(DeltaTime);
-		break;
-	case EMovementState::EMS_InAir:
-		//To Do Something In Air
-		break;
-	case EMovementState::EMS_RagDoll:
-		RagdollUpdate(DeltaTime);
-		break;
-	default:
-		UE_LOG(LogTemp,Error,TEXT("No MovementState setting, Please check it."));
-	}
-	
-	//DebugMessage
-	//UE_LOG(LogTemp,Warning,TEXT("LastRagdollVelocity[%f]"),LastRagdollVelocity.Size());
-	//UE_LOG(LogTemp,Warning,TEXT("DeltaRotation[%f]"),DeltaDirectRotation.Yaw);
-}
 
 void ARougeDemoCharacter::RagdollUpdate(float DeltaTime)
 {
@@ -464,6 +467,7 @@ FMovementSettings ARougeDemoCharacter::GetTargetMovementSettings()
 
 void ARougeDemoCharacter::UpdateGroundedRotation(float DeltaTime)
 {
+	if(bCanPlayMontage){ return; }
 	if(CanUpdateMovingRotation())
 	{
 		const FRotator Target (0.f, LastVelocityRotation.Yaw, 0.f);
@@ -667,7 +671,7 @@ void ARougeDemoCharacter::MoveRight(float Value)
 		AddMovementInput(2 * Direction,Value);
 	}
 
-	MoveR = Value;
+	MoveR = Value * (-1);
 }
 
 void ARougeDemoCharacter::Turn(float Value)

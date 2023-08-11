@@ -33,8 +33,8 @@ APlayerKatanaCharacter::APlayerKatanaCharacter()
 
 void APlayerKatanaCharacter::TestAction()
 {
-	if(CombatComp == nullptr){ return;}
-
+	if(CombatComp == nullptr || RougeDemoAnimInstance == nullptr){ return;}
+	
 	float Duration = 0.2f;
 	if(OverlayState == EOverlayState::EOS_Katana)
 	{
@@ -123,10 +123,13 @@ void APlayerKatanaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 void APlayerKatanaCharacter::AttackAction()
 {
-	if(RougeDemoAnimInstance && AttackMontageRoot)
+	if(!bCanPlayMontage) { return; }
+	if(RougeDemoAnimInstance && AttackMontageRoot && AttackCount < 4)
 	{
-		const FName MontageSection = FName("Attack01");
+		bCanPlayMontage = true;
+		const FName MontageSection = AttackSectionArr[AttackCount];
 		RougeDemoAnimInstance->Montage_Play(AttackMontageRoot);
 		RougeDemoAnimInstance->Montage_JumpToSection(MontageSection,AttackMontageRoot);
+		AttackCount++;
 	}
 }

@@ -24,7 +24,7 @@ private:
 
 	void MontageFinishTimerCallBack();
 protected:
-	void BeginPlay() override;
+	virtual void BeginPlay() override;
 	
 	UPROPERTY(EditAnywhere,Category=Combat)
 	UAnimMontage* EquipAnimMontageRoot;
@@ -49,6 +49,11 @@ protected:
 	UPROPERTY(EditAnywhere,Category=Combat)
 	UStaticMeshComponent* KatanaMeshComp;
 
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FName> AttackSectionArr;
+
+	int32 AttackCount;
+	
 public:
 	FORCEINLINE UStaticMeshComponent* GetKatanaMeshComp() const { return KatanaMeshComp; } 
 };

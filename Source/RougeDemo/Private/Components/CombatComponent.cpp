@@ -29,7 +29,6 @@ void UCombatComponent::BeginPlay()
 
 	// ...
 	RougeDemoCharacter = Cast<ARougeDemoCharacter>(GetOwner());
-	//RougeDemoCharacter = Cast<ARougeDemoCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
 
 	float AngleDegree = 45.f;
 	const FVector Start = RougeDemoCharacter->GetActorLocation();
