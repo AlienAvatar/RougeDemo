@@ -41,8 +41,19 @@ ARougeDemoCharacter::ARougeDemoCharacter()
 
 	LockOnComp = CreateDefaultSubobject<ULockOnComponent>(TEXT("LockOnComp"));
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComp"));
-	
+
 	MovementState = EMovementState::EMS_Grounded;
+
+	GetMesh()->SetRelativeLocation(FVector(0.f,0.f,-88.f));
+	GetMesh()->SetRelativeRotation(FRotator(0.f,-90.f,0.f));
+
+	UDataTable* MovementModelDataTableRef = LoadObject<UDataTable>(nullptr, TEXT("/Game/RougeDemo/SRC/Data/DataTables/DT_MovementModel.DT_MovementModel"));
+	if(MovementModelDataTableRef)
+	{
+		MovementModelDataTable = MovementModelDataTableRef;
+	}
+
+	Tags.Add(FName("Player"));
 }
 
 
@@ -54,6 +65,7 @@ void ARougeDemoCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	OnBeginPlay();
+	
 }
 
 void ARougeDemoCharacter::OnBeginPlay()
@@ -416,7 +428,7 @@ FMovementSettings ARougeDemoCharacter::GetTargetMovementSettings()
 	if(MovementData == nullptr)
 	{
 		UE_LOG(LogTemp,Error,TEXT("No MovementData setting, please check it."))
-		FMovementSettings();
+		return FMovementSettings();
 	}
 	switch (RotationMode)
 	{
@@ -753,7 +765,6 @@ void ARougeDemoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	PlayerInputComponent->BindAction("RagdollAction",IE_Pressed,this,&ARougeDemoCharacter::RagdollAction);
 	PlayerInputComponent->BindAction("Crouch",IE_Pressed,this,&ARougeDemoCharacter::CrouchAction);
 	PlayerInputComponent->BindAction("LockOn",IE_Pressed,this,&ARougeDemoCharacter::LockOnAction);
-	PlayerInputComponent->BindAction("Attack",IE_Pressed,this,&ARougeDemoCharacter::AttackAction);
 	PlayerInputComponent->BindAction("Sprint",IE_Pressed,this,&ARougeDemoCharacter::StartSprint);
 	PlayerInputComponent->BindAction("Sprint",IE_Released,this,&ARougeDemoCharacter::StopSprint);
 	PlayerInputComponent->BindAction("Roll",IE_Pressed,this,&ARougeDemoCharacter::RollAction);

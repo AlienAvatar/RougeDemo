@@ -38,8 +38,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	UCameraComponent* FollowCamera;
 
-	UPROPERTY(VisibleAnywhere, Category = Component)
-	ULockOnComponent* LockOnComp;
+	
 	
 	float AO_Pitch;
 	float AO_Yaw;
@@ -169,7 +168,7 @@ private:
 	//true 禁止玩家所有输入，false，玩家可以输入
 	bool bDisableInput;
 
-	void AttackAction();
+	virtual void AttackAction();
 
 	FTimerHandle RollTimerHandle;
 
@@ -201,7 +200,10 @@ protected:
 
 	EOverlayState OverlayState = EOverlayState::EOS_Default;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = Component)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component)
+	ULockOnComponent* LockOnComp;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component)
 	UCombatComponent* CombatComp;
 
 	float Speed;
@@ -260,5 +262,6 @@ public:
 	FORCEINLINE ERotationMode GetRotationMode() const {return RotationMode; }
 	ULockOnComponent* GetLockOnComp() const { return LockOnComp; }
 	void SetDisableInput(bool bNewDisableInput);
-	UCombatComponent* GetComponent() const { return CombatComp; }
+	UCombatComponent* GetCombatComponent() const { return CombatComp; }
+	URougeDemoAnimInstance* GetAnimationInstance() const { return RougeDemoAnimInstance; }
 };

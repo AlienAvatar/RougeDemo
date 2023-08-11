@@ -82,9 +82,6 @@ private:
 	UPROPERTY()
 	AActor* TempScreenTarget;
 
-	//Debug Point
-	void DrawPoint(FVector2D Position, FLinearColor Color, float Size);
-
 	//Clear Market
 	void ClearMarket(AActor* AIActor,bool bLockOn);
 

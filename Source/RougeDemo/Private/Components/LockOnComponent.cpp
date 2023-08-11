@@ -18,6 +18,13 @@ ULockOnComponent::ULockOnComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	FStringAssetReference MarketWidgetPath(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/RougeDemo/SRC/Blueprints/UI/Target/WBP_Mark.WBP_Mark'"));
+	UWidget* MarketWidgetObj = Cast<UWidget>(StaticLoadObject(UWidget::StaticClass(), nullptr, *MarketWidgetPath.ToString()));
+	if(MarketWidgetObj)
+	{
+		MarketWidgetClass = MarketWidgetObj->GetClass();
+	}
+	
 	// ...
 }
 
@@ -151,7 +158,7 @@ AActor* ULockOnComponent::IdentifyTeam(FHitResult Hit)
 {
 	AActor* HitActor = Hit.GetActor();
 	//比较Actor Tags，如果是同一队伍，则不进行锁敌 Floor会报错
-	if(PlayerRougeDemoCharacter && HitActor && HitActor->Tags.Num() > 0 && PlayerRougeDemoCharacter->Tags[0] != HitActor->Tags[0])
+	if(PlayerRougeDemoCharacter && HitActor && HitActor->Tags.Num() > 0 && PlayerRougeDemoCharacter->Tags.Num() > 0 && PlayerRougeDemoCharacter->Tags[0] != HitActor->Tags[0])
 	{
 		const FVector Start = PlayerRougeDemoCharacter->GetActorLocation();
 		const FVector End = HitActor->GetActorLocation();
@@ -262,16 +269,6 @@ void ULockOnComponent::ActivateLockOnScreenPositionBased()
 	}
 }
 
-void ULockOnComponent::DrawPoint(FVector2D Position, FLinearColor Color, float Size)
-{
-	UCanvas* Canvas = GetWorld()->GetCanvasForDrawMaterialToRenderTarget();
-
-	if (Canvas)
-	{
-		
-	}
-}
-
 void ULockOnComponent::ClearMarket(AActor* AIActor, bool bLockOn)
 {
 	ABaseAI* BaseAI = Cast<ABaseAI>(AIActor);
@@ -285,7 +282,7 @@ void ULockOnComponent::ExistTarget()
 {
 	if(PlayerRougeDemoCharacter && LockOnTarget)
 	{
-		float Distance = PlayerRougeDemoCharacter->GetDistanceTo(LockOnTarget);
+		const float Distance = PlayerRougeDemoCharacter->GetDistanceTo(LockOnTarget);
 		if(Distance > RadarRange)
 		{
 			DeactivateLockOn();

@@ -12,6 +12,7 @@ class ABaseAI;
 class AWeapon;
 class ARougeDemoCharacter;
 class UAnimMontage;
+class APlayerKatanaCharacter;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ROUGEDEMO_API UCombatComponent : public UActorComponent
@@ -21,7 +22,7 @@ class ROUGEDEMO_API UCombatComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UCombatComponent();
-
+	friend class ARougeDemoCharacter;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -33,7 +34,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* FinisherMontage;
-	
+
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* AttackMontage;
 private:
 	//是否在战斗中
 	bool bIsInCombat = false;

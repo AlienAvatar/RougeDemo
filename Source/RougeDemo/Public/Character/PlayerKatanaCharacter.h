@@ -24,6 +24,8 @@ private:
 
 	void MontageFinishTimerCallBack();
 protected:
+	void BeginPlay() override;
+	
 	UPROPERTY(EditAnywhere,Category=Combat)
 	UAnimMontage* EquipAnimMontageRoot;
 
@@ -37,12 +39,16 @@ protected:
 	UAnimMontage* UnArmAnimMontageInPlace;
 
 	UPROPERTY(EditAnywhere,Category=Combat)
-	UStaticMeshComponent* KatanaMeshComp;
-	
-
+	UAnimMontage* AttackMontageRoot;
 	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void AttackAction() override;
 
+	UPROPERTY(EditAnywhere,Category=Combat)
+	UStaticMeshComponent* KatanaMeshComp;
+
+public:
+	FORCEINLINE UStaticMeshComponent* GetKatanaMeshComp() const { return KatanaMeshComp; } 
 };

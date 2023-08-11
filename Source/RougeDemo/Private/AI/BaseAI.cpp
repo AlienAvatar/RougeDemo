@@ -13,8 +13,8 @@ ABaseAI::ABaseAI()
 
 	TargetWidget =  CreateDefaultSubobject<UWidgetComponent>(TEXT("TargetWidget"));
 	TargetWidget->SetupAttachment(GetMesh());
-	
-	//TargetWidget->SetVisibility(false);
+
+	Tags.Add(FName("Enemy"));
 }
 
 // Called when the game starts or when spawned
