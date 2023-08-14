@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Struct/AttributeInfo.h"
+#include "Enum/EState.h"
 #include "BaseAI.generated.h"
 
 class UWidgetComponent;
@@ -27,10 +29,23 @@ public:
 	bool BossEnemies;
 
 	float ToughnessValue;
+
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=State)
+	EState State;
 
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category=State)
+	FAttributeInfo AttributeInfo;
+
+	UPROPERTY(BlueprintReadWrite)
+	float Speed;
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector Velocity;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -39,4 +54,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void ToggleMarket(bool bLockOn);
+
+	FORCEINLINE float GetSpeed() const { return Speed; }
 };

@@ -5,3 +5,4 @@
 #include "CoreMinimal.h"
 
 #define ECC_PlayerBackStabbed ECollisionChannel::ECC_GameTraceChannel1
+#define ECC_Attack ECollisionChannel::ECC_GameTraceChannel2

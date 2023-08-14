@@ -173,6 +173,10 @@ private:
 	FTimerHandle RollTimerHandle;
 
 	void RollTimerHandlerCallback();
+
+	FTimerHandle ControlRotationTimerHandle;
+
+	void ControlRotationCallback();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -237,6 +241,7 @@ protected:
 
 	FRotator DeltaDirectRotation;
 
+	float ZYaw;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -52,7 +52,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FName> AttackSectionArr;
 
-	int32 AttackCount;
+	UPROPERTY(BlueprintReadWrite)
+	int32 AttackIndex = 0;
 	
 public:
 	FORCEINLINE UStaticMeshComponent* GetKatanaMeshComp() const { return KatanaMeshComp; } 

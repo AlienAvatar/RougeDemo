@@ -14,6 +14,7 @@ ABaseAI::ABaseAI()
 	TargetWidget =  CreateDefaultSubobject<UWidgetComponent>(TEXT("TargetWidget"));
 	TargetWidget->SetupAttachment(GetMesh());
 
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	Tags.Add(FName("Enemy"));
 }
 
@@ -29,6 +30,9 @@ void ABaseAI::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	Velocity = GetVelocity();
+	Velocity.Z = 0.f;
+	Speed = Velocity.Size();
 }
 
 // Called to bind functionality to input

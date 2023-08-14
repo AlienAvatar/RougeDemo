@@ -28,7 +28,8 @@ APlayerKatanaCharacter::APlayerKatanaCharacter()
 	{
 		KatanaMeshComp->SetStaticMesh(KatanaAndScabbardMeshRef);
 	}
-	
+	//关闭刀鞘的碰撞
+	KatanaMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void APlayerKatanaCharacter::TestAction()
@@ -38,7 +39,7 @@ void APlayerKatanaCharacter::TestAction()
 	float Duration = 0.2f;
 	if(OverlayState == EOverlayState::EOS_Katana)
 	{
-		//检查播放蒙太奇动画
+		//检查是否可以播放蒙太奇动画
 		if(bCanPlayMontage)
 		{
 			OverlayState = EOverlayState::EOS_Default;
@@ -123,13 +124,18 @@ void APlayerKatanaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 void APlayerKatanaCharacter::AttackAction()
 {
-	if(!bCanPlayMontage) { return; }
-	if(RougeDemoAnimInstance && AttackMontageRoot && AttackCount < 4)
+	/*if(OverlayState != EOverlayState::EOS_Katana)
 	{
-		bCanPlayMontage = true;
-		const FName MontageSection = AttackSectionArr[AttackCount];
+		TestAction();
+	}*/
+	if(!bCanPlayMontage) { return; }
+	
+	if(RougeDemoAnimInstance && AttackMontageRoot && AttackIndex < 4)
+	{
+		bCanPlayMontage = false;
+		const FName MontageSection = AttackSectionArr[AttackIndex];
 		RougeDemoAnimInstance->Montage_Play(AttackMontageRoot);
 		RougeDemoAnimInstance->Montage_JumpToSection(MontageSection,AttackMontageRoot);
-		AttackCount++;
+		AttackIndex++;
 	}
 }

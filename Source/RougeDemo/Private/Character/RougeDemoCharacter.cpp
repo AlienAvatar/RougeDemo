@@ -58,7 +58,6 @@ ARougeDemoCharacter::ARougeDemoCharacter()
 
 
 
-
 // Called when the game starts or when spawned
 void ARougeDemoCharacter::BeginPlay()
 {
@@ -105,6 +104,15 @@ void ARougeDemoCharacter::OnBeginPlay()
 		0.01f,
 		true
 	);
+
+	//控制方向TimerHandle
+	GetWorld()->GetTimerManager().SetTimer(
+		ControlRotationTimerHandle,
+		this,
+		&ARougeDemoCharacter::ControlRotationCallback,
+		0.01f,
+		true
+	);
 }
 
 // Called every frame
@@ -138,11 +146,25 @@ void ARougeDemoCharacter::Tick(float DeltaTime)
 	//UE_LOG(LogTemp,Warning,TEXT("DeltaRotation[%f]"),DeltaDirectRotation.Yaw);
 }
 
+
+void ARougeDemoCharacter::ControlRotationCallback()
+{
+	if(RougeDemoAnimInstance->IsAnyMontagePlaying())
+	{
+		FRotator LerpRotation = UKismetMathLibrary::RLerp(
+			FRotator(0.f,GetActorRotation().Yaw,0.f),
+			FRotator(0.f,GetControlRotation().Yaw,0.f),
+			0.003,
+			true
+		);
+		SetActorRotation(LerpRotation);
+	}
+}
+
 void ARougeDemoCharacter::StartSprint()
 {
 	bIsSprint = true;
 	CameraBoom->CameraLagSpeed = 5.f;
-	
 }
 
 void ARougeDemoCharacter::StopSprint()
@@ -257,6 +279,16 @@ void ARougeDemoCharacter::RollTimerHandlerCallback()
 
 	const FRotator DirectionRotator = DirectionVector.Rotation();
 	DeltaDirectRotation = UKismetMathLibrary::NormalizedDeltaRotator(GetActorRotation(),DirectionRotator);
+
+	if(FMath::Abs(MoveF) + FMath::Abs(MoveR) == 0.f)
+	{
+		ZYaw = 0.f;
+	}else
+	{
+		ZYaw = DeltaDirectRotation.Yaw;
+	}
+
+	
 }
 
 void ARougeDemoCharacter::SetActorLocationAndRotationFromTarget(FVector NewLocation,FRotator NewRotation,bool bSweep,bool bTeleport)

@@ -261,7 +261,7 @@ void URougeDemoAnimInstance::UpdateMovementValues(float DeltaTime)
 
 	//Debug Message
 	//UE_LOG(LogTemp,Warning,TEXT("StrideBlend[%f]"),StrideBlend);
-	UE_LOG(LogTemp,Warning,TEXT("StandingPlayRate[%f]"),StandingPlayRate);
+	//UE_LOG(LogTemp,Warning,TEXT("StandingPlayRate[%f]"),StandingPlayRate);
 	//UE_LOG(LogTemp,Warning,TEXT("EnableAimOffset[%f]"),EnableAimOffset);
 	//UE_LOG(LogTemp,Warning,TEXT("WalkRunBlend[%f]"),WalkRunBlend);
 	//UE_LOG(LogTemp,Warning,TEXT("VelocityBlend F[%f]"),VelocityBlend.F);

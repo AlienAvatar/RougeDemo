@@ -30,6 +30,7 @@ void UCombatComponent::BeginPlay()
 	// ...
 	RougeDemoCharacter = Cast<ARougeDemoCharacter>(GetOwner());
 
+	//Test 扇形
 	float AngleDegree = 45.f;
 	const FVector Start = RougeDemoCharacter->GetActorLocation();
 	const FVector End = RougeDemoCharacter->GetActorForwardVector() * 150.f;
@@ -56,7 +57,6 @@ void UCombatComponent::Attack()
 		}else
 		{
 			//地面攻击
-			//判断是否可以攻击，如在游泳状态下不能攻击
 			/*URougeDemoAnimInstance* RougeDemoAnimInstance = RougeDemoCharacter->GetAnimationInstance();
 			if(RougeDemoAnimInstance && AttackMontage)
 			{
@@ -64,7 +64,8 @@ void UCombatComponent::Attack()
 				RougeDemoAnimInstance->Montage_Play(AttackMontage);
 				RougeDemoAnimInstance->Montage_JumpToSection(MontageSection,AttackMontage);
 			}*/
-			
+
+			//判断是否可以攻击，如在游泳状态下不能攻击
 			if(CheckAttackState())
 			{
 				//是否在战斗中
@@ -93,7 +94,6 @@ void UCombatComponent::Attack()
 			}
 		}
 	}
-	//检查武器Slot
 }
 
 bool UCombatComponent::CheckAttackState()
