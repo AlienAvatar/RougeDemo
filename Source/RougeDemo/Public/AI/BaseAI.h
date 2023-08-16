@@ -28,25 +28,9 @@ public:
 
 	bool BossEnemies;
 
-	float ToughnessValue;
-
-	
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=State)
-	EState State;
-
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category=State)
 	FAttributeInfo AttributeInfo;
-
-	UPROPERTY(BlueprintReadWrite)
-	float Speed;
-
-	UPROPERTY(BlueprintReadWrite)
-	FVector Velocity;
-public:
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -56,4 +40,26 @@ public:
 	void ToggleMarket(bool bLockOn);
 
 	FORCEINLINE float GetSpeed() const { return Speed; }
+	
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=State)
+	EState State;
+
+	UPROPERTY(BlueprintReadWrite)
+	float Speed;
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector Velocity;
+private:
+	//受击
+	virtual float OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser, AController* InstigatedByController, AActor* DamageCauserActor);
+
+	virtual float InternalTakePointDamage(float Damage, FPointDamageEvent const& PointDamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	
+	void Dead();
+
+
 };

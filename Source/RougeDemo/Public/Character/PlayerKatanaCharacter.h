@@ -56,5 +56,7 @@ protected:
 	int32 AttackIndex = 0;
 	
 public:
-	FORCEINLINE UStaticMeshComponent* GetKatanaMeshComp() const { return KatanaMeshComp; } 
+	FORCEINLINE UStaticMeshComponent* GetKatanaMeshComp() const { return KatanaMeshComp; }
+
+	void PlayAttackAnim();
 };

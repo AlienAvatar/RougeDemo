@@ -4,6 +4,7 @@
 #include "Character/PlayerKatanaCharacter.h"
 
 #include "Character/RougeDemoAnimInstance.h"
+#include "Components/CombatComponent.h"
 
 APlayerKatanaCharacter::APlayerKatanaCharacter()
 {
@@ -129,7 +130,15 @@ void APlayerKatanaCharacter::AttackAction()
 		TestAction();
 	}*/
 	if(!bCanPlayMontage) { return; }
-	
+
+	if(CombatComp)
+	{
+		CombatComp->Attack();
+	}
+}
+
+void APlayerKatanaCharacter::PlayAttackAnim()
+{
 	if(RougeDemoAnimInstance && AttackMontageRoot && AttackIndex < 4)
 	{
 		bCanPlayMontage = false;

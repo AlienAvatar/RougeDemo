@@ -77,4 +77,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void UnArmWeapon();
+
+	FORCEINLINE AWeapon* GetCurrentWeapon() const { return CurrentWeapon; }
 };

@@ -4,6 +4,7 @@
 #include "Weapon/KatanaWeapon.h"
 
 #include "AI/BaseAI.h"
+#include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -16,13 +17,13 @@ void AKatanaWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorld()->GetTimerManager().SetTimer(
+	/*GetWorld()->GetTimerManager().SetTimer(
 		CheckDamageTimerHandle,
 		this,
 		&AKatanaWeapon::CheckDamage,
 		0.02f,
 		true
-	);
+	);*/
 }
 
 void AKatanaWeapon::CheckDamage()
@@ -66,19 +67,31 @@ void AKatanaWeapon::CheckDamage()
 				if(Enemy)
 				{
 					UGameplayStatics::ApplyPointDamage(
-					Enemy,
-					10.f,
-					HitFromDirection,
-					OutHit,
-					GetInstigatorController(),
-					GetOwner(),
-					UDamageType::StaticClass()
-				);
+						Enemy,
+						10.f,
+						HitFromDirection,
+						OutHit,
+						GetInstigatorController(),
+						GetOwner(),
+						UDamageType::StaticClass()
+					);
 				}
 				
 			}
 		}
 
 		SetLastLocationArrayItem();
+	}
+}
+
+void AKatanaWeapon::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	ABaseAI* BaseAI = Cast<ABaseAI>(OtherActor);
+	if(BaseAI)
+	{
+		FDamageEvent DamageEvent;
+		TakeDamage(DamageCount,DamageEvent,GetInstigatorController(),GetOwner());
 	}
 }

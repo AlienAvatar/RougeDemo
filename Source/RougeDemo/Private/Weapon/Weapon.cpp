@@ -11,7 +11,8 @@ AWeapon::AWeapon()
 
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
 	RootComponent = WeaponMesh;
-
+	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//WeaponMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
 // Called when the game starts or when spawned
@@ -20,6 +21,8 @@ void AWeapon::BeginPlay()
 	Super::BeginPlay();
 	
 }
+
+
 
 void AWeapon::Fire()
 {

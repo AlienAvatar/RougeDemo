@@ -54,6 +54,8 @@ ARougeDemoCharacter::ARougeDemoCharacter()
 	}
 
 	Tags.Add(FName("Player"));
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
 
@@ -106,13 +108,14 @@ void ARougeDemoCharacter::OnBeginPlay()
 	);
 
 	//控制方向TimerHandle
-	GetWorld()->GetTimerManager().SetTimer(
+	//问题，会发生抽帧现象
+	/*GetWorld()->GetTimerManager().SetTimer(
 		ControlRotationTimerHandle,
 		this,
 		&ARougeDemoCharacter::ControlRotationCallback,
 		0.01f,
 		true
-	);
+	);*/
 }
 
 // Called every frame

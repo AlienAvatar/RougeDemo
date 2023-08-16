@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Weapon/Weapon.h"
+#include "MeleeWeapon.h"
 #include "KatanaWeapon.generated.h"
 
 class USceneComponent;
@@ -11,7 +11,7 @@ class USceneComponent;
  * 
  */
 UCLASS()
-class ROUGEDEMO_API AKatanaWeapon : public AWeapon
+class ROUGEDEMO_API AKatanaWeapon : public AMeleeWeapon
 {
 	GENERATED_BODY()
 
@@ -39,7 +39,5 @@ private:
 
 	void CheckDamage();
 
-	
-
-	
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 };

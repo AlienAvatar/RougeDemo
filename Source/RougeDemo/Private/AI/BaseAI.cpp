@@ -50,3 +50,40 @@ void ABaseAI::ToggleMarket(bool bLockOn)
 	}
 }
 
+float ABaseAI::OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation,
+	UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser,
+	AController* InstigatedByController, AActor* DamageCauserActor)
+{
+	UE_LOG(LogTemp,Warning,TEXT("Damage[%f]"),Damage);
+	return 0.f;
+}
+
+float ABaseAI::InternalTakePointDamage(float Damage, FPointDamageEvent const& PointDamageEvent,
+	AController* EventInstigator, AActor* DamageCauser)
+{
+	UE_LOG(LogTemp,Warning,TEXT("Damage[%f]"),Damage);
+	AttributeInfo.Health = AttributeInfo.Health - Damage;
+	if(AttributeInfo.Health < 0.f)
+	{
+		Dead();
+	}
+	
+	return Super::InternalTakePointDamage(Damage, PointDamageEvent, EventInstigator, DamageCauser);
+}
+
+void ABaseAI::Dead()
+{
+	//解除锁定
+	ToggleMarket(false);
+
+	State = EState::ES_Dead;
+
+	
+	//模拟物理
+	GetMesh()->SetSimulatePhysics(true);
+
+	
+}
+
+
+

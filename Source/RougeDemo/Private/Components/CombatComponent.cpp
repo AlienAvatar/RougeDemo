@@ -56,35 +56,38 @@ void UCombatComponent::Attack()
 			//To Do 空中攻击
 		}else
 		{
-			//地面攻击
-			/*URougeDemoAnimInstance* RougeDemoAnimInstance = RougeDemoCharacter->GetAnimationInstance();
-			if(RougeDemoAnimInstance && AttackMontage)
-			{
-				const FName MontageSection = FName("Attack01");
-				RougeDemoAnimInstance->Montage_Play(AttackMontage);
-				RougeDemoAnimInstance->Montage_JumpToSection(MontageSection,AttackMontage);
-			}*/
-
 			//判断是否可以攻击，如在游泳状态下不能攻击
 			if(CheckAttackState())
 			{
 				//是否在战斗中
 				if(!bIsInCombat)
 				{
+					//后续更改为扇形检测，现检测前方150的位置是否有敌人
 					const FVector Start = RougeDemoCharacter->GetActorLocation();
-					const FVector End = Start + RougeDemoCharacter->GetActorForwardVector() * 150.f;
+					const FVector End = Start + RougeDemoCharacter->GetActorForwardVector() * 150.f; 
 					
 					FHitResult HitResult;
 					bool bTraceChannel = GetWorld()->LineTraceSingleByChannel(HitResult,Start,End,ECC_Pawn);
-					//判断前方是否有敌人
+					//判断前方是否有敌人，true代表有，false 执行默认
 					if(bTraceChannel)
 					{
-						const AActor* LocalHitActor = HitResult.GetActor();
+						const ABaseAI* LocalEnemy = Cast<ABaseAI>(HitResult.GetActor());
 						//检测敌人是否在玩家前方
-						if(LocalHitActor->GetDotProductTo(RougeDemoCharacter) > 0.25)
+						if(LocalEnemy && LocalEnemy->GetDotProductTo(RougeDemoCharacter) > 0.25)
 						{
-							//实施处决效果
-							FinisherTimerTrigger();
+							//当韧值小于0
+							if(LocalEnemy->AttributeInfo.ToughnessValue < 0)
+							{
+								//实施处决效果
+								FinisherTimerTrigger();
+							}
+						}
+						
+						//不同角色的攻击动画
+						APlayerKatanaCharacter* Player = Cast<APlayerKatanaCharacter>(RougeDemoCharacter);
+						if(Player)
+						{
+							Player->PlayAttackAnim();
 						}
 					}
 				}else
@@ -161,6 +164,8 @@ void UCombatComponent::UnArmWeapon()
 		}
 	}
 }
+
+
 
 void UCombatComponent::FinisherTimerTrigger()
 {
