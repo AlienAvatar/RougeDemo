@@ -3,6 +3,7 @@
 
 #include "AI/BaseAI.h"
 
+#include "AI/BaseAIAnimInstance.h"
 #include "Components/WidgetComponent.h"
 
 // Sets default values
@@ -13,7 +14,9 @@ ABaseAI::ABaseAI()
 
 	TargetWidget =  CreateDefaultSubobject<UWidgetComponent>(TEXT("TargetWidget"));
 	TargetWidget->SetupAttachment(GetMesh());
-
+	HealthWidget =  CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthWidget"));
+	HealthWidget->SetupAttachment(GetMesh());
+	
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	Tags.Add(FName("Enemy"));
 }
@@ -22,7 +25,8 @@ ABaseAI::ABaseAI()
 void ABaseAI::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	OnTakeAnyDamage.AddDynamic(this,&ABaseAI::ReceiveDamage);
 }
 
 // Called every frame
@@ -50,9 +54,39 @@ void ABaseAI::ToggleMarket(bool bLockOn)
 	}
 }
 
+void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
+	AController* InstigatorController, AActor* DamageCauser)
+{
+	
+	AttributeInfo.Health = FMath::Clamp(AttributeInfo.Health - Damage, 0.f, AttributeInfo.MaxHealth);
+
+	UpdateHealthHUD();
+	PlayHitReactMontage();
+
+	if(AttributeInfo.Health <= 0.f)
+	{
+		Dead();
+	}
+}
+
+void ABaseAI::UpdateHealthHUD()
+{
+	
+}
+
+void ABaseAI::SetHealthHUD(float NewHealth)
+{
+	AttributeInfo.Health = NewHealth;
+}
+
+void ABaseAI::DestroyCallBack()
+{
+	Destroy();
+}
+
 float ABaseAI::OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation,
-	UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser,
-	AController* InstigatedByController, AActor* DamageCauserActor)
+                                 UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser,
+                                 AController* InstigatedByController, AActor* DamageCauserActor)
 {
 	UE_LOG(LogTemp,Warning,TEXT("Damage[%f]"),Damage);
 	return 0.f;
@@ -63,7 +97,7 @@ float ABaseAI::InternalTakePointDamage(float Damage, FPointDamageEvent const& Po
 {
 	UE_LOG(LogTemp,Warning,TEXT("Damage[%f]"),Damage);
 	AttributeInfo.Health = AttributeInfo.Health - Damage;
-	if(AttributeInfo.Health < 0.f)
+	if(AttributeInfo.Health <= 0.f)
 	{
 		Dead();
 	}
@@ -78,11 +112,31 @@ void ABaseAI::Dead()
 
 	State = EState::ES_Dead;
 
-	
+	//GetMesh()->SetCollisionResponseToAllChannels(ECR_Ignore);
+	//GetMesh()->SetCollisionResponseToChannel(ECC_PhysicsBody,ECR_Block);
+	GetMesh()->SetCollisionObjectType(ECC_PhysicsBody);
 	//模拟物理
 	GetMesh()->SetSimulatePhysics(true);
 
-	
+	GetWorld()->GetTimerManager().SetTimer(
+		DestroyTimerHandle,
+		this,
+		&ABaseAI::DestroyCallBack,
+		5.f,
+		false
+	);
+}
+
+void ABaseAI::PlayHitReactMontage()
+{
+	UBaseAIAnimInstance* AnimInstance = Cast<UBaseAIAnimInstance>(GetMesh()->GetAnimInstance());
+	if(AnimInstance)
+	{
+		if(F_HitMontage)
+		{
+			AnimInstance->Montage_Play(F_HitMontage);
+		}
+	}
 }
 
 

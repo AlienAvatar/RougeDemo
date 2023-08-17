@@ -4,6 +4,7 @@
 #include "Weapon/KatanaWeapon.h"
 
 #include "AI/BaseAI.h"
+#include "Character/PlayerKatanaCharacter.h"
 #include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -84,14 +85,3 @@ void AKatanaWeapon::CheckDamage()
 	}
 }
 
-void AKatanaWeapon::NotifyActorBeginOverlap(AActor* OtherActor)
-{
-	Super::NotifyActorBeginOverlap(OtherActor);
-
-	ABaseAI* BaseAI = Cast<ABaseAI>(OtherActor);
-	if(BaseAI)
-	{
-		FDamageEvent DamageEvent;
-		TakeDamage(DamageCount,DamageEvent,GetInstigatorController(),GetOwner());
-	}
-}

@@ -26,6 +26,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	UStaticMeshComponent* WeaponMesh;
+
+	UPROPERTY(EditDefaultsOnly,Category=Damage)
+	float DamageCount = 10.f;
 	
 public:	
 	// Called every frame

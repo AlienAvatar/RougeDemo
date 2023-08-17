@@ -112,7 +112,10 @@ void UCombatComponent::SpawnWeapon()
 	if(RougeDemoCharacter == nullptr) return;
 	if(CurrentWeaponClass)
 	{
-		CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(CurrentWeaponClass);
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = GetOwner();
+		const FTransform UnArmSocketTransform = RougeDemoCharacter->GetMesh()->GetSocketTransform(FName("R_Weapon_UnArmKatana_Socket"));
+		CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(CurrentWeaponClass,UnArmSocketTransform,SpawnParameters);
 		CurrentWeapon->AttachToComponent(RougeDemoCharacter->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,FName("R_Weapon_UnArmKatana_Socket"));
 	}
 }

@@ -4,7 +4,10 @@
 #include "Weapon/MeleeWeapon.h"
 
 #include "AI/BaseAI.h"
+#include "Character/PlayerKatanaCharacter.h"
 #include "Engine/DamageEvents.h"
+#include "Kismet/GameplayStatics.h"
+
 
 AMeleeWeapon::AMeleeWeapon()
 {
@@ -28,7 +31,15 @@ void AMeleeWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	if(BaseAI)
 	{
 		FDamageEvent DamageEvent;
-		TakeDamage(DamageCount,DamageEvent,GetInstigatorController(),GetOwner());
+		APlayerKatanaCharacter* OwnerCharacter = Cast<APlayerKatanaCharacter>(GetOwner());
+		if(OwnerCharacter)
+		{
+			AController* OwnerController = OwnerCharacter->Controller;
+			if(OwnerController)
+			{
+				UGameplayStatics::ApplyDamage(OtherActor,DamageCount,OwnerController,this,UDamageType::StaticClass());
+			}
+		}
 	}
 }
 

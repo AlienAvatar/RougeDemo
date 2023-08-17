@@ -22,13 +22,16 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	UWidgetComponent* TargetWidget;
 
+	UPROPERTY(EditDefaultsOnly)
+	UWidgetComponent* HealthWidget;
+	
 	bool bCanBeExecuted = true;
 
 	bool NormalEnemies;
 
 	bool BossEnemies;
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category=State)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=State)
 	FAttributeInfo AttributeInfo;
 	
 	// Called every frame
@@ -40,6 +43,7 @@ public:
 	void ToggleMarket(bool bLockOn);
 
 	FORCEINLINE float GetSpeed() const { return Speed; }
+
 	
 protected:
 	// Called when the game starts or when spawned
@@ -53,6 +57,19 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 	FVector Velocity;
+
+	UPROPERTY(EditDefaultsOnly, Category=Hit)
+	UAnimMontage* F_HitMontage;
+
+	UFUNCTION()
+	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, class AController* InstigatorController,AActor* DamageCauser);
+
+	void UpdateHealthHUD();
+
+	void SetHealthHUD(float NewHealth);
+
+	FTimerHandle DestroyTimerHandle;
+
 private:
 	//受击
 	virtual float OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser, AController* InstigatedByController, AActor* DamageCauserActor);
@@ -61,5 +78,7 @@ private:
 	
 	void Dead();
 
-
+	void PlayHitReactMontage();
+	
+	void DestroyCallBack();
 };

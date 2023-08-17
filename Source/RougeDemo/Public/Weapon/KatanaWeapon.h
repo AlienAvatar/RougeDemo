@@ -39,5 +39,5 @@ private:
 
 	void CheckDamage();
 
-	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+	//virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 };
