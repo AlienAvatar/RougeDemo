@@ -6,6 +6,7 @@
 #include "Character/RougeDemoCharacter.h"
 #include "PlayerKatanaCharacter.generated.h"
 
+class ARougeDemoPlayerController;
 /**
  * 
  */
@@ -54,7 +55,7 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 	int32 AttackIndex = 0;
-	
+
 public:
 	FORCEINLINE UStaticMeshComponent* GetKatanaMeshComp() const { return KatanaMeshComp; }
 

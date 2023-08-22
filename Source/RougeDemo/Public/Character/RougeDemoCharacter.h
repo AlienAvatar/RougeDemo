@@ -10,6 +10,7 @@
 #include "Enum/EOverlayState.h"
 #include "Enum/ERotationMode.h"
 #include "Enum/EStance.h"
+#include "Struct/AttributeInfo.h"
 #include "Struct/MovementSettings.h"
 #include "Struct/MovementSettingsState.h"
 #include "RougeDemoCharacter.generated.h"
@@ -19,6 +20,7 @@ class UCombatComponent;
 class ULockOnComponent;
 class UCameraComponent;
 class USpringArmComponent;
+class ARougeDemoPlayerController;
 
 UCLASS()
 class ROUGEDEMO_API ARougeDemoCharacter : public ACharacter
@@ -242,6 +244,22 @@ protected:
 	FRotator DeltaDirectRotation;
 
 	float ZYaw;
+
+	UPROPERTY()
+	ARougeDemoPlayerController* RougeDemoPlayerController;
+
+	UPROPERTY(EditDefaultsOnly)
+	FAttributeInfo AttributeInfo;
+
+	UFUNCTION()
+	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, class AController* InstigatorController,AActor* DamageCauser);
+
+	void UpdateHealthHUD();
+
+	void PlayHitReactMontage();
+	
+	UPROPERTY(EditDefaultsOnly, Category=Hit)
+	UAnimMontage* F_HitMontage;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

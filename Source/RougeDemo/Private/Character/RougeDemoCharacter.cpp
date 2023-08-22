@@ -8,12 +8,15 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/CombatComponent.h"
 #include "Components/LockOnComponent.h"
+#include "Core/RougeDemoGameMode.h"
+#include "Core/RougeDemoPlayerController.h"
 #include "Curves/CurveVector.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Struct/AttributeInfo.h"
 
 
 // Sets default values
@@ -76,10 +79,20 @@ void ARougeDemoCharacter::OnBeginPlay()
 
 	//设置动画实例
 	RougeDemoAnimInstance = Cast<URougeDemoAnimInstance>(GetMesh()->GetAnimInstance());
+	//设置Controller
+	RougeDemoPlayerController = Cast<ARougeDemoPlayerController>(Controller);
+	//绑定受击函数
+	OnTakeAnyDamage.AddDynamic(this,&ARougeDemoCharacter::ReceiveDamage);
+	
+	if(RougeDemoPlayerController)
+	{
+		RougeDemoPlayerController->SetHUDHealth(AttributeInfo.Health,AttributeInfo.MaxHealth);
+	}
+	
 	//设置默认状态
 	Gait = DesiredGait;
 	RotationMode = DesiredRotationMode;
-
+	
 	switch (DesiredStance)
 	{
 	case EStance::ES_Standing:
@@ -116,6 +129,43 @@ void ARougeDemoCharacter::OnBeginPlay()
 		0.01f,
 		true
 	);*/
+}
+
+void ARougeDemoCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
+	AController* InstigatorController, AActor* DamageCauser)
+{
+	AttributeInfo.Health = FMath::Clamp(AttributeInfo.Health - Damage, 0.f, AttributeInfo.MaxHealth);
+
+	UpdateHealthHUD();
+	PlayHitReactMontage();
+
+	if(AttributeInfo.Health == 0.f)
+	{
+		ARougeDemoGameMode* RougeDemoGameMode = GetWorld()->GetAuthGameMode<ARougeDemoGameMode>();
+		if(RougeDemoGameMode)
+		{
+			RougeDemoPlayerController = RougeDemoPlayerController == nullptr ? Cast<ARougeDemoPlayerController>(Controller) : RougeDemoPlayerController;
+			ARougeDemoPlayerController* AttackController = Cast<ARougeDemoPlayerController>(InstigatorController);
+			
+			RougeDemoGameMode->PlayEliminated(this,RougeDemoPlayerController,AttackController);
+		}
+	}
+}
+
+void ARougeDemoCharacter::UpdateHealthHUD()
+{
+}
+
+void ARougeDemoCharacter::PlayHitReactMontage()
+{
+	URougeDemoAnimInstance* AnimInstance = Cast<URougeDemoAnimInstance>(GetMesh()->GetAnimInstance());
+	if(AnimInstance)
+	{
+		if(F_HitMontage)
+		{
+			AnimInstance->Montage_Play(F_HitMontage);
+		}
+	}
 }
 
 // Called every frame
