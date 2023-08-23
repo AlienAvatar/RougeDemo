@@ -19,6 +19,8 @@ ABaseAI::ABaseAI()
 	
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	Tags.Add(FName("Enemy"));
+
+	DissolveTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DissolveTimelineComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -63,7 +65,7 @@ void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageTyp
 	UpdateHealthHUD();
 	PlayHitReactMontage();
 
-	if(AttributeInfo.Health <= 0.f)
+	if(AttributeInfo.Health == 0.f)
 	{
 		Dead();
 	}
@@ -71,7 +73,7 @@ void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageTyp
 
 void ABaseAI::UpdateHealthHUD()
 {
-	
+	SetHealthHUD(AttributeInfo.Health);
 }
 
 void ABaseAI::SetHealthHUD(float NewHealth)
@@ -79,9 +81,44 @@ void ABaseAI::SetHealthHUD(float NewHealth)
 	AttributeInfo.Health = NewHealth;
 }
 
+void ABaseAI::Elim()
+{
+	if(DissolveMaterialInstance)
+	{
+		//UMaterialInterface* DissolveMaterialInterface = GetMesh()->GetMaterial(0);
+		DynamicDissolveMaterialInstance = UMaterialInstanceDynamic::Create(DissolveMaterialInstance,this);
+		GetMesh()->SetMaterial(0,DynamicDissolveMaterialInstance);
+		DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Dissolve"),0.55f);
+		DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Glow"),35.f);
+	}
+
+	StartDissolve();
+}
+
 void ABaseAI::DestroyCallBack()
 {
-	Destroy();
+	Elim();
+	//Destroy();
+
+	GetWorld()->GetTimerManager().ClearTimer(DestroyTimerHandle);
+}
+
+void ABaseAI::UpdateDissolveMaterial(float DissolveValue)
+{
+	if(DynamicDissolveMaterialInstance)
+	{
+		DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Dissolve"),DissolveValue);
+	}
+}
+
+void ABaseAI::StartDissolve()
+{
+	DissolveTrack.BindDynamic(this,&ABaseAI::UpdateDissolveMaterial);
+	if(DissolveCurve && DissolveTimeline)
+	{
+		DissolveTimeline->AddInterpFloat(DissolveCurve,DissolveTrack);
+		DissolveTimeline->Play();
+	}
 }
 
 float ABaseAI::OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation,
@@ -118,13 +155,16 @@ void ABaseAI::Dead()
 	//模拟物理
 	GetMesh()->SetSimulatePhysics(true);
 
+	//2s后调用
 	GetWorld()->GetTimerManager().SetTimer(
 		DestroyTimerHandle,
 		this,
 		&ABaseAI::DestroyCallBack,
-		5.f,
+		2.f,
 		false
 	);
+
+	Elim();
 }
 
 void ABaseAI::PlayHitReactMontage()

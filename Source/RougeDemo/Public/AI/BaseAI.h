@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Character.h"
 #include "Struct/AttributeInfo.h"
 #include "Enum/EState.h"
 #include "BaseAI.generated.h"
 
 class UWidgetComponent;
-
+class UTimelineComponent;
 UCLASS()
 class ROUGEDEMO_API ABaseAI : public ACharacter
 {
@@ -44,6 +45,7 @@ public:
 
 	FORCEINLINE float GetSpeed() const { return Speed; }
 
+
 	
 protected:
 	// Called when the game starts or when spawned
@@ -69,6 +71,30 @@ protected:
 	void SetHealthHUD(float NewHealth);
 
 	FTimerHandle DestroyTimerHandle;
+	
+	//消除效果
+	void Elim();
+	
+	UPROPERTY(VisibleAnywhere)
+	UTimelineComponent* DissolveTimeline;
+	
+	FOnTimelineFloat DissolveTrack;
+
+	UPROPERTY(EditAnywhere)
+	UCurveFloat* DissolveCurve;
+
+	UFUNCTION()
+	void UpdateDissolveMaterial(float DissolveValue);
+
+	void StartDissolve();
+
+	//更改在runtime
+	UPROPERTY(VisibleAnywhere,Category=Elim)
+	UMaterialInstanceDynamic* DynamicDissolveMaterialInstance;
+
+	//从蓝图中设置
+	UPROPERTY(EditAnywhere,Category=Elim)
+	UMaterialInstance* DissolveMaterialInstance;
 
 private:
 	//受击

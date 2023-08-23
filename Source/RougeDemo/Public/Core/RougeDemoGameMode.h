@@ -18,4 +18,7 @@ class ROUGEDEMO_API ARougeDemoGameMode : public AGameMode
 
 public:
 	virtual void PlayEliminated(ARougeDemoCharacter* ElimmedCharacter, ARougeDemoPlayerController* VictimController,ARougeDemoPlayerController* AttackController);
+
+	virtual void RequetRespwan(ACharacter* ElimmedCharacter,AController* ElimmedController);
+	
 };

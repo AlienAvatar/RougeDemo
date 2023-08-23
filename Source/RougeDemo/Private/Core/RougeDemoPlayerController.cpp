@@ -28,7 +28,7 @@ void ARougeDemoPlayerController::SetHUDHealth(float Health, float MaxHealth)
 	{
 		const float HealthPercent = Health / MaxHealth;
 		RougeDemoHUD->PlayerOverlayWidget->HealthBar->SetPercent(HealthPercent);
-		FString HealthText = FString::Printf(TEXT("%d%d"),FMath::CeilToInt(Health),FMath::CeilToInt(MaxHealth));
+		FString HealthText = FString::Printf(TEXT("%d/%d"),FMath::CeilToInt(Health),FMath::CeilToInt(MaxHealth));
 		RougeDemoHUD->PlayerOverlayWidget->HealthText->SetText(FText::FromString(HealthText));
 	}
 	

@@ -179,6 +179,12 @@ private:
 	FTimerHandle ControlRotationTimerHandle;
 
 	void ControlRotationCallback();
+
+	FTimerHandle ElimTimerHandle;
+
+	void ElimTimerFinished();
+
+	float ElimDelay = 3.f;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -288,4 +294,7 @@ public:
 	//控制蒙太奇播放
 	UPROPERTY(BlueprintReadWrite)
 	bool bCanPlayMontage = true;
+
+	//消除Player
+	void Elim();
 };

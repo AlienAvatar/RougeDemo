@@ -26,7 +26,6 @@ ARougeDemoCharacter::ARougeDemoCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//设置Camera
-	
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetMesh());
 	CameraBoom->TargetArmLength = 315.f;
@@ -62,7 +61,6 @@ ARougeDemoCharacter::ARougeDemoCharacter()
 }
 
 
-
 // Called when the game starts or when spawned
 void ARougeDemoCharacter::BeginPlay()
 {
@@ -83,7 +81,7 @@ void ARougeDemoCharacter::OnBeginPlay()
 	RougeDemoPlayerController = Cast<ARougeDemoPlayerController>(Controller);
 	//绑定受击函数
 	OnTakeAnyDamage.AddDynamic(this,&ARougeDemoCharacter::ReceiveDamage);
-	
+	//设置当前血量
 	if(RougeDemoPlayerController)
 	{
 		RougeDemoPlayerController->SetHUDHealth(AttributeInfo.Health,AttributeInfo.MaxHealth);
@@ -154,6 +152,11 @@ void ARougeDemoCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, cons
 
 void ARougeDemoCharacter::UpdateHealthHUD()
 {
+	//更改UMG
+	if(RougeDemoPlayerController)
+	{
+		RougeDemoPlayerController->SetHUDHealth(AttributeInfo.Health,AttributeInfo.MaxHealth);
+	}
 }
 
 void ARougeDemoCharacter::PlayHitReactMontage()
@@ -845,6 +848,26 @@ void ARougeDemoCharacter::AttackAction()
 	}
 }
 
+void ARougeDemoCharacter::Elim()
+{
+	GetWorld()->GetTimerManager().SetTimer(
+		ElimTimerHandle,
+		this,
+		&ARougeDemoCharacter::ElimTimerFinished,
+		ElimDelay,
+		false
+	);
+}
+
+void ARougeDemoCharacter::ElimTimerFinished()
+{
+	ARougeDemoGameMode* RougeDemoGameMode = GetWorld()->GetAuthGameMode<ARougeDemoGameMode>();
+	if(RougeDemoGameMode)
+	{
+		RougeDemoGameMode->RequetRespwan(this,Controller);
+	}
+}
+
 // Called to bind functionality to input
 void ARougeDemoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -868,6 +891,8 @@ void ARougeDemoCharacter::SetDisableInput(bool bNewDisableInput)
 {
 	bDisableInput = bNewDisableInput;
 }
+
+
 
 
 
