@@ -9,6 +9,7 @@
 #include "Character/RougeDemoCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Weapon/Weapon.h"
 
 // Sets default values for this component's properties
@@ -89,6 +90,15 @@ void UCombatComponent::Attack()
 						{
 							Player->PlayAttackAnim();
 						}
+
+						//会产生抖动
+						FRotator LerpRotation = UKismetMathLibrary::RLerp(
+							FRotator(0.f,Player->GetActorRotation().Yaw,0.f),
+							FRotator(0.f,Player->GetControlRotation().Yaw,0.f),
+							0.1,
+							true
+						);
+						Player->SetActorRotation(LerpRotation);
 					}
 				}else
 				{

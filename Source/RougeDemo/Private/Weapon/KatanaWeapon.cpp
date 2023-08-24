@@ -33,6 +33,7 @@ void AKatanaWeapon::CheckDamage()
 	FVector LocalLastLocationKatana = LastLocationKatana - GetWeaponMesh()->GetComponentLocation();
 	float KatanaSpeed = LocalLastLocationKatana.Length();
 	UE_LOG(LogTemp,Warning,TEXT("KatanaSpeed[%f]"),KatanaSpeed);
+	
 	if(KatanaSpeed < 35.f)
 	{
 		return;

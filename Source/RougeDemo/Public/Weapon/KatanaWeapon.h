@@ -38,6 +38,4 @@ private:
 	FTimerHandle CheckDamageTimerHandle;
 
 	void CheckDamage();
-
-	//virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 };

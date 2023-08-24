@@ -13,7 +13,9 @@ public class RougeDemo : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
 			"UMG", 
-			"AnimGraphRuntime"
+			"AnimGraphRuntime",
+			"GameplayTasks",
+			"NavigationSystem"
 		});
 
 		// Uncomment if you are using Slate UI

@@ -37,6 +37,7 @@ void AMeleeWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 			AController* OwnerController = OwnerCharacter->Controller;
 			if(OwnerController)
 			{
+				UE_LOG(LogTemp,Warning,TEXT("DamageCount[%f]"),DamageCount);
 				UGameplayStatics::ApplyDamage(OtherActor,DamageCount,OwnerController,this,UDamageType::StaticClass());
 			}
 		}
@@ -46,8 +47,6 @@ void AMeleeWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 
 void AMeleeWeapon::BeginWeaponAttack(float NewAttackDelayTime, int NewAttackDelayCount)
 {
-	//打开Attack通道
-	//GetWeaponMesh()->SetCollisionResponseToChannel(ECC_EngineTraceChannel2,ECR_Overlap);
 	GetWeaponMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	AttackDelayTime = NewAttackDelayTime;
 	AttackDelayCount = NewAttackDelayCount;

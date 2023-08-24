@@ -4,7 +4,13 @@
 #include "AI/BaseAI.h"
 
 #include "AI/BaseAIAnimInstance.h"
+#include "Components/ProgressBar.h"
 #include "Components/WidgetComponent.h"
+#include "HUD/EnemyHealthBarWidget.h"
+#include "Kismet/GameplayStatics.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig.h"
+#include "Perception/AISense_Sight.h"
 
 // Sets default values
 ABaseAI::ABaseAI()
@@ -21,7 +27,13 @@ ABaseAI::ABaseAI()
 	Tags.Add(FName("Enemy"));
 
 	DissolveTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DissolveTimelineComponent"));
+	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+
+	AISenseConfig = NewObject<UAISense_Sight>();
+	
 }
+
+
 
 // Called when the game starts or when spawned
 void ABaseAI::BeginPlay()
@@ -29,6 +41,13 @@ void ABaseAI::BeginPlay()
 	Super::BeginPlay();
 
 	OnTakeAnyDamage.AddDynamic(this,&ABaseAI::ReceiveDamage);
+
+	BaseAIAnimInstance = Cast<UBaseAIAnimInstance>(GetMesh()->GetAnimInstance());
+
+	//设置Health Bar
+	SetHUDHealth();
+
+	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ABaseAI::OnTargetPerceptionUpdated);
 }
 
 // Called every frame
@@ -59,26 +78,21 @@ void ABaseAI::ToggleMarket(bool bLockOn)
 void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
 	AController* InstigatorController, AActor* DamageCauser)
 {
-	
 	AttributeInfo.Health = FMath::Clamp(AttributeInfo.Health - Damage, 0.f, AttributeInfo.MaxHealth);
 
-	UpdateHealthHUD();
-	PlayHitReactMontage();
-
+	UpdateHUDHealth();
 	if(AttributeInfo.Health == 0.f)
 	{
 		Dead();
+	}else
+	{
+		PlayHitReactMontage();
 	}
 }
 
-void ABaseAI::UpdateHealthHUD()
+void ABaseAI::UpdateHUDHealth()
 {
-	SetHealthHUD(AttributeInfo.Health);
-}
-
-void ABaseAI::SetHealthHUD(float NewHealth)
-{
-	AttributeInfo.Health = NewHealth;
+	SetHUDHealth();
 }
 
 void ABaseAI::Elim()
@@ -103,6 +117,38 @@ void ABaseAI::DestroyCallBack()
 	GetWorld()->GetTimerManager().ClearTimer(DestroyTimerHandle);
 }
 
+void ABaseAI::SetHUDHealth()
+{
+	UEnemyHealthBarWidget* HealthBarWidget = Cast<UEnemyHealthBarWidget>(HealthWidget->GetUserWidgetObject());
+
+	bool bHUDValid = HealthBarWidget &&
+		HealthBarWidget->HealthBar;
+	
+	if(bHUDValid)
+	{
+		float HealthPercent = AttributeInfo.Health / AttributeInfo.MaxHealth;
+		HealthBarWidget->HealthBar->SetPercent(HealthPercent);
+	}
+}
+
+bool ABaseAI::CanUseAnyAbility()
+{
+	return IsAlive() && UGameplayStatics::IsGamePaused(GetWorld());
+}
+
+void ABaseAI::PlayAttackMeleeMontage()
+{
+	if(BaseAIAnimInstance && AttackMontageRoot)
+	{
+		BaseAIAnimInstance->Montage_Play(AttackMontageRoot,1.f);
+	}
+}
+
+void ABaseAI::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+{
+	UE_LOG(LogTemp, Warning, TEXT("See Actor Name::::%s"),*Actor->GetName());
+}
+
 void ABaseAI::UpdateDissolveMaterial(float DissolveValue)
 {
 	if(DynamicDissolveMaterialInstance)
@@ -121,6 +167,16 @@ void ABaseAI::StartDissolve()
 	}
 }
 
+void ABaseAI::PlayElimMontage()
+{
+	if(BaseAIAnimInstance && F_ElimMontageRoot)
+	{
+		FName MontageSection = TEXT("Forward");
+		BaseAIAnimInstance->Montage_Play(F_ElimMontageRoot);
+		BaseAIAnimInstance->Montage_JumpToSection(MontageSection,F_ElimMontageRoot);
+	}
+}
+
 float ABaseAI::OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation,
                                  UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser,
                                  AController* InstigatedByController, AActor* DamageCauserActor)
@@ -132,7 +188,6 @@ float ABaseAI::OnTakePointDamage(AActor* DamagedActor, float Damage, AController
 float ABaseAI::InternalTakePointDamage(float Damage, FPointDamageEvent const& PointDamageEvent,
 	AController* EventInstigator, AActor* DamageCauser)
 {
-	UE_LOG(LogTemp,Warning,TEXT("Damage[%f]"),Damage);
 	AttributeInfo.Health = AttributeInfo.Health - Damage;
 	if(AttributeInfo.Health <= 0.f)
 	{
@@ -148,9 +203,7 @@ void ABaseAI::Dead()
 	ToggleMarket(false);
 
 	State = EState::ES_Dead;
-
-	//GetMesh()->SetCollisionResponseToAllChannels(ECR_Ignore);
-	//GetMesh()->SetCollisionResponseToChannel(ECC_PhysicsBody,ECR_Block);
+	
 	GetMesh()->SetCollisionObjectType(ECC_PhysicsBody);
 	//模拟物理
 	GetMesh()->SetSimulatePhysics(true);
@@ -165,6 +218,17 @@ void ABaseAI::Dead()
 	);
 
 	Elim();
+}
+
+bool ABaseAI::DoMeleeAttack()
+{
+	if(CanUseAnyAbility())
+	{
+		
+		PlayAttackMeleeMontage();
+		return true;
+	}
+	return false;
 }
 
 void ABaseAI::PlayHitReactMontage()

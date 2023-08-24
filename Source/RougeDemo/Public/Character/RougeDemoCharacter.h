@@ -40,8 +40,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	UCameraComponent* FollowCamera;
 
-	
-	
 	float AO_Pitch;
 	float AO_Yaw;
 
@@ -289,7 +287,7 @@ public:
 	ULockOnComponent* GetLockOnComp() const { return LockOnComp; }
 	void SetDisableInput(bool bNewDisableInput);
 	UCombatComponent* GetCombatComponent() const { return CombatComp; }
-	URougeDemoAnimInstance* GetAnimationInstance() const { return RougeDemoAnimInstance; }
+	URougeDemoAnimInstance* GetRougeDemoAnimationInstance() const { return RougeDemoAnimInstance; }
 
 	//控制蒙太奇播放
 	UPROPERTY(BlueprintReadWrite)

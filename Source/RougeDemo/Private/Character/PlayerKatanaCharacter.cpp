@@ -5,6 +5,7 @@
 
 #include "Character/RougeDemoAnimInstance.h"
 #include "Components/CombatComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 APlayerKatanaCharacter::APlayerKatanaCharacter()
 {
@@ -31,6 +32,17 @@ APlayerKatanaCharacter::APlayerKatanaCharacter()
 	}
 	//关闭刀鞘的碰撞
 	KatanaMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+}
+
+void APlayerKatanaCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if(KatanaMeshComp)
+	{
+		KatanaMeshComp->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,FName("R_Weapon_KatanaAndScabbard_Socket"));	
+	}
 }
 
 void APlayerKatanaCharacter::TestAction()
@@ -106,14 +118,7 @@ void APlayerKatanaCharacter::MontageFinishTimerCallBack()
 	bCanPlayMontage = true;
 }
 
-void APlayerKatanaCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-	if(KatanaMeshComp)
-	{
-		KatanaMeshComp->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,FName("R_Weapon_KatanaAndScabbard_Socket"));	
-	}
-}
+
 
 void APlayerKatanaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

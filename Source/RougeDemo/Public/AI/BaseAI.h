@@ -9,8 +9,13 @@
 #include "Enum/EState.h"
 #include "BaseAI.generated.h"
 
+class UAISense_Sight;
+class UBaseAIAnimInstance;
 class UWidgetComponent;
 class UTimelineComponent;
+class UAIPerceptionComponent;
+class UAISenseConfig;
+
 UCLASS()
 class ROUGEDEMO_API ABaseAI : public ACharacter
 {
@@ -35,9 +40,6 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=State)
 	FAttributeInfo AttributeInfo;
 	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -45,11 +47,20 @@ public:
 
 	FORCEINLINE float GetSpeed() const { return Speed; }
 
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE bool IsAlive() const { return State != EState::ES_Dead; }
 
+	UFUNCTION(BlueprintCallable)
+	bool DoMeleeAttack();
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY()
+	UBaseAIAnimInstance* BaseAIAnimInstance;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=State)
 	EState State;
@@ -66,9 +77,7 @@ protected:
 	UFUNCTION()
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, class AController* InstigatorController,AActor* DamageCauser);
 
-	void UpdateHealthHUD();
-
-	void SetHealthHUD(float NewHealth);
+	void UpdateHUDHealth();
 
 	FTimerHandle DestroyTimerHandle;
 	
@@ -96,8 +105,24 @@ protected:
 	UPROPERTY(EditAnywhere,Category=Elim)
 	UMaterialInstance* DissolveMaterialInstance;
 
+	void PlayElimMontage();
+
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* F_ElimMontageRoot;
+
+	//攻击
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* AttackMontageRoot;
+
+	UPROPERTY(EditAnywhere)
+	UAIPerceptionComponent* AIPerceptionComponent;
+
+	//视觉感官配置文件
+	UPROPERTY(EditAnywhere)
+	UAISense_Sight* AISenseConfig;
+
 private:
-	//受击
+	//轨迹检测受击
 	virtual float OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser, AController* InstigatedByController, AActor* DamageCauserActor);
 
 	virtual float InternalTakePointDamage(float Damage, FPointDamageEvent const& PointDamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
@@ -107,4 +132,13 @@ private:
 	void PlayHitReactMontage();
 	
 	void DestroyCallBack();
+
+	void SetHUDHealth();
+
+	bool CanUseAnyAbility();
+
+	void PlayAttackMeleeMontage();
+
+	UFUNCTION()
+	void OnTargetPerceptionUpdated( AActor* Actor, FAIStimulus Stimulus);
 };

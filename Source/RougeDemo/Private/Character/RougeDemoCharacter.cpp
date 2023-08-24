@@ -81,6 +81,7 @@ void ARougeDemoCharacter::OnBeginPlay()
 	RougeDemoPlayerController = Cast<ARougeDemoPlayerController>(Controller);
 	//绑定受击函数
 	OnTakeAnyDamage.AddDynamic(this,&ARougeDemoCharacter::ReceiveDamage);
+	
 	//设置当前血量
 	if(RougeDemoPlayerController)
 	{
@@ -147,6 +148,8 @@ void ARougeDemoCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, cons
 			
 			RougeDemoGameMode->PlayEliminated(this,RougeDemoPlayerController,AttackController);
 		}
+
+		RagdollAction();
 	}
 }
 
@@ -205,16 +208,7 @@ void ARougeDemoCharacter::Tick(float DeltaTime)
 
 void ARougeDemoCharacter::ControlRotationCallback()
 {
-	if(RougeDemoAnimInstance->IsAnyMontagePlaying())
-	{
-		FRotator LerpRotation = UKismetMathLibrary::RLerp(
-			FRotator(0.f,GetActorRotation().Yaw,0.f),
-			FRotator(0.f,GetControlRotation().Yaw,0.f),
-			0.003,
-			true
-		);
-		SetActorRotation(LerpRotation);
-	}
+	
 }
 
 void ARougeDemoCharacter::StartSprint()
@@ -374,6 +368,10 @@ void ARougeDemoCharacter::RagdollAction()
 
 void ARougeDemoCharacter::RagdollStart()
 {
+	//禁止移动
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->StopMovementImmediately();
+
 	GetCharacterMovement()->SetMovementMode(MOVE_None,0);
 	MovementState = EMovementState::EMS_RagDoll;
 
@@ -857,6 +855,7 @@ void ARougeDemoCharacter::Elim()
 		ElimDelay,
 		false
 	);
+
 }
 
 void ARougeDemoCharacter::ElimTimerFinished()
