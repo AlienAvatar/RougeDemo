@@ -24,10 +24,7 @@ void AWeapon::BeginPlay()
 
 
 
-void AWeapon::Fire()
-{
-	
-}
+
 
 // Called every frame
 void AWeapon::Tick(float DeltaTime)

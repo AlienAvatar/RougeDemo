@@ -295,4 +295,9 @@ public:
 
 	//消除Player
 	void Elim();
+
+	FORCEINLINE FAttributeInfo GetAttributeInfo() const { return AttributeInfo; }
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE bool IsAlive() const { return AttributeInfo.Health > 0; }
 };

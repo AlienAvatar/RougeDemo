@@ -4,13 +4,12 @@
 #include "AI/BaseAI.h"
 
 #include "AI/BaseAIAnimInstance.h"
+#include "Character/RougeDemoCharacter.h"
+#include "Components/BoxComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/WidgetComponent.h"
 #include "HUD/EnemyHealthBarWidget.h"
 #include "Kismet/GameplayStatics.h"
-#include "Perception/AIPerceptionComponent.h"
-#include "Perception/AISenseConfig.h"
-#include "Perception/AISense_Sight.h"
 
 // Sets default values
 ABaseAI::ABaseAI()
@@ -27,10 +26,17 @@ ABaseAI::ABaseAI()
 	Tags.Add(FName("Enemy"));
 
 	DissolveTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DissolveTimelineComponent"));
-	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 
-	AISenseConfig = NewObject<UAISense_Sight>();
-	
+	LeftAttackSphere = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftAttackSphere"));
+	LeftAttackSphere->SetupAttachment(GetMesh(),FName("LeftAttackSocket"));
+	LeftAttackSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	LeftAttackSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+	LeftAttackSphere->SetCollisionResponseToChannel(ECC_Pawn,ECR_Overlap);
+	RightAttackSphere = CreateDefaultSubobject<UBoxComponent>(TEXT("RightAttackSphere"));
+	RightAttackSphere->SetupAttachment(GetMesh(),FName("RightAttackSocket"));
+	RightAttackSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	RightAttackSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+	RightAttackSphere->SetCollisionResponseToChannel(ECC_Pawn,ECR_Overlap);
 }
 
 
@@ -46,8 +52,9 @@ void ABaseAI::BeginPlay()
 
 	//设置Health Bar
 	SetHUDHealth();
-
-	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ABaseAI::OnTargetPerceptionUpdated);
+	//绑定碰撞
+	LeftAttackSphere->OnComponentBeginOverlap.AddDynamic(this,&ABaseAI::OnLeftAttackBeginOverHandle);
+	RightAttackSphere->OnComponentBeginOverlap.AddDynamic(this,&ABaseAI::OnRightAttackBeginOverHandle);
 }
 
 // Called every frame
@@ -133,20 +140,42 @@ void ABaseAI::SetHUDHealth()
 
 bool ABaseAI::CanUseAnyAbility()
 {
-	return IsAlive() && UGameplayStatics::IsGamePaused(GetWorld());
+	return IsAlive() && !UGameplayStatics::IsGamePaused(GetWorld());
 }
 
-void ABaseAI::PlayAttackMeleeMontage()
+float ABaseAI::PlayAttackMeleeMontage()
 {
 	if(BaseAIAnimInstance && AttackMontageRoot)
 	{
-		BaseAIAnimInstance->Montage_Play(AttackMontageRoot,1.f);
+		const float FinishAttackDelay = BaseAIAnimInstance->Montage_Play(AttackMontageRoot,1.f);
+		BaseAIAnimInstance->Montage_JumpToSection(FName("ForwardAttack1"));
+		return FinishAttackDelay;
 	}
+	return 0.f;
 }
 
-void ABaseAI::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+void ABaseAI::OnLeftAttackBeginOverHandle(UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("See Actor Name::::%s"),*Actor->GetName());
+	
+}
+
+void ABaseAI::OnRightAttackBeginOverHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp,Warning,TEXT("OtherActor[%s]"),*OtherActor->GetName());
+
+	ARougeDemoCharacter* OwnerCharacter = Cast<ARougeDemoCharacter>(OtherActor);
+	if(OwnerCharacter)
+	{
+		AController* OwnerController = OwnerCharacter->Controller;
+		if(OwnerController)
+		{
+			UE_LOG(LogTemp,Warning,TEXT("DamageCount[%f]"),DamageCount);
+			UGameplayStatics::ApplyDamage(OwnerCharacter,DamageCount,OwnerController,this,UDamageType::StaticClass());
+		}
+	}
 }
 
 void ABaseAI::UpdateDissolveMaterial(float DissolveValue)
@@ -220,15 +249,39 @@ void ABaseAI::Dead()
 	Elim();
 }
 
-bool ABaseAI::DoMeleeAttack()
+bool ABaseAI::DoMeleeAttack(float& Delay)
 {
-	if(CanUseAnyAbility())
+	const ARougeDemoCharacter* Player = Cast<ARougeDemoCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
+	if(Player && Player->IsAlive())
 	{
-		
-		PlayAttackMeleeMontage();
-		return true;
+		if(CanUseAnyAbility())
+		{
+			const float DelaySeconds = PlayAttackMeleeMontage();
+			Delay = DelaySeconds;
+			return true;
+		}
 	}
 	return false;
+}
+
+void ABaseAI::ActivateLeftAttack()
+{
+	LeftAttackSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void ABaseAI::ActivateRightAttack()
+{
+	RightAttackSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void ABaseAI::DeactivateLeftAttack()
+{
+	LeftAttackSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ABaseAI::DeactivateRightAttack()
+{
+	RightAttackSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ABaseAI::PlayHitReactMontage()

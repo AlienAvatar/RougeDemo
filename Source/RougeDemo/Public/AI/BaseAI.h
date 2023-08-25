@@ -9,12 +9,14 @@
 #include "Enum/EState.h"
 #include "BaseAI.generated.h"
 
+class USphereComponent;
 class UAISense_Sight;
 class UBaseAIAnimInstance;
 class UWidgetComponent;
 class UTimelineComponent;
 class UAIPerceptionComponent;
 class UAISenseConfig;
+class UBoxComponent;
 
 UCLASS()
 class ROUGEDEMO_API ABaseAI : public ACharacter
@@ -51,9 +53,24 @@ public:
 	FORCEINLINE bool IsAlive() const { return State != EState::ES_Dead; }
 
 	UFUNCTION(BlueprintCallable)
-	bool DoMeleeAttack();
+	bool DoMeleeAttack(float& Delay);
+
+	UFUNCTION(BlueprintCallable)
+	void ActivateLeftAttack();
+	UFUNCTION(BlueprintCallable)
+	void ActivateRightAttack();
+	UFUNCTION(BlueprintCallable)
+	void DeactivateLeftAttack();
+	UFUNCTION(BlueprintCallable)
+	void DeactivateRightAttack();
 	
 protected:
+	UPROPERTY(EditDefaultsOnly)
+	UBoxComponent* LeftAttackSphere;
+
+	UPROPERTY(EditDefaultsOnly)
+	UBoxComponent* RightAttackSphere;
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	// Called every frame
@@ -114,13 +131,13 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* AttackMontageRoot;
 
-	UPROPERTY(EditAnywhere)
-	UAIPerceptionComponent* AIPerceptionComponent;
-
 	//视觉感官配置文件
 	UPROPERTY(EditAnywhere)
 	UAISense_Sight* AISenseConfig;
 
+	//伤害数值
+	UPROPERTY(EditAnywhere)
+	float DamageCount;
 private:
 	//轨迹检测受击
 	virtual float OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser, AController* InstigatedByController, AActor* DamageCauserActor);
@@ -137,8 +154,11 @@ private:
 
 	bool CanUseAnyAbility();
 
-	void PlayAttackMeleeMontage();
+	float PlayAttackMeleeMontage();
 
 	UFUNCTION()
-	void OnTargetPerceptionUpdated( AActor* Actor, FAIStimulus Stimulus);
+	void OnLeftAttackBeginOverHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnRightAttackBeginOverHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

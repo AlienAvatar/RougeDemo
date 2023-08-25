@@ -32,13 +32,11 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UBehaviorTreeComponent* BehaviorTreeComponent;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UBlackboardData* EnemyBlackBoard;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UBehaviorTree* EnemyBehaviorTree;
-
-	
 private:
 
 	bool bIsRanged = false;

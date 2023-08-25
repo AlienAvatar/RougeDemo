@@ -223,7 +223,7 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category=Ragdoll, meta=(AllowPrivateAccess = "true"))
 	float FlailRate;
-private:
+
 	void UpdateLayerValues(float DeltaTime);
 
 	void UpdateCharacterInfo(float DeltaTime);
@@ -272,6 +272,6 @@ private:
 	bool AngleInRange(float Angle,float MinAngle,float MaxAngle,float Buffer,bool bIncreaseBuffer);
 	
 	FVector2D AimingAngle;
-protected:
+
 	
 };
