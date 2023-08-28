@@ -3,14 +3,27 @@
 
 #include "Core/RougeDemoGameMode.h"
 
+#include "AI/AIEnemyController.h"
+#include "AI/BaseAI.h"
+#include "Core/RougeDemoPlayerController.h"
+#include "Core/RougeDemoPlayerState.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
-void ARougeDemoGameMode::PlayEliminated(ARougeDemoCharacter* ElimmedCharacter,
-                                        ARougeDemoPlayerController* VictimController, ARougeDemoPlayerController* AttackController)
+void ARougeDemoGameMode::PlayEliminated(ABaseAI* ElimmedCharacter,
+                                        AAIEnemyController* VictimController, ARougeDemoPlayerController* AttackController)
 {
-	
+	//计算Kills
+	ARougeDemoPlayerController* RougeDemoPlayerController = Cast<ARougeDemoPlayerController>(AttackController);
+	if(RougeDemoPlayerController)
+	{
+		ARougeDemoPlayerState* AttackerPlayerState = RougeDemoPlayerController ? Cast<ARougeDemoPlayerState>(RougeDemoPlayerController->PlayerState) : nullptr;
+		if(AttackerPlayerState)
+		{
+			AttackerPlayerState->AddToScore(1.f);
+		}
+	}
 }
 
 void ARougeDemoGameMode::RequetRespwan(ACharacter* ElimmedCharacter, AController* ElimmedController)

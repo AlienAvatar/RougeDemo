@@ -37,6 +37,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* AttackMontage;
+
+	UPROPERTY(BlueprintReadWrite)
+	AWeapon* CurrentWeapon;
 private:
 	//是否在战斗中
 	bool bIsInCombat = false;
@@ -45,9 +48,6 @@ private:
 
 	UPROPERTY()
 	ARougeDemoCharacter* RougeDemoCharacter;
-
-	UPROPERTY()
-	AWeapon* CurrentWeapon;
 
 	ECombatType CombatType;
 

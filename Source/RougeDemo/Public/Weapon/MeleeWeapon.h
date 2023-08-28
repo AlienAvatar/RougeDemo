@@ -19,6 +19,12 @@ public:
 	void BeginWeaponAttack(float NewAttackDelayTime, int NewAttackDelayCount);
 
 	void EndWeaponAttack();
+
+	UFUNCTION(BlueprintCallable)
+	void ActivateWeaponAttack();
+
+	UFUNCTION(BlueprintCallable)
+	void DeactivateWeaponAttack();
 protected:
 	virtual void BeginPlay() override;
 	
@@ -28,7 +34,6 @@ protected:
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-
 
 private:
 };

@@ -8,6 +8,8 @@
 
 class ARougeDemoPlayerController;
 class ARougeDemoCharacter;
+class AAIEnemyController;
+class ABaseAI;
 /**
  * 
  */
@@ -17,7 +19,7 @@ class ROUGEDEMO_API ARougeDemoGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
-	virtual void PlayEliminated(ARougeDemoCharacter* ElimmedCharacter, ARougeDemoPlayerController* VictimController,ARougeDemoPlayerController* AttackController);
+	virtual void PlayEliminated(ABaseAI* ElimmedCharacter, AAIEnemyController* VictimController,ARougeDemoPlayerController* AttackController);
 
 	virtual void RequetRespwan(ACharacter* ElimmedCharacter,AController* ElimmedController);
 	

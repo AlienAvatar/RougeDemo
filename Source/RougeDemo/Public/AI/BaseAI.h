@@ -9,6 +9,7 @@
 #include "Enum/EState.h"
 #include "BaseAI.generated.h"
 
+class AAIEnemyController;
 class USphereComponent;
 class UAISense_Sight;
 class UBaseAIAnimInstance;
@@ -138,6 +139,9 @@ protected:
 	//伤害数值
 	UPROPERTY(EditAnywhere)
 	float DamageCount;
+
+	UPROPERTY()
+	AAIEnemyController* EnemyController;
 private:
 	//轨迹检测受击
 	virtual float OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser, AController* InstigatedByController, AActor* DamageCauserActor);

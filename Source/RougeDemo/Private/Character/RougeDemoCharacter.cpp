@@ -140,15 +140,6 @@ void ARougeDemoCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, cons
 
 	if(AttributeInfo.Health == 0.f)
 	{
-		ARougeDemoGameMode* RougeDemoGameMode = GetWorld()->GetAuthGameMode<ARougeDemoGameMode>();
-		if(RougeDemoGameMode)
-		{
-			RougeDemoPlayerController = RougeDemoPlayerController == nullptr ? Cast<ARougeDemoPlayerController>(Controller) : RougeDemoPlayerController;
-			ARougeDemoPlayerController* AttackController = Cast<ARougeDemoPlayerController>(InstigatorController);
-			
-			RougeDemoGameMode->PlayEliminated(this,RougeDemoPlayerController,AttackController);
-		}
-
 		RagdollAction();
 	}
 }

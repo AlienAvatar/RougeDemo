@@ -23,5 +23,5 @@ protected:
 	
 public:
 	void SetHUDHealth(float Health, float MaxHealth);
-	
+	void SetHUDScore(float Score);
 };

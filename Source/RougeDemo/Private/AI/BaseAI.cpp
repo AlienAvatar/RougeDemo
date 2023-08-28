@@ -3,11 +3,15 @@
 
 #include "AI/BaseAI.h"
 
+#include "AI/AIEnemyController.h"
 #include "AI/BaseAIAnimInstance.h"
 #include "Character/RougeDemoCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/WidgetComponent.h"
+#include "Core/RougeDemoGameMode.h"
+#include "Core/RougeDemoPlayerController.h"
+#include "Core/RougeDemoPlayerState.h"
 #include "HUD/EnemyHealthBarWidget.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -85,11 +89,21 @@ void ABaseAI::ToggleMarket(bool bLockOn)
 void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
 	AController* InstigatorController, AActor* DamageCauser)
 {
+	UE_LOG(LogTemp,Warning,TEXT("Damage[%f]"),Damage);
 	AttributeInfo.Health = FMath::Clamp(AttributeInfo.Health - Damage, 0.f, AttributeInfo.MaxHealth);
 
 	UpdateHUDHealth();
 	if(AttributeInfo.Health == 0.f)
 	{
+		ARougeDemoGameMode* RougeDemoGameMode = GetWorld()->GetAuthGameMode<ARougeDemoGameMode>();
+		if(RougeDemoGameMode)
+		{
+			EnemyController = EnemyController == nullptr ? Cast<AAIEnemyController>(Controller) : EnemyController;
+			ARougeDemoPlayerController* AttackController = Cast<ARougeDemoPlayerController>(InstigatorController);
+			
+			RougeDemoGameMode->PlayEliminated(this,EnemyController,AttackController);
+		}
+
 		Dead();
 	}else
 	{
@@ -246,6 +260,8 @@ void ABaseAI::Dead()
 		false
 	);
 
+	
+	
 	Elim();
 }
 

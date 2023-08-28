@@ -44,6 +44,16 @@ void AMeleeWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	}
 }
 
+void AMeleeWeapon::ActivateWeaponAttack()
+{
+	GetWeaponMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void AMeleeWeapon::DeactivateWeaponAttack()
+{
+	GetWeaponMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 
 void AMeleeWeapon::BeginWeaponAttack(float NewAttackDelayTime, int NewAttackDelayCount)
 {
