@@ -61,6 +61,17 @@ ARougeDemoCharacter::ARougeDemoCharacter()
 }
 
 
+bool ARougeDemoCharacter::CanSprint()
+{
+	if(bHasMovementInput)
+	{
+		return MovementInputAmount > 0.9f;
+	}else
+	{
+		return false;
+	}
+}
+
 // Called when the game starts or when spawned
 void ARougeDemoCharacter::BeginPlay()
 {
@@ -206,12 +217,14 @@ void ARougeDemoCharacter::StartSprint()
 {
 	bIsSprint = true;
 	CameraBoom->CameraLagSpeed = 5.f;
+	DesiredGait = EGait::EG_Sprinting;
 }
 
 void ARougeDemoCharacter::StopSprint()
 {
 	bIsSprint = false;
 	CameraBoom->CameraLagSpeed = 10.f;
+	DesiredGait = EGait::EG_Running;
 }
 
 void ARougeDemoCharacter::RollAction()
@@ -491,7 +504,6 @@ void ARougeDemoCharacter::UpdateDynamicMovementSettings()
 	}
 
 	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
-	GetCharacterMovement()->MaxWalkSpeedCrouched = MaxWalkSpeed;
 
 	//设置MaxAcceleration,BrakingDecelerationWalking,GroundFraction
 	FVector CurveValue = CurrentMovementSettings.MovementCurve->GetVectorValue(
@@ -688,9 +700,8 @@ void ARougeDemoCharacter::UpdateCharacterMovement(float DeltaTime)
 
 EGait ARougeDemoCharacter::GetActualGait()
 {
-	float LocalWalkSpeed = CurrentMovementSettings.WalkSpeed;
-	float LocalRunSpeed = CurrentMovementSettings.RunSpeed;
-	float LocalSprintSpeed = CurrentMovementSettings.SprintSpeed;
+	const float LocalWalkSpeed = CurrentMovementSettings.WalkSpeed;
+	const float LocalRunSpeed = CurrentMovementSettings.RunSpeed;
 
 	if(Speed >= LocalRunSpeed + 10.f)
 	{
@@ -723,6 +734,14 @@ EGait ARougeDemoCharacter::GetAllowedGait()
 			return EGait::EG_Walking;
 		case EGait::EG_Running:
 			return EGait::EG_Running;
+		case EGait::EG_Sprinting:
+			if(CanSprint())
+			{
+				return EGait::EG_Sprinting;
+			}else
+			{
+				return EGait::EG_Running;
+			}
 		}
 	}
 	return EGait::EG_Walking;

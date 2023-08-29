@@ -272,6 +272,7 @@ void URougeDemoAnimInstance::UpdateMovementValues(float DeltaTime)
 	//UE_LOG(LogTemp,Warning,TEXT("PitchOffset[%f]"),PitchOffset);
 	//UE_LOG(LogTemp,Warning,TEXT("PitchOffset[%f]"),PitchOffset);
 	//UE_LOG(LogTemp,Warning,TEXT("FlailRate[%f]"),FlailRate);
+	UE_LOG(LogTemp,Warning,TEXT("Speed[%f]"),Speed);
 }
 
 float URougeDemoAnimInstance::CalculateStrideBlend()
@@ -371,7 +372,8 @@ float URougeDemoAnimInstance::CalculateStandingPlayRate()
 {
 	const float WalkSpeedRatio = Speed / AnimatedWalkSpeed;
 	const float RunSpeedRatio = Speed / AnimatedRunSpeed;
-	const float SprintSpeedRation = Speed / AnimatedSprintSpeed;
+	const float SprintSpeedRatio = Speed / AnimatedSprintSpeed;
+	
 	const float WalkRunAlpha = GetAnimCurveClamped(TEXT("Weight_Gait"),-1.f,0.f,1.f);
 	const float WalkRunRatio = UKismetMathLibrary::Lerp(
 		WalkSpeedRatio,
@@ -380,21 +382,26 @@ float URougeDemoAnimInstance::CalculateStandingPlayRate()
 	);
 	
 	const float RunSprintAlpha = GetAnimCurveClamped(TEXT("Weight_Gait"),-2.f,0.f,1.f);
-	const float RunSprintRatio = UKismetMathLibrary::Lerp(
+	
+	 float RunSprintRatio = UKismetMathLibrary::Lerp(
 			WalkRunRatio,
-			SprintSpeedRation,
+			SprintSpeedRatio,
 			RunSprintAlpha
 		);
+
+	//限制Rate太快
+	if(RunSprintRatio > 1.5f)
+	{
+		RunSprintRatio = 1.5f;
+	}
 	
 	//查看骨骼是否有伸缩
 	const float ComponentZ = GetOwningComponent()->GetComponentScale().Z;
-	const float ResultPlayRate =
-		UKismetMathLibrary::Clamp(
-		RunSprintRatio / StrideBlend / ComponentZ,
-		0.f,
-		3.f
-	);
-	return ResultPlayRate;
+	const float PlayRateValue = RunSprintRatio / StrideBlend / ComponentZ;
+	//UE_LOG(LogTemp,Warning,TEXT("PlayRateValue[%f]"),PlayRateValue);
+	
+
+	return PlayRateValue;
 }
 
 bool URougeDemoAnimInstance::ShouldMoveCheck()

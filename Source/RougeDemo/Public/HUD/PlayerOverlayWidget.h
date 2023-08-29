@@ -25,4 +25,7 @@ public:
 
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* ScoreAmount;
+
+	UPROPERTY(meta=(BindWidget))
+	UProgressBar* SkillValueBar;
 };

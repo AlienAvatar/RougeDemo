@@ -11,7 +11,6 @@
 #include "Components/WidgetComponent.h"
 #include "Core/RougeDemoGameMode.h"
 #include "Core/RougeDemoPlayerController.h"
-#include "Core/RougeDemoPlayerState.h"
 #include "HUD/EnemyHealthBarWidget.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -89,7 +88,6 @@ void ABaseAI::ToggleMarket(bool bLockOn)
 void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
 	AController* InstigatorController, AActor* DamageCauser)
 {
-	UE_LOG(LogTemp,Warning,TEXT("Damage[%f]"),Damage);
 	AttributeInfo.Health = FMath::Clamp(AttributeInfo.Health - Damage, 0.f, AttributeInfo.MaxHealth);
 
 	UpdateHUDHealth();
@@ -178,15 +176,12 @@ void ABaseAI::OnLeftAttackBeginOverHandle(UPrimitiveComponent* OverlappedCompone
 void ABaseAI::OnRightAttackBeginOverHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp,Warning,TEXT("OtherActor[%s]"),*OtherActor->GetName());
-
 	ARougeDemoCharacter* OwnerCharacter = Cast<ARougeDemoCharacter>(OtherActor);
 	if(OwnerCharacter)
 	{
 		AController* OwnerController = OwnerCharacter->Controller;
 		if(OwnerController)
 		{
-			UE_LOG(LogTemp,Warning,TEXT("DamageCount[%f]"),DamageCount);
 			UGameplayStatics::ApplyDamage(OwnerCharacter,DamageCount,OwnerController,this,UDamageType::StaticClass());
 		}
 	}
@@ -224,7 +219,7 @@ float ABaseAI::OnTakePointDamage(AActor* DamagedActor, float Damage, AController
                                  UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser,
                                  AController* InstigatedByController, AActor* DamageCauserActor)
 {
-	UE_LOG(LogTemp,Warning,TEXT("Damage[%f]"),Damage);
+	UE_LOG(LogTemp,Warning,TEXT("OnTakePointDamage Damage[%f]"),Damage);
 	return 0.f;
 }
 
@@ -260,7 +255,8 @@ void ABaseAI::Dead()
 		false
 	);
 
-	
+	//隐藏Health Widget
+	HealthWidget->SetVisibility(false);
 	
 	Elim();
 }
