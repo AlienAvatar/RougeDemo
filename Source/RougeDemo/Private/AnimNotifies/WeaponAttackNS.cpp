@@ -18,6 +18,11 @@ void UWeaponAttackNS::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenc
 		if(MeleeWeapon)
 		{
 			MeleeWeapon->BeginWeaponAttack(0.04f,2);
+			//不同武器播放粒子Trail
+			if(MeleeWeapon)
+			{
+				MeleeWeapon->PlayTrailFX();
+			}
 		}
 	}
 }
@@ -33,6 +38,8 @@ void UWeaponAttackNS::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 		if(MeleeWeapon)
 		{
 			MeleeWeapon->EndWeaponAttack();
+
+			MeleeWeapon->EndTrailFX();
 		}
 	}
 }

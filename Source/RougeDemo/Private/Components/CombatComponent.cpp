@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Weapon/MeleeWeapon.h"
 #include "Weapon/Weapon.h"
 
 // Sets default values for this component's properties
