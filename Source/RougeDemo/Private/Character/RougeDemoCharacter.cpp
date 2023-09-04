@@ -61,16 +61,7 @@ ARougeDemoCharacter::ARougeDemoCharacter()
 }
 
 
-bool ARougeDemoCharacter::CanSprint()
-{
-	if(bHasMovementInput)
-	{
-		return MovementInputAmount > 0.9f;
-	}else
-	{
-		return false;
-	}
-}
+
 
 // Called when the game starts or when spawned
 void ARougeDemoCharacter::BeginPlay()
@@ -141,6 +132,58 @@ void ARougeDemoCharacter::OnBeginPlay()
 	);*/
 }
 
+// Called every frame
+void ARougeDemoCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	//AimOffset(DeltaTime);
+	
+	SetEssentialValues(DeltaTime);
+	CacheValues(DeltaTime);
+
+	//在锁定状态下启用
+	if(LockOnComp->GetIsLockOn())
+	{
+		AActor* TargetActor = LockOnComp->GetLockOnTarget();
+		AimOffset2Target(DeltaTime,TargetActor);
+		
+		FRotator CameraRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(),TargetActor->GetActorLocation());
+		//CameraBoom->SetWorldRotation(CameraRotation);
+	}
+	
+	switch (MovementState)
+	{
+	case EMovementState::EMS_Grounded:
+		UpdateCharacterMovement(DeltaTime);
+		UpdateGroundedRotation(DeltaTime);
+		break;
+	case EMovementState::EMS_InAir:
+		//To Do Something In Air
+		break;
+	case EMovementState::EMS_RagDoll:
+		RagdollUpdate(DeltaTime);
+		break;
+	default:
+		UE_LOG(LogTemp,Error,TEXT("No MovementState setting, Please check it."));
+	}
+	
+	//DebugMessage
+	//UE_LOG(LogTemp,Warning,TEXT("LastRagdollVelocity[%f]"),LastRagdollVelocity.Size());
+	//UE_LOG(LogTemp,Warning,TEXT("DeltaRotation[%f]"),DeltaDirectRotation.Yaw);
+}
+
+bool ARougeDemoCharacter::CanSprint()
+{
+	if(bHasMovementInput)
+	{
+		return MovementInputAmount > 0.9f;
+	}else
+	{
+		return false;
+	}
+}
+
 void ARougeDemoCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
 	AController* InstigatorController, AActor* DamageCauser)
 {
@@ -175,38 +218,6 @@ void ARougeDemoCharacter::PlayHitReactMontage()
 		}
 	}
 }
-
-// Called every frame
-void ARougeDemoCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	//AimOffset(DeltaTime);
-	
-	SetEssentialValues(DeltaTime);
-	CacheValues(DeltaTime);
-	
-	switch (MovementState)
-	{
-	case EMovementState::EMS_Grounded:
-		UpdateCharacterMovement(DeltaTime);
-		//UpdateGroundedRotation(DeltaTime);
-		break;
-	case EMovementState::EMS_InAir:
-		//To Do Something In Air
-		break;
-	case EMovementState::EMS_RagDoll:
-		RagdollUpdate(DeltaTime);
-		break;
-	default:
-		UE_LOG(LogTemp,Error,TEXT("No MovementState setting, Please check it."));
-	}
-	
-	//DebugMessage
-	//UE_LOG(LogTemp,Warning,TEXT("LastRagdollVelocity[%f]"),LastRagdollVelocity.Size());
-	//UE_LOG(LogTemp,Warning,TEXT("DeltaRotation[%f]"),DeltaDirectRotation.Yaw);
-}
-
 
 void ARougeDemoCharacter::ControlRotationCallback()
 {
@@ -556,11 +567,19 @@ FMovementSettings ARougeDemoCharacter::GetTargetMovementSettings()
 
 void ARougeDemoCharacter::UpdateGroundedRotation(float DeltaTime)
 {
-	if(bCanPlayMontage){ return; }
-	if(CanUpdateMovingRotation())
+	if(bSwingBeforeAttack)
+	{
+		const FRotator YawRotation(0.f,Controller->GetControlRotation().Yaw,0.f);
+		//UE_LOG(LogTemp,Warning,TEXT("YawRotation[%f]"),YawRotation.Yaw);
+		const float RotationRate = CalculateGroundedRotationRate();
+		SmoothCharacterRotation(YawRotation,800.f,RotationRate);
+	}
+	
+	
+	/*if(CanUpdateMovingRotation())
 	{
 		const FRotator Target (0.f, LastVelocityRotation.Yaw, 0.f);
-		SmoothCharacterRotation(Target,800.f,CalculateGroundedRotationRate());
+		
 		/*switch (RotationMode)
 		{
 		case ERotationMode::ERM_VelocityDirection:
@@ -571,7 +590,7 @@ void ARougeDemoCharacter::UpdateGroundedRotation(float DeltaTime)
 			break;
 		case ERotationMode::ERM_Aiming:
 			break;
-		}*/
+		}#1#
 	}else
 	{
 		const float RotationAmountValue = GetAnimCurveValue(TEXT("RotationAmount"));
@@ -582,7 +601,7 @@ void ARougeDemoCharacter::UpdateGroundedRotation(float DeltaTime)
 			AddActorWorldRotation(DeltaRotation);
 			TargetRotation = GetActorRotation();
 		}
-	}
+	}*/
 }
 
 bool ARougeDemoCharacter::CanUpdateMovingRotation()
@@ -780,28 +799,21 @@ void ARougeDemoCharacter::LookUp(float Value)
 	AddControllerPitchInput(Value);
 }
 
-
-
-void ARougeDemoCharacter::AimOffset(float DeltaTime)
+void ARougeDemoCharacter::AimOffset2Target(float DeltaTime, AActor* TargetActor)
 {
-	FVector Velocity = GetVelocity();
-	Velocity.Z = 0.f;
-	Speed = Velocity.Size();
-	if(Speed == 0.f)
+	//LookDirection
+	/*CurrentRotation = FRotator(0.f,GetBaseAimRotation().Yaw,0.f);
+	AO_Yaw = UKismetMathLibrary::NormalizedDeltaRotator(CurrentRotation, StartRotation).Yaw;
+	bUseControllerRotationYaw = false;*/
+	
+	//头朝向锁定目标
+	if(TargetActor)
 	{
-		//LookDirection
-		CurrentRotation = FRotator(0.f,GetBaseAimRotation().Yaw,0.f);
-		AO_Yaw = UKismetMathLibrary::NormalizedDeltaRotator(CurrentRotation, StartRotation).Yaw;
+		CurrentRotation = FRotator(0.f,UKismetMathLibrary::FindLookAtRotation(GetActorLocation(),TargetActor->GetActorLocation()).Yaw,0.f);
+		AO_Yaw = UKismetMathLibrary::NormalizedDeltaRotator(CurrentRotation, GetBaseAimRotation()).Yaw;
+		AO_Pitch = GetBaseAimRotation().Pitch;
 		bUseControllerRotationYaw = false;
 	}
-	//runing
-	if(Speed > 0.f)
-	{
-		StartRotation = FRotator(0.f,GetBaseAimRotation().Yaw,0.f);
-		AO_Yaw = 0.f;
-		bUseControllerRotationYaw = true;
-	}
-	AO_Pitch = GetBaseAimRotation().Pitch;
 }
 
 void ARougeDemoCharacter::SetEssentialValues(float DeltaTime)

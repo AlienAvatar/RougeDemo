@@ -5,6 +5,7 @@
 
 #include "Character/RougeDemoAnimInstance.h"
 #include "Components/CombatComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
 APlayerKatanaCharacter::APlayerKatanaCharacter()

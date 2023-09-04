@@ -15,7 +15,8 @@ public class RougeDemo : ModuleRules
 			"UMG", 
 			"AnimGraphRuntime",
 			"GameplayTasks",
-			"NavigationSystem"
+			"NavigationSystem",
+			"GameplayTags"
 		});
 
 		// Uncomment if you are using Slate UI

@@ -92,6 +92,8 @@ void URougeDemoAnimInstance::UpdateLayerValues(float DeltaTime)
 
 void URougeDemoAnimInstance::UpdateCharacterInfo(float DeltaTime)
 {
+	if(RougeDemoCharacter == nullptr) return;
+	
 	bIsAccelerating = RougeDemoCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f ? true : false;
 	bIsAir = RougeDemoCharacter->GetCharacterMovement()->IsFalling();
 	PitchOffset = RougeDemoCharacter->GetAO_Pitch();
@@ -272,7 +274,7 @@ void URougeDemoAnimInstance::UpdateMovementValues(float DeltaTime)
 	//UE_LOG(LogTemp,Warning,TEXT("PitchOffset[%f]"),PitchOffset);
 	//UE_LOG(LogTemp,Warning,TEXT("PitchOffset[%f]"),PitchOffset);
 	//UE_LOG(LogTemp,Warning,TEXT("FlailRate[%f]"),FlailRate);
-	UE_LOG(LogTemp,Warning,TEXT("Speed[%f]"),Speed);
+	//UE_LOG(LogTemp,Warning,TEXT("Speed[%f]"),Speed);
 }
 
 float URougeDemoAnimInstance::CalculateStrideBlend()

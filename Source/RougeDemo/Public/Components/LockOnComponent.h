@@ -101,4 +101,6 @@ public:
 	void ToggleLockOn();
 
 	FORCEINLINE bool GetIsLockOn() const { return bIsLockOn; }
+
+	FORCEINLINE AActor* GetLockOnTarget() const { return LockOnTarget; }
 };

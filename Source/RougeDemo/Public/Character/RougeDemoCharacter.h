@@ -31,21 +31,13 @@ public:
 	// Sets default values for this character's properties
 	ARougeDemoCharacter();
 
-
 private:
-
-	UPROPERTY(VisibleAnywhere, Category = Camera)
-	USpringArmComponent* CameraBoom;
-
-	UPROPERTY(VisibleAnywhere, Category = Camera)
-	UCameraComponent* FollowCamera;
-
 	float AO_Pitch;
 	float AO_Yaw;
 
 	FRotator CurrentRotation;
 	FRotator StartRotation;
-	void AimOffset(float DeltaTime);
+	void AimOffset2Target(float DeltaTime,AActor* TargetActor);
 
 	void SetEssentialValues(float DeltaTime);
 	
@@ -94,7 +86,7 @@ private:
 
 	FMovementSettings GetTargetMovementSettings();
 	
-	void UpdateGroundedRotation(float DeltaTime);
+
 
 	bool CanUpdateMovingRotation();
 
@@ -266,6 +258,12 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category=Hit)
 	UAnimMontage* F_HitMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
+	USpringArmComponent* CameraBoom;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera)
+	UCameraComponent* FollowCamera;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -302,4 +300,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE bool IsAlive() const { return AttributeInfo.Health > 0; }
+
+	FORCEINLINE float GetMoveF() const { return MoveF; }
+
+	void UpdateGroundedRotation(float DeltaTime);
+
+	//控制攻击前摇
+	bool bSwingBeforeAttack = false;
 };
