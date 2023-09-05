@@ -33,6 +33,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	UWidgetComponent* HealthWidget;
+
+	UPROPERTY(EditDefaultsOnly)
+	UWidgetComponent* ToughWidget;
 	
 	bool bCanBeExecuted = true;
 
@@ -64,7 +67,9 @@ public:
 	void DeactivateLeftAttack();
 	UFUNCTION(BlueprintCallable)
 	void DeactivateRightAttack();
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=State)
+	EState State;
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UBoxComponent* LeftAttackSphere;
@@ -80,9 +85,6 @@ protected:
 	UPROPERTY()
 	UBaseAIAnimInstance* BaseAIAnimInstance;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=State)
-	EState State;
-
 	UPROPERTY(BlueprintReadWrite)
 	float Speed;
 
@@ -97,6 +99,8 @@ protected:
 
 	void UpdateHUDHealth();
 
+	void UpdateHUDTough();
+	
 	FTimerHandle DestroyTimerHandle;
 	
 	//消除效果
@@ -142,6 +146,9 @@ protected:
 
 	UPROPERTY()
 	AAIEnemyController* EnemyController;
+
+	UPROPERTY(EditDefaultsOnly)
+	float ToughRecoverAmount = 20.f;
 private:
 	//轨迹检测受击
 	virtual float OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser, AController* InstigatedByController, AActor* DamageCauserActor);
@@ -156,6 +163,8 @@ private:
 
 	void SetHUDHealth();
 
+	void SetHUDTough();
+	
 	bool CanUseAnyAbility();
 
 	float PlayAttackMeleeMontage();
@@ -165,4 +174,8 @@ private:
 
 	UFUNCTION()
 	void OnRightAttackBeginOverHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	FTimerHandle ToughRecoverTimer;
+
+	void ToughRecoverTimerCallback();
 };

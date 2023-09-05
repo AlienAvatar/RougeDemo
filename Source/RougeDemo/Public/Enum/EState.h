@@ -13,4 +13,6 @@ enum class EState : uint8
 	ES_Falling UMETA(DisplayName="Falling"),
 	
 	ES_Dead UMETA(DisplayName="Dead"),
+	
+	ES_Stun UMETA(DisplayName="Stun"),
 };

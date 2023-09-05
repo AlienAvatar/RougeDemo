@@ -16,4 +16,7 @@ struct FAttributeInfo : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float ToughnessValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float MaxToughnessValue;
 };

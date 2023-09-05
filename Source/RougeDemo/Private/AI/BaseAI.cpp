@@ -11,7 +11,9 @@
 #include "Components/WidgetComponent.h"
 #include "Core/RougeDemoGameMode.h"
 #include "Core/RougeDemoPlayerController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/EnemyHealthBarWidget.h"
+#include "HUD/EnemyToughBarWidget.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -24,6 +26,8 @@ ABaseAI::ABaseAI()
 	TargetWidget->SetupAttachment(GetMesh());
 	HealthWidget =  CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthWidget"));
 	HealthWidget->SetupAttachment(GetMesh());
+	ToughWidget =  CreateDefaultSubobject<UWidgetComponent>(TEXT("ToughWidget"));
+	ToughWidget->SetupAttachment(GetMesh());
 	
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	Tags.Add(FName("Enemy"));
@@ -55,6 +59,9 @@ void ABaseAI::BeginPlay()
 
 	//设置Health Bar
 	SetHUDHealth();
+	//设置Tough Bar
+	SetHUDTough();
+	
 	//绑定碰撞
 	LeftAttackSphere->OnComponentBeginOverlap.AddDynamic(this,&ABaseAI::OnLeftAttackBeginOverHandle);
 	RightAttackSphere->OnComponentBeginOverlap.AddDynamic(this,&ABaseAI::OnRightAttackBeginOverHandle);
@@ -89,8 +96,26 @@ void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageTyp
 	AController* InstigatorController, AActor* DamageCauser)
 {
 	AttributeInfo.Health = FMath::Clamp(AttributeInfo.Health - Damage, 0.f, AttributeInfo.MaxHealth);
-
+	AttributeInfo.ToughnessValue = FMath::Clamp(AttributeInfo.ToughnessValue + 50.f, 0.f, AttributeInfo.MaxToughnessValue);
+	UE_LOG(LogTemp,Warning,TEXT("AttributeInfo.ToughnessValue[%f]"),AttributeInfo.ToughnessValue);
+	
 	UpdateHUDHealth();
+	UpdateHUDTough();
+
+	if(AttributeInfo.Health > 0.f && AttributeInfo.ToughnessValue >= 100.f)
+	{
+		GetWorld()->GetTimerManager().SetTimer(
+			ToughRecoverTimer,
+			this,
+			&ABaseAI::ToughRecoverTimerCallback,
+			0.75f,
+			true,
+			1.f
+		);
+		State = EState::ES_Stun;
+		GetCharacterMovement()->DisableMovement();
+	}
+	
 	if(AttributeInfo.Health == 0.f)
 	{
 		ARougeDemoGameMode* RougeDemoGameMode = GetWorld()->GetAuthGameMode<ARougeDemoGameMode>();
@@ -112,6 +137,11 @@ void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageTyp
 void ABaseAI::UpdateHUDHealth()
 {
 	SetHUDHealth();
+}
+
+void ABaseAI::UpdateHUDTough()
+{
+	SetHUDTough();
 }
 
 void ABaseAI::Elim()
@@ -150,6 +180,20 @@ void ABaseAI::SetHUDHealth()
 	}
 }
 
+void ABaseAI::SetHUDTough()
+{
+	UEnemyToughBarWidget* ToughBarWidget = Cast<UEnemyToughBarWidget>(ToughWidget->GetUserWidgetObject());
+
+	bool bHUDValid = ToughBarWidget &&
+		ToughBarWidget->ToughBar;
+	
+	if(bHUDValid)
+	{
+		float ToughPercent = AttributeInfo.ToughnessValue / AttributeInfo.MaxToughnessValue;
+		ToughBarWidget->ToughBar->SetPercent(ToughPercent);
+	}
+}
+
 bool ABaseAI::CanUseAnyAbility()
 {
 	return IsAlive() && !UGameplayStatics::IsGamePaused(GetWorld());
@@ -185,6 +229,19 @@ void ABaseAI::OnRightAttackBeginOverHandle(UPrimitiveComponent* OverlappedCompon
 			UGameplayStatics::ApplyDamage(OwnerCharacter,DamageCount,OwnerController,this,UDamageType::StaticClass());
 		}
 	}
+}
+
+void ABaseAI::ToughRecoverTimerCallback()
+{
+	float LocalAttributeInfo = AttributeInfo.ToughnessValue - ToughRecoverAmount;
+	AttributeInfo.ToughnessValue = FMath::Clamp(LocalAttributeInfo, 0.f, AttributeInfo.MaxToughnessValue);
+	if(IsAlive() && AttributeInfo.ToughnessValue == 0.f)
+	{
+		State = EState::ES_Idle;
+		GetWorld()->GetTimerManager().ClearTimer(ToughRecoverTimer);
+	}
+
+	UpdateHUDTough();
 }
 
 void ABaseAI::UpdateDissolveMaterial(float DissolveValue)
