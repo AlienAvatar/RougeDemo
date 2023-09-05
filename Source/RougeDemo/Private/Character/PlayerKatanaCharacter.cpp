@@ -36,6 +36,8 @@ APlayerKatanaCharacter::APlayerKatanaCharacter()
 	
 }
 
+
+
 void APlayerKatanaCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -46,76 +48,33 @@ void APlayerKatanaCharacter::BeginPlay()
 	}
 }
 
-void APlayerKatanaCharacter::TestAction()
+void APlayerKatanaCharacter::EquipOrUnarmAction()
 {
-	if(CombatComp == nullptr || RougeDemoAnimInstance == nullptr){ return;}
+	if(CombatComp == nullptr || RougeDemoAnimInstance == nullptr){ return; }
 	
-	float Duration = 0.2f;
-	if(OverlayState == EOverlayState::EOS_Katana)
+	//检查是否正在播放蒙太奇动画
+	if(!RougeDemoAnimInstance->IsAnyMontagePlaying())
 	{
-		//检查是否可以播放蒙太奇动画
-		if(bCanPlayMontage)
+		if(!bEquipped)
 		{
-			OverlayState = EOverlayState::EOS_Default;
-			bCanPlayMontage = false;
-
-			//速度小于10，用root收刀，>10,用Inplace收刀
-			if(Speed < 10.f)
-			{
-				if(UnArmAnimMontagesRoot)
-				{
-					Duration = RougeDemoAnimInstance->Montage_Play(UnArmAnimMontagesRoot,1.f);
-				}
-			}else
-			{
-				if(UnArmAnimMontageInPlace)
-				{
-					Duration = RougeDemoAnimInstance->Montage_Play(UnArmAnimMontageInPlace,1.5f);
-					Duration /= 1.5f;
-				}
-			}
-
-			GetWorld()->GetTimerManager().SetTimer(
-				MontageFinishTimer,
-				this,
-				&APlayerKatanaCharacter::MontageFinishTimerCallBack,
-				Duration
-			);
-		}
-	}else
-	{
-		if(bCanPlayMontage)
-		{
+			//更改动画状态
 			OverlayState = EOverlayState::EOS_Katana;
-			bCanPlayMontage = false;
 
-			if(Speed < 10.f)
-			{
-				if(EquipAnimMontageRoot)
-				{
-					Duration = RougeDemoAnimInstance->Montage_Play(EquipAnimMontageRoot,1.f);
-				}
-			}else
-			{
-				if(EquipAnimMontageInPlace)
-				{
-					Duration = RougeDemoAnimInstance->Montage_Play(EquipAnimMontageInPlace,1.5f);
-				}
-			}
-			
-
-			GetWorld()->GetTimerManager().SetTimer(
-				MontageFinishTimer,
-				this,
-				&APlayerKatanaCharacter::MontageFinishTimerCallBack,
-				Duration
-			);
+			//播放拔刀动画
+			PlayEquippedAnim();
+		}else
+		{
+			//更改动画状态
+			OverlayState = EOverlayState::EOS_Default;
+			//播放收刀动画
+			PlayUnarmAnim();
 		}
 	}
 }
 
-void APlayerKatanaCharacter::MontageFinishTimerCallBack()
+void APlayerKatanaCharacter::EquippedMontageFinishTimerCallBack()
 {
+	bEquipped = true;
 	bCanPlayMontage = true;
 }
 
@@ -125,22 +84,70 @@ void APlayerKatanaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAction("EquipOrUnarm",IE_Pressed,this,&APlayerKatanaCharacter::EquipOrUnarmAction);
 	PlayerInputComponent->BindAction("Test",IE_Pressed,this,&APlayerKatanaCharacter::TestAction);
 	PlayerInputComponent->BindAction("Attack",IE_Pressed,this,&APlayerKatanaCharacter::AttackAction);
 }
 
 void APlayerKatanaCharacter::AttackAction()
 {
-	/*if(OverlayState != EOverlayState::EOS_Katana)
-	{
-		TestAction();
-	}*/
 	if(!bCanPlayMontage) { return; }
 
 	if(CombatComp)
 	{
-		CombatComp->Attack();
+		if(!bEquipped)
+		{
+			//更改动画状态
+			OverlayState = EOverlayState::EOS_Katana;
+			//如果武器在背上，先拔出武器
+			PlayEquippedAnim();
+			//说明是从攻击命令下拔刀的
+			bEquippedToAttack = true;
+		}
+		
+		if(bEquipped)
+		{
+			CombatComp->Attack();
+		}
 	}
+}
+
+void APlayerKatanaCharacter::PlayUnarmAnim()
+{
+	if(CombatComp == nullptr || RougeDemoAnimInstance == nullptr){ return; }
+	
+	float LocalDuration = 0.2f;
+	//速度小于10，用root收刀，>10,用Inplace收刀
+	if(Speed < 10.f)
+	{
+		if(UnArmAnimMontagesRoot)
+		{
+			LocalDuration = RougeDemoAnimInstance->Montage_Play(UnArmAnimMontagesRoot,1.5f);
+		}
+	}else
+	{
+		if(UnArmAnimMontageInPlace)
+		{
+			LocalDuration = RougeDemoAnimInstance->Montage_Play(UnArmAnimMontageInPlace,1.5f);
+		}
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(
+		UnarmMontageFinishTimer,
+		this,
+		&APlayerKatanaCharacter::UnarmMontageFinishTimerCallBack,
+		LocalDuration
+	);
+}
+
+void APlayerKatanaCharacter::UnarmMontageFinishTimerCallBack()
+{
+	bEquipped = false;
+	bEquippedToAttack = false;
+}
+
+void APlayerKatanaCharacter::TestAction()
+{
 }
 
 void APlayerKatanaCharacter::PlayAttackAnim()
@@ -153,4 +160,45 @@ void APlayerKatanaCharacter::PlayAttackAnim()
 		RougeDemoAnimInstance->Montage_JumpToSection(MontageSection,AttackMontageRoot);
 		AttackIndex++;
 	}
+}
+
+void APlayerKatanaCharacter::PlayEquippedAnim()
+{
+	if(CombatComp == nullptr || RougeDemoAnimInstance == nullptr){ return; }
+	
+	float LocalDuration = 0.2f;
+	//检查是否有正在播放蒙太奇动画
+	if(RougeDemoAnimInstance->IsAnyMontagePlaying())
+	{
+		return;
+	}else
+	{
+		//速度小于10，用Root播放，反之用Inplace
+		if(Speed < 10.f)
+		{
+			if(EquipAnimMontageRoot)
+			{
+				LocalDuration = RougeDemoAnimInstance->Montage_Play(EquipAnimMontageRoot,1.5f);
+			}
+		}else
+		{
+			if(EquipAnimMontageInPlace)
+			{
+				LocalDuration = RougeDemoAnimInstance->Montage_Play(EquipAnimMontageInPlace,1.5f);
+			}
+		}
+
+		GetWorld()->GetTimerManager().SetTimer(
+			EquippedMontageFinishTimer,
+			this,
+			&APlayerKatanaCharacter::EquippedMontageFinishTimerCallBack,
+			LocalDuration
+		);
+	}
+}
+
+void APlayerKatanaCharacter::ResetOverlayState()
+{
+	//更改动画状态
+	OverlayState = EOverlayState::EOS_Default;
 }

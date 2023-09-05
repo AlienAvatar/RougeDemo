@@ -145,7 +145,7 @@ void UCombatComponent::EquipWeapon()
 		CurrentWeapon->GetWeaponMesh()->SetVisibility(true);
 
 		//设置static为鞘
-		const APlayerKatanaCharacter* PlayerKatanaCharacter = Cast<APlayerKatanaCharacter>(RougeDemoCharacter);
+		APlayerKatanaCharacter* PlayerKatanaCharacter = Cast<APlayerKatanaCharacter>(RougeDemoCharacter);
 		if(PlayerKatanaCharacter)
 		{
 			UStaticMesh* KatanaAndScabbardMeshRef = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/RougeDemo/RES/Mesh/Weapon/Katana/SM_Scabbard01.SM_Scabbard01"));
@@ -153,6 +153,7 @@ void UCombatComponent::EquipWeapon()
 			{
 				PlayerKatanaCharacter->GetKatanaMeshComp()->SetStaticMesh(KatanaAndScabbardMeshRef);
 			}
+			PlayerKatanaCharacter->bEquipped = true;
 		}
 	}
 }
@@ -165,9 +166,9 @@ void UCombatComponent::UnArmWeapon()
 		
 		CurrentWeapon->AttachToComponent(RougeDemoCharacter->GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,FName("R_Weapon_KatanaAndScabbard_Socket"));
 		CurrentWeapon->GetWeaponMesh()->SetVisibility(false);
-
+		
 		//重新设置static为刀鞘
-		const APlayerKatanaCharacter* PlayerKatanaCharacter = Cast<APlayerKatanaCharacter>(RougeDemoCharacter);
+		APlayerKatanaCharacter* PlayerKatanaCharacter = Cast<APlayerKatanaCharacter>(RougeDemoCharacter);
 		UStaticMesh* KatanaAndScabbardMeshRef = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/RougeDemo/RES/Mesh/Weapon/Katana/SM_KatanaAndScabbard.SM_KatanaAndScabbard"));
 		if(PlayerKatanaCharacter)
 		{
@@ -175,6 +176,7 @@ void UCombatComponent::UnArmWeapon()
 			{
 				PlayerKatanaCharacter->GetKatanaMeshComp()->SetStaticMesh(KatanaAndScabbardMeshRef);
 			}
+			PlayerKatanaCharacter->bEquipped = false;
 		}
 	}
 }

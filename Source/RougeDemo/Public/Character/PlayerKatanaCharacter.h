@@ -19,11 +19,17 @@ public:
 	APlayerKatanaCharacter();
 	
 private:
+	void EquipOrUnarmAction();
+
+	FTimerHandle EquippedMontageFinishTimer;
+
+	void EquippedMontageFinishTimerCallBack();
+
+	FTimerHandle UnarmMontageFinishTimer;
+
+	void UnarmMontageFinishTimerCallBack();
+
 	void TestAction();
-
-	FTimerHandle MontageFinishTimer;
-
-	void MontageFinishTimerCallBack();
 protected:
 	virtual void BeginPlay() override;
 	
@@ -56,8 +62,21 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	int32 AttackIndex = 0;
 
+	void PlayUnarmAnim();
 public:
 	FORCEINLINE UStaticMeshComponent* GetKatanaMeshComp() const { return KatanaMeshComp; }
 
 	void PlayAttackAnim();
+
+	void PlayEquippedAnim();
+
+	//逻辑控制装备是否装备
+	bool bEquipped = false;
+
+	//用来判断是攻击命令还是装备命令
+	UPROPERTY(BlueprintReadWrite)
+	bool bEquippedToAttack = false;
+
+	UFUNCTION(BlueprintCallable)
+	void ResetOverlayState();
 };

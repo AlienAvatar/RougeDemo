@@ -85,8 +85,6 @@ private:
 	void UpdateDynamicMovementSettings();
 
 	FMovementSettings GetTargetMovementSettings();
-	
-
 
 	bool CanUpdateMovingRotation();
 
@@ -264,6 +262,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera)
 	UCameraComponent* FollowCamera;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -307,4 +306,5 @@ public:
 
 	//控制攻击前摇
 	bool bSwingBeforeAttack = false;
+	
 };
