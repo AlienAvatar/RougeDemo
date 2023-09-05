@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "Struct/AttributeInfo.h"
 #include "Enum/EState.h"
+#include "Enum/EMovementDirection.h"
 #include "BaseAI.generated.h"
 
 class AAIEnemyController;
@@ -36,6 +37,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	UWidgetComponent* ToughWidget;
+
+	UPROPERTY(EditDefaultsOnly)
+	UWidgetComponent* FinisherWidget;
 	
 	bool bCanBeExecuted = true;
 
@@ -178,4 +182,7 @@ private:
 	FTimerHandle ToughRecoverTimer;
 
 	void ToughRecoverTimerCallback();
+
+	//受击方向
+	EMovementDirection ReceDamageDirection(AActor* DamagedActor,AActor* CauseActor);
 };

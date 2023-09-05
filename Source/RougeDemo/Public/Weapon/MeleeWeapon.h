@@ -48,5 +48,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	UParticleSystemComponent* TrailComp;
+
+	
 private:
 };

@@ -11,10 +11,12 @@
 #include "Components/WidgetComponent.h"
 #include "Core/RougeDemoGameMode.h"
 #include "Core/RougeDemoPlayerController.h"
+#include "Enum/EMovementDirection.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/EnemyHealthBarWidget.h"
 #include "HUD/EnemyToughBarWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ABaseAI::ABaseAI()
@@ -28,6 +30,9 @@ ABaseAI::ABaseAI()
 	HealthWidget->SetupAttachment(GetMesh());
 	ToughWidget =  CreateDefaultSubobject<UWidgetComponent>(TEXT("ToughWidget"));
 	ToughWidget->SetupAttachment(GetMesh());
+	FinisherWidget =  CreateDefaultSubobject<UWidgetComponent>(TEXT("FinisherWidget"));
+	FinisherWidget->SetupAttachment(GetMesh(),FName("FinisherSocket"));
+	FinisherWidget->SetVisibility(false);
 	
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	Tags.Add(FName("Enemy"));
@@ -97,11 +102,12 @@ void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageTyp
 {
 	AttributeInfo.Health = FMath::Clamp(AttributeInfo.Health - Damage, 0.f, AttributeInfo.MaxHealth);
 	AttributeInfo.ToughnessValue = FMath::Clamp(AttributeInfo.ToughnessValue + 50.f, 0.f, AttributeInfo.MaxToughnessValue);
-	UE_LOG(LogTemp,Warning,TEXT("AttributeInfo.ToughnessValue[%f]"),AttributeInfo.ToughnessValue);
+	//UE_LOG(LogTemp,Warning,TEXT("AttributeInfo.ToughnessValue[%f]"),AttributeInfo.ToughnessValue);
 	
 	UpdateHUDHealth();
 	UpdateHUDTough();
 
+	//处于Stun状态，可以被角色处决
 	if(AttributeInfo.Health > 0.f && AttributeInfo.ToughnessValue >= 100.f)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
@@ -114,6 +120,8 @@ void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageTyp
 		);
 		State = EState::ES_Stun;
 		GetCharacterMovement()->DisableMovement();
+
+		FinisherWidget->SetVisibility(true);
 	}
 	
 	if(AttributeInfo.Health == 0.f)
@@ -131,6 +139,7 @@ void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageTyp
 	}else
 	{
 		PlayHitReactMontage();
+		ReceDamageDirection(DamagedActor,DamageCauser);
 	}
 }
 
@@ -233,15 +242,37 @@ void ABaseAI::OnRightAttackBeginOverHandle(UPrimitiveComponent* OverlappedCompon
 
 void ABaseAI::ToughRecoverTimerCallback()
 {
-	float LocalAttributeInfo = AttributeInfo.ToughnessValue - ToughRecoverAmount;
-	AttributeInfo.ToughnessValue = FMath::Clamp(LocalAttributeInfo, 0.f, AttributeInfo.MaxToughnessValue);
+	AttributeInfo.ToughnessValue = FMath::Clamp(AttributeInfo.ToughnessValue - ToughRecoverAmount, 0.f, AttributeInfo.MaxToughnessValue);
 	if(IsAlive() && AttributeInfo.ToughnessValue == 0.f)
 	{
 		State = EState::ES_Idle;
 		GetWorld()->GetTimerManager().ClearTimer(ToughRecoverTimer);
+		FinisherWidget->SetVisibility(false);
+		GetCharacterMovement()->SetMovementMode(MOVE_MAX);
 	}
 
 	UpdateHUDTough();
+}
+
+EMovementDirection ABaseAI::ReceDamageDirection(AActor* DamagedActor, AActor* CauseActor)
+{
+	const FVector DamageVector = DamagedActor->GetActorLocation();
+	const FVector CauseVector = CauseActor->GetActorLocation();
+	
+	FRotator Damage2CauseRotator = UKismetMathLibrary::FindLookAtRotation(
+		DamageVector,
+		CauseVector
+	);
+	float DirectionValue = UKismetMathLibrary::NormalizedDeltaRotator(
+		Damage2CauseRotator,
+		DamagedActor->GetActorRotation()
+	).Yaw;
+
+	UE_LOG(LogTemp,Warning,TEXT("DirectionValue[%f]"),DirectionValue);
+	EMovementDirection Direction = EMovementDirection::EMD_Forward;
+
+	
+	return Direction;
 }
 
 void ABaseAI::UpdateDissolveMaterial(float DissolveValue)

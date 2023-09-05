@@ -3,6 +3,8 @@
 
 #include "Weapon/Weapon.h"
 
+#include "Components/BoxComponent.h"
+
 // Sets default values
 AWeapon::AWeapon()
 {
@@ -12,6 +14,11 @@ AWeapon::AWeapon()
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
 	RootComponent = WeaponMesh;
 	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	AttackBox = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackBox"));
+	AttackBox->SetupAttachment(WeaponMesh);
+	AttackBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AttackBox->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
 // Called when the game starts or when spawned

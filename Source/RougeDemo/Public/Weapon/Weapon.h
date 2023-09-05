@@ -7,6 +7,7 @@
 #include "Weapon.generated.h"
 
 class UStaticMeshComponent;
+class UBoxComponent;
 
 UCLASS()
 class ROUGEDEMO_API AWeapon : public AActor
@@ -26,12 +27,14 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly,Category=Damage)
 	float DamageCount = 10.f;
-	
+
+	UPROPERTY(EditDefaultsOnly)
+	UBoxComponent* AttackBox;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	FORCEINLINE UStaticMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 
-	
+
 };

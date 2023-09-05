@@ -6,6 +6,7 @@
 #include "AI/BaseAI.h"
 #include "Character/PlayerKatanaCharacter.h"
 #include "Character/RougeDemoAnimInstance.h"
+#include "Components/BoxComponent.h"
 #include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -22,10 +23,10 @@ void AMeleeWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(GetWeaponMesh())
+	if(AttackBox)
 	{
-		GetWeaponMesh()->OnComponentBeginOverlap.AddDynamic(this, &AMeleeWeapon::OnBeginOverlap);
-		GetWeaponMesh()->OnComponentEndOverlap.AddDynamic(this, &AMeleeWeapon::OnEndOverlap);
+		AttackBox->OnComponentBeginOverlap.AddDynamic(this, &AMeleeWeapon::OnBeginOverlap);
+		AttackBox->OnComponentEndOverlap.AddDynamic(this, &AMeleeWeapon::OnEndOverlap);
 	}
 }
 
@@ -88,12 +89,12 @@ void AMeleeWeapon::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 
 void AMeleeWeapon::ActivateWeaponAttack()
 {
-	GetWeaponMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	AttackBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
 void AMeleeWeapon::DeactivateWeaponAttack()
 {
-	GetWeaponMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AttackBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AMeleeWeapon::PlayTrailFX()
