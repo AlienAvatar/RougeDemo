@@ -384,6 +384,38 @@ void ABaseAI::DeactivateRightAttack()
 	RightAttackSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void ABaseAI::ActivateRangeAttack()
+{
+	
+	PlayRangeAttackAnim();
+}
+
+void ABaseAI::PlayRangeAttackAnim()
+{
+	UBaseAIAnimInstance* AnimInstance = Cast<UBaseAIAnimInstance>(GetMesh()->GetAnimInstance());
+	if(AnimInstance)
+	{
+		if(RangeAttackMontageRoot)
+		{
+			AnimInstance->Montage_Play(RangeAttackMontageRoot);
+		}
+	}
+}
+
+void ABaseAI::SpawnProjectile(AActor* TargetActor)
+{
+	//获取MuzzleSocket
+	FVector MuzzleLocation = GetMesh()->GetSocketLocation("MuzzleSocket");
+	FVector Direction = TargetActor->GetActorLocation() - MuzzleLocation;
+	FRotator MuzzleRotation = Direction.Rotation();
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	Params.Instigator = this;
+
+	AActor* NewProj = GetWorld()->SpawnActor<AActor>(ProjectileClass, MuzzleLocation, MuzzleRotation, Params);
+}
+
 void ABaseAI::PlayHitReactMontage()
 {
 	UBaseAIAnimInstance* AnimInstance = Cast<UBaseAIAnimInstance>(GetMesh()->GetAnimInstance());

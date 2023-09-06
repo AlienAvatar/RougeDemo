@@ -21,9 +21,6 @@ void AAIEnemyController::BeginPlay()
 
 	if(EnemyBlackBoard)
 	{
-		UseBlackboard(EnemyBlackBoard,BlackboardComponent);
-		FName IsRangeKeyName = UKismetSystemLibrary::MakeLiteralName(FName("IsRanged"));
-		BlackboardComponent->SetValueAsBool(IsRangeKeyName,bIsRanged);
 		if(EnemyBehaviorTree)
 		{
 			RunBehaviorTree(EnemyBehaviorTree);

@@ -74,6 +74,17 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=State)
 	EState State;
+
+	UFUNCTION(BlueprintCallable)
+	void ActivateRangeAttack();
+
+	void PlayRangeAttackAnim();
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnProjectile(AActor* TargetActor);
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	TSubclassOf<AActor> ProjectileClass;
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UBoxComponent* LeftAttackSphere;
@@ -153,6 +164,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	float ToughRecoverAmount = 20.f;
+
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* RangeAttackMontageRoot;
 private:
 	//轨迹检测受击
 	virtual float OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser, AController* InstigatedByController, AActor* DamageCauserActor);
