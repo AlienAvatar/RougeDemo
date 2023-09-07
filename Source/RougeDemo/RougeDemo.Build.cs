@@ -16,7 +16,8 @@ public class RougeDemo : ModuleRules
 			"AnimGraphRuntime",
 			"GameplayTasks",
 			"NavigationSystem",
-			"GameplayTags"
+			"GameplayTags",
+			"Niagara"
 		});
 
 		// Uncomment if you are using Slate UI

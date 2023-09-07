@@ -4,6 +4,7 @@
 #include "AI/BaseAIAnimInstance.h"
 
 #include "AI/BaseAI.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void UBaseAIAnimInstance::NativeInitializeAnimation()
 {
@@ -28,4 +29,11 @@ void UBaseAIAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	Velocity = BaseAI->GetVelocity();
 	Speed = BaseAI->GetSpeed();
+	
+	
+}
+
+void UBaseAIAnimInstance::RotateInPlaceCheck()
+{
+	
 }

@@ -240,6 +240,9 @@ void ARougeDemoCharacter::StopSprint()
 
 void ARougeDemoCharacter::RollAction()
 {
+	if(bRolling){ return; }
+
+	bRolling = true;
 	//前
 	if(UKismetMathLibrary::InRange_FloatFloat(DeltaDirectRotation.Yaw,-45.f,45.f,true,true))
 	{

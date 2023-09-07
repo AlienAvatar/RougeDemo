@@ -167,6 +167,17 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* RangeAttackMontageRoot;
+
+	virtual void UpdateGroundedRotation(float DeltaTime);
+
+	UPROPERTY()
+	AAIEnemyController* AIController;
+
+	void SmoothCharacterRotation(FRotator Target,float TargetInterpSpeed,float ActorInterpSpeed);
+
+	void UpdateCharacterInfo(float DeltaTime);
+
+	
 private:
 	//轨迹检测受击
 	virtual float OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser, AController* InstigatedByController, AActor* DamageCauserActor);
@@ -199,4 +210,6 @@ private:
 
 	//受击方向
 	EMovementDirection ReceDamageDirection(AActor* DamagedActor,AActor* CauseActor);
+
+	FRotator TargetRotation;
 };

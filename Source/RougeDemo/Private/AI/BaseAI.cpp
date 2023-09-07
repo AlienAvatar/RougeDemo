@@ -5,6 +5,7 @@
 
 #include "AI/AIEnemyController.h"
 #include "AI/BaseAIAnimInstance.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Character/RougeDemoCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Components/ProgressBar.h"
@@ -70,6 +71,8 @@ void ABaseAI::BeginPlay()
 	//绑定碰撞
 	LeftAttackSphere->OnComponentBeginOverlap.AddDynamic(this,&ABaseAI::OnLeftAttackBeginOverHandle);
 	RightAttackSphere->OnComponentBeginOverlap.AddDynamic(this,&ABaseAI::OnRightAttackBeginOverHandle);
+
+	AIController = Cast<AAIEnemyController>(GetController());
 }
 
 // Called every frame
@@ -77,9 +80,8 @@ void ABaseAI::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	Velocity = GetVelocity();
-	Velocity.Z = 0.f;
-	Speed = Velocity.Size();
+	UpdateCharacterInfo(DeltaTime);
+	UpdateGroundedRotation(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -275,6 +277,30 @@ EMovementDirection ABaseAI::ReceDamageDirection(AActor* DamagedActor, AActor* Ca
 	return Direction;
 }
 
+void ABaseAI::SmoothCharacterRotation(FRotator Target, float TargetInterpSpeed, float ActorInterpSpeed)
+{
+	TargetRotation = UKismetMathLibrary::RInterpTo_Constant(
+		TargetRotation,
+		Target,
+		UGameplayStatics::GetWorldDeltaSeconds(GetWorld()),
+		TargetInterpSpeed);
+
+	FRotator ActorRotation = UKismetMathLibrary::RInterpTo(
+		GetActorRotation(),
+		TargetRotation,
+		UGameplayStatics::GetWorldDeltaSeconds(GetWorld()),
+		ActorInterpSpeed);
+
+	SetActorRotation(ActorRotation);
+}
+
+void ABaseAI::UpdateCharacterInfo(float DeltaTime)
+{
+	Velocity = GetVelocity();
+	Velocity.Z = 0.f;
+	Speed = Velocity.Size();
+}
+
 void ABaseAI::UpdateDissolveMaterial(float DissolveValue)
 {
 	if(DynamicDissolveMaterialInstance)
@@ -300,6 +326,44 @@ void ABaseAI::PlayElimMontage()
 		FName MontageSection = TEXT("Forward");
 		BaseAIAnimInstance->Montage_Play(F_ElimMontageRoot);
 		BaseAIAnimInstance->Montage_JumpToSection(MontageSection,F_ElimMontageRoot);
+	}
+}
+
+void ABaseAI::UpdateGroundedRotation(float DeltaTime)
+{
+	const UBlackboardComponent* BlackboardComponent = AIController->GetBlackboardComponent();
+	if(BlackboardComponent)
+	{
+		//获取TargetActor，一般为Player
+		AActor* TargetActor = Cast<AActor>(BlackboardComponent->GetValueAsObject("TargetActor"));
+		if(TargetActor)
+		{
+			//计算玩家方位
+			float DireValue = UKismetMathLibrary::Dot_VectorVector(
+				TargetActor->GetActorLocation(),
+				this->GetActorLocation()
+			);
+
+			UE_LOG(LogTemp,Warning,TEXT("DireValue[%f]"),DireValue);
+			//true 玩家在前面
+			if(DireValue > 0.f)
+			{
+				//如果Player在玩家前面执行AO
+				//To Do 计算YawOffset
+				
+			}else
+			{
+				FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(
+				this->GetActorLocation(),
+				TargetActor->GetActorLocation()
+				);
+				//如果Player在玩家后面执行旋转
+				const FRotator YawRotation(0.f,Rotation.Yaw,0.f);
+
+				const float RotationRate = 1.f;
+				SmoothCharacterRotation(YawRotation,800.f,RotationRate);
+			}
+		}
 	}
 }
 

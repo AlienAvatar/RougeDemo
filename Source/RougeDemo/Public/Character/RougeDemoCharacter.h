@@ -175,6 +175,8 @@ private:
 	float ElimDelay = 3.f;
 
 	bool CanSprint();
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -306,5 +308,8 @@ public:
 
 	//控制攻击前摇
 	bool bSwingBeforeAttack = false;
-	
+
+	//控制翻滚
+	UPROPERTY(BlueprintReadWrite)
+	bool bRolling = false;
 };
