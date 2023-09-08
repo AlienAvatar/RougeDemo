@@ -12,6 +12,7 @@ class UBlackboardComponent;
 class UParticleSystem;
 class UNiagaraSystem;
 class UStaticMeshComponent;
+class UCTRD_EliteAIAnimInstance;
 /**
  * 
  */
@@ -76,6 +77,19 @@ protected:
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,FVector NormalImpulse,const FHitResult& Hit);
+
+	virtual float PlayAttackMeleeMontage() override;
+	
+	UPROPERTY(EditDefaultsOnly,Category="Attack")
+	UAnimMontage* MeleeAttackMontage;
+
+	UPROPERTY()
+	UCTRD_EliteAIAnimInstance* MainAnimInstance;
+
+	UPROPERTY(EditDefaultsOnly,Category="Attack")
+	TArray<FName> AttackSectionArr;
+
+	
 private:
 	UFUNCTION()
 	void OnTimelineEndEvent(float Output);
@@ -95,6 +109,7 @@ private:
 	FTimerHandle MoveRayAttackTimerHandle;
 
 	void MoveRayAttackHandleCallBack();
+
 public:
 
 	FORCEINLINE float GetYawOffset() const { return YawOffset; }
@@ -108,4 +123,12 @@ public:
 	UBlackboardComponent* BlackboardComponent;
 
 	FORCEINLINE float GetAimYawRate() const { return AimYawRate; }
+
+	UFUNCTION(BlueprintCallable)
+	void MeleeAttack();
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category="Attack")
+	int32 AttackCount;
+
+	
 };

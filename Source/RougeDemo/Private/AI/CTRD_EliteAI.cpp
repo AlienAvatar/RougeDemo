@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "NiagaraFunctionLibrary.h"
+#include "AI/CTRD_EliteAIAnimInstance.h"
 
 ACTRD_EliteAI::ACTRD_EliteAI()
 {
@@ -39,6 +40,10 @@ ACTRD_EliteAI::ACTRD_EliteAI()
 	LeftLaser->OnComponentBeginOverlap.AddDynamic(this,&ACTRD_EliteAI::ACTRD_EliteAI::OnBeginOverlap);
 	RightLaser->OnComponentHit.AddDynamic(this,&ACTRD_EliteAI::ACTRD_EliteAI::OnHit);
 	LeftLaser->OnComponentHit.AddDynamic(this,&ACTRD_EliteAI::ACTRD_EliteAI::OnHit);
+
+	AttackSectionArr.Add(FName("Attack01"));
+	AttackSectionArr.Add(FName("Attack02"));
+	AttackSectionArr.Add(FName("Attack03"));
 }
 
 void ACTRD_EliteAI::BeginPlay()
@@ -75,6 +80,8 @@ void ACTRD_EliteAI::BeginPlay()
 	}
 
 	BlackboardComponent = AIController->GetBlackboardComponent();
+
+	MainAnimInstance = Cast<UCTRD_EliteAIAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
 void ACTRD_EliteAI::Tick(float DeltaSeconds)
@@ -233,6 +240,25 @@ void ACTRD_EliteAI::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 	}
 }
 
+float ACTRD_EliteAI::PlayAttackMeleeMontage()
+{
+	if(MainAnimInstance && AttackMontageRoot)
+	{
+		float MonDuration = 0.f;
+		MonDuration = MainAnimInstance->Montage_Play(AttackMontageRoot);
+		MainAnimInstance->Montage_JumpToSection(AttackSectionArr[AttackCount],AttackMontageRoot);
+		AttackCount++;
+
+		if(AttackCount > 2)
+		{
+			AttackCount = 0.f;
+		}
+		return MonDuration;
+	}
+	
+	return 0.f;
+}
+
 void ACTRD_EliteAI::OnTimelineEndEvent(float Output)
 {
 	bIsRayAttacking = false;
@@ -241,6 +267,8 @@ void ACTRD_EliteAI::OnTimelineEndEvent(float Output)
 	RightLaser->SetVisibility(false);
 	LeftLaser->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	RightLaser->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	GetWorldTimerManager().ClearTimer(MoveRayAttackTimerHandle);
 }
 
 void ACTRD_EliteAI::CacheValues(float DeltaTime)
@@ -316,4 +344,12 @@ void ACTRD_EliteAI::RayAttack()
 		false,
 		0.5f
 	);
+}
+
+void ACTRD_EliteAI::MeleeAttack()
+{
+	float Duration = PlayAttackMeleeMontage();
+
+	UE_LOG(LogTemp,Warning,TEXT("Duration[%f]"),Duration);
+	
 }
