@@ -44,6 +44,7 @@ ACTRD_EliteAI::ACTRD_EliteAI()
 	AttackSectionArr.Add(FName("Attack01"));
 	AttackSectionArr.Add(FName("Attack02"));
 	AttackSectionArr.Add(FName("Attack03"));
+	
 }
 
 void ACTRD_EliteAI::BeginPlay()
@@ -87,7 +88,7 @@ void ACTRD_EliteAI::BeginPlay()
 void ACTRD_EliteAI::Tick(float DeltaSeconds)
 {
 	UpdateCharacterInfo(DeltaSeconds);
-	if(!bIsRayAttacking)
+	/*if(!bIsRayAttacking)
 	{
 		UpdateGroundedRotation(DeltaSeconds);
 	}
@@ -96,7 +97,7 @@ void ACTRD_EliteAI::Tick(float DeltaSeconds)
 	{
 		RayAttackTimeLine->TickComponent(DeltaSeconds, ELevelTick::LEVELTICK_TimeOnly, NULL);
 	}
-	CacheValues(DeltaSeconds);
+	CacheValues(DeltaSeconds);*/
 }
 
 void ACTRD_EliteAI::UpdateGroundedRotation(float DeltaTime)
@@ -242,17 +243,13 @@ void ACTRD_EliteAI::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 
 float ACTRD_EliteAI::PlayAttackMeleeMontage()
 {
-	if(MainAnimInstance && AttackMontageRoot)
+	if(MainAnimInstance && AttackMontageRoot && AttackCount < 3)
 	{
 		float MonDuration = 0.f;
 		MonDuration = MainAnimInstance->Montage_Play(AttackMontageRoot);
 		MainAnimInstance->Montage_JumpToSection(AttackSectionArr[AttackCount],AttackMontageRoot);
 		AttackCount++;
 
-		if(AttackCount > 2)
-		{
-			AttackCount = 0.f;
-		}
 		return MonDuration;
 	}
 	
@@ -346,10 +343,10 @@ void ACTRD_EliteAI::RayAttack()
 	);
 }
 
-void ACTRD_EliteAI::MeleeAttack()
+bool ACTRD_EliteAI::DoMeleeAttack(float& Delay)
 {
-	float Duration = PlayAttackMeleeMontage();
-
-	UE_LOG(LogTemp,Warning,TEXT("Duration[%f]"),Duration);
-	
+	float DelaySeconds = PlayAttackMeleeMontage();
+	Delay = DelaySeconds;
+	UE_LOG(LogTemp,Warning,TEXT("Duration[%f]"),Delay);
+	return true;
 }

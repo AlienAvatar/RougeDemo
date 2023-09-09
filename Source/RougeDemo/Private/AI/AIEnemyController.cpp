@@ -18,14 +18,6 @@ AAIEnemyController::AAIEnemyController()
 void AAIEnemyController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if(EnemyBlackBoard)
-	{
-		if(EnemyBehaviorTree)
-		{
-			RunBehaviorTree(EnemyBehaviorTree);
-		}
-	}
 }
 
 void AAIEnemyController::OnPossess(APawn* InPawn)
@@ -38,5 +30,12 @@ void AAIEnemyController::OnPossess(APawn* InPawn)
 	if(BaseAI)
 	{
 		BlackboardComponent->InitializeBlackboard(*EnemyBlackBoard);
+		if(EnemyBlackBoard)
+		{
+			if(EnemyBehaviorTree)
+			{
+				RunBehaviorTree(EnemyBehaviorTree);
+			}
+		}
 	}
 }

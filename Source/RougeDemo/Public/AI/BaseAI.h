@@ -61,7 +61,7 @@ public:
 	FORCEINLINE bool IsAlive() const { return State != EState::ES_Dead; }
 
 	UFUNCTION(BlueprintCallable)
-	bool DoMeleeAttack(float& Delay);
+	virtual bool DoMeleeAttack(float& Delay);
 
 	UFUNCTION(BlueprintCallable)
 	void ActivateLeftAttack();

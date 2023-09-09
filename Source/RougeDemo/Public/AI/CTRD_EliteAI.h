@@ -124,9 +124,8 @@ public:
 
 	FORCEINLINE float GetAimYawRate() const { return AimYawRate; }
 
-	UFUNCTION(BlueprintCallable)
-	void MeleeAttack();
-
+	virtual bool DoMeleeAttack(float& Delay) override;
+	
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category="Attack")
 	int32 AttackCount;
 
