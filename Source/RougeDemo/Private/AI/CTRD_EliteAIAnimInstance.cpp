@@ -31,7 +31,7 @@ void UCTRD_EliteAIAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	PitchOffset = EliteAI->GetPitchOffset();
 	AimYawRate = EliteAI->GetAimYawRate();
 	
-	if(AnimState == EState::ES_Idle)
+	if(AnimState == EState::ES_Passive)
 	{
 		RotateInPlaceCheck();
 	}else

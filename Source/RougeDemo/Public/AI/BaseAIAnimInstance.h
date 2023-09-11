@@ -59,4 +59,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
 	float RotateRate = 1.f;
 	float AimYawRate = 0.f;
+
+	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
+	float Direction;
 };

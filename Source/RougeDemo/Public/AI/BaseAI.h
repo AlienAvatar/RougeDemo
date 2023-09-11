@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/TimelineComponent.h"
+#include "Enum/EAISense.h"
 #include "GameFramework/Character.h"
 #include "Struct/AttributeInfo.h"
 #include "Enum/EState.h"
 #include "Enum/EMovementDirection.h"
+#include "Enum/EAIStage.h"
+#include "Interface/EnemyAIInterface.h"
 #include "BaseAI.generated.h"
 
 class AAIEnemyController;
@@ -19,9 +22,10 @@ class UTimelineComponent;
 class UAIPerceptionComponent;
 class UAISenseConfig;
 class UBoxComponent;
+class UDataTable;
 
 UCLASS()
-class ROUGEDEMO_API ABaseAI : public ACharacter
+class ROUGEDEMO_API ABaseAI : public ACharacter, public IEnemyAIInterface
 {
 	GENERATED_BODY()
 
@@ -85,6 +89,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 	TSubclassOf<AActor> ProjectileClass;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	EAIStage Stage;
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE EState GetCurrentState() const { return State; }
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UBoxComponent* LeftAttackSphere;
@@ -177,7 +187,18 @@ protected:
 
 	void UpdateCharacterInfo(float DeltaTime);
 
-	
+	UFUNCTION(BlueprintCallable)
+	bool CanSenseActor(AActor* Actor,EAISense Sense);
+
+	virtual bool SetMovementSpeed(EGait Gait) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UDataTable* AttributeDataTable;
+
+	FAttributeInfo* AttributeData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ToughRecoverTimeRate = 0.75f;
 private:
 	//轨迹检测受击
 	virtual float OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser, AController* InstigatedByController, AActor* DamageCauserActor);
@@ -212,4 +233,10 @@ private:
 	EMovementDirection ReceDamageDirection(AActor* DamagedActor,AActor* CauseActor);
 
 	FRotator TargetRotation;
+
+	//从DataTable中读取
+	void SetAttributeInfo();
+
+	bool bIsRecoveringToughness = false;
+
 };

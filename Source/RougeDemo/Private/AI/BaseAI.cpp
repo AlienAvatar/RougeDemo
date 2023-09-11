@@ -18,6 +18,7 @@
 #include "HUD/EnemyToughBarWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Weapon/MeleeWeapon.h"
 
 // Sets default values
 ABaseAI::ABaseAI()
@@ -50,9 +51,9 @@ ABaseAI::ABaseAI()
 	RightAttackSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	RightAttackSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
 	RightAttackSphere->SetCollisionResponseToChannel(ECC_Pawn,ECR_Overlap);
+
+	State = EState::ES_Passive;
 }
-
-
 
 // Called when the game starts or when spawned
 void ABaseAI::BeginPlay()
@@ -73,6 +74,9 @@ void ABaseAI::BeginPlay()
 	RightAttackSphere->OnComponentBeginOverlap.AddDynamic(this,&ABaseAI::OnRightAttackBeginOverHandle);
 
 	AIController = Cast<AAIEnemyController>(GetController());
+
+	//读取Table
+	SetAttributeInfo();
 }
 
 // Called every frame
@@ -81,7 +85,7 @@ void ABaseAI::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	UpdateCharacterInfo(DeltaTime);
-	UpdateGroundedRotation(DeltaTime);
+	//UpdateGroundedRotation(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -103,26 +107,35 @@ void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageTyp
 	AController* InstigatorController, AActor* DamageCauser)
 {
 	AttributeInfo.Health = FMath::Clamp(AttributeInfo.Health - Damage, 0.f, AttributeInfo.MaxHealth);
-	AttributeInfo.ToughnessValue = FMath::Clamp(AttributeInfo.ToughnessValue + 50.f, 0.f, AttributeInfo.MaxToughnessValue);
-	//UE_LOG(LogTemp,Warning,TEXT("AttributeInfo.ToughnessValue[%f]"),AttributeInfo.ToughnessValue);
+	//在恢复的时候，无法增加韧值
+	if(!bIsRecoveringToughness)
+	{
+		AttributeInfo.ToughnessValue = FMath::Clamp(AttributeInfo.ToughnessValue + 50.f, 0.f, AttributeInfo.MaxToughnessValue);
+	}
 	
+	//UE_LOG(LogTemp,Warning,TEXT("AttributeInfo.ToughnessValue[%f]"),AttributeInfo.ToughnessValue);
+
+	//更新UI
 	UpdateHUDHealth();
 	UpdateHUDTough();
 
 	//处于Stun状态，可以被角色处决
 	if(AttributeInfo.Health > 0.f && AttributeInfo.ToughnessValue >= 100.f)
 	{
+		//设置状态，禁止移动
+		State = EState::ES_Stun;
+		GetCharacterMovement()->DisableMovement();
+
+		//根据时间来减少韧值,延迟1s执行
 		GetWorld()->GetTimerManager().SetTimer(
 			ToughRecoverTimer,
 			this,
 			&ABaseAI::ToughRecoverTimerCallback,
-			0.75f,
+			ToughRecoverTimeRate,
 			true,
 			1.f
 		);
-		State = EState::ES_Stun;
-		GetCharacterMovement()->DisableMovement();
-
+		
 		FinisherWidget->SetVisibility(true);
 	}
 	
@@ -140,6 +153,7 @@ void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageTyp
 		Dead();
 	}else
 	{
+		//播放受击动画
 		PlayHitReactMontage();
 		ReceDamageDirection(DamagedActor,DamageCauser);
 	}
@@ -244,15 +258,20 @@ void ABaseAI::OnRightAttackBeginOverHandle(UPrimitiveComponent* OverlappedCompon
 
 void ABaseAI::ToughRecoverTimerCallback()
 {
+	bIsRecoveringToughness = true;
+	//减少韧值
 	AttributeInfo.ToughnessValue = FMath::Clamp(AttributeInfo.ToughnessValue - ToughRecoverAmount, 0.f, AttributeInfo.MaxToughnessValue);
+	//ToughnessValue == 0.f证明AI需解除Stun状态
 	if(IsAlive() && AttributeInfo.ToughnessValue == 0.f)
 	{
-		State = EState::ES_Idle;
+		//设置回攻击状态
+		State = EState::ES_Attacking;
 		GetWorld()->GetTimerManager().ClearTimer(ToughRecoverTimer);
 		FinisherWidget->SetVisibility(false);
-		GetCharacterMovement()->SetMovementMode(MOVE_MAX);
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		bIsRecoveringToughness = false;
 	}
-
+	
 	UpdateHUDTough();
 }
 
@@ -265,6 +284,8 @@ EMovementDirection ABaseAI::ReceDamageDirection(AActor* DamagedActor, AActor* Ca
 		DamageVector,
 		CauseVector
 	);
+	UE_LOG(LogTemp,Warning,TEXT("Damage2CauseRotator[%f]"),Damage2CauseRotator.Yaw);
+	
 	float DirectionValue = UKismetMathLibrary::NormalizedDeltaRotator(
 		Damage2CauseRotator,
 		DamagedActor->GetActorRotation()
@@ -275,6 +296,16 @@ EMovementDirection ABaseAI::ReceDamageDirection(AActor* DamagedActor, AActor* Ca
 
 	
 	return Direction;
+}
+
+void ABaseAI::SetAttributeInfo()
+{
+	if(AttributeDataTable)
+	{
+		const FName RowName("CPRD_Elite");
+		const FString ContextString = TEXT("Attempting to find Skill_01 in SkillTable");
+		AttributeData = AttributeDataTable->FindRow<FAttributeInfo>(RowName,ContextString);
+	}
 }
 
 void ABaseAI::SmoothCharacterRotation(FRotator Target, float TargetInterpSpeed, float ActorInterpSpeed)
@@ -299,6 +330,29 @@ void ABaseAI::UpdateCharacterInfo(float DeltaTime)
 	Velocity = GetVelocity();
 	Velocity.Z = 0.f;
 	Speed = Velocity.Size();
+}
+
+bool ABaseAI::CanSenseActor(AActor* Actor, EAISense Sense)
+{
+	
+	return false;
+}
+
+bool ABaseAI::SetMovementSpeed(EGait Gait)
+{
+	switch (Gait)
+	{
+	case EGait::EG_Walking:
+		GetCharacterMovement()->MaxWalkSpeed = AttributeInfo.MovementSettings.WalkSpeed;
+		return true;
+	case EGait::EG_Running:
+		GetCharacterMovement()->MaxWalkSpeed = AttributeInfo.MovementSettings.RunSpeed;
+		return true;
+	case EGait::EG_Sprinting:
+		GetCharacterMovement()->MaxWalkSpeed = AttributeInfo.MovementSettings.SprintSpeed;
+		return true;
+	}
+	return IEnemyAIInterface::SetMovementSpeed(Gait);
 }
 
 void ABaseAI::UpdateDissolveMaterial(float DissolveValue)
@@ -344,7 +398,7 @@ void ABaseAI::UpdateGroundedRotation(float DeltaTime)
 				this->GetActorLocation()
 			);
 
-			UE_LOG(LogTemp,Warning,TEXT("DireValue[%f]"),DireValue);
+			//UE_LOG(LogTemp,Warning,TEXT("DireValue[%f]"),DireValue);
 			//true 玩家在前面
 			if(DireValue > 0.f)
 			{
@@ -378,11 +432,11 @@ float ABaseAI::OnTakePointDamage(AActor* DamagedActor, float Damage, AController
 float ABaseAI::InternalTakePointDamage(float Damage, FPointDamageEvent const& PointDamageEvent,
 	AController* EventInstigator, AActor* DamageCauser)
 {
-	AttributeInfo.Health = AttributeInfo.Health - Damage;
+	/*AttributeInfo.Health = AttributeInfo.Health - Damage;
 	if(AttributeInfo.Health <= 0.f)
 	{
 		Dead();
-	}
+	}*/
 	
 	return Super::InternalTakePointDamage(Damage, PointDamageEvent, EventInstigator, DamageCauser);
 }
@@ -450,7 +504,6 @@ void ABaseAI::DeactivateRightAttack()
 
 void ABaseAI::ActivateRangeAttack()
 {
-	
 	PlayRangeAttackAnim();
 }
 

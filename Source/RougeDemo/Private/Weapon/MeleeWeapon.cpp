@@ -10,6 +10,7 @@
 #include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Perception/AISense_Damage.h"
 
 
 AMeleeWeapon::AMeleeWeapon()
@@ -33,6 +34,9 @@ void AMeleeWeapon::BeginPlay()
 void AMeleeWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 	bool bFromSweep, const FHitResult& SweepResult)
 {
+	AttackBox->SetGenerateOverlapEvents(false);
+	
+	UE_LOG(LogTemp,Warning,TEXT("OnBeginOverlap"));
 	ABaseAI* BaseAI = Cast<ABaseAI>(OtherActor);
 	if(BaseAI)
 	{
@@ -41,7 +45,7 @@ void AMeleeWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 		if(OwnerCharacter)
 		{
 			//添加打击感
-			URougeDemoAnimInstance* AnimInstance = OwnerCharacter->GetRougeDemoAnimationInstance();
+			/*URougeDemoAnimInstance* AnimInstance = OwnerCharacter->GetRougeDemoAnimationInstance();
 			if(AnimInstance)
 			{
 				//获取当前播放的蒙太奇
@@ -50,12 +54,13 @@ void AMeleeWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 				{
 					CurrentActiveMontage->RateScale = 0.2f;
 				}
-			}
+			}*/
 			
 			AController* OwnerController = OwnerCharacter->Controller;
 			if(OwnerController)
 			{
 				UE_LOG(LogTemp,Warning,TEXT("DamageCount[%f]"),DamageCount);
+				UAISense_Damage::ReportDamageEvent(GetWorld(),BaseAI,this,DamageCount,GetActorLocation(),BaseAI->GetActorLocation());
 				UGameplayStatics::ApplyDamage(OtherActor,DamageCount,OwnerController,this,UDamageType::StaticClass());
 			}
 		}
@@ -65,6 +70,7 @@ void AMeleeWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 void AMeleeWeapon::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	UE_LOG(LogTemp,Warning,TEXT("OnEndOverlap"));
 	ABaseAI* BaseAI = Cast<ABaseAI>(OtherActor);
 	if(BaseAI)
 	{

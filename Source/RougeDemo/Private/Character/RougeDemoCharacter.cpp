@@ -5,18 +5,19 @@
 
 #include "Camera/CameraComponent.h"
 #include "Character/RougeDemoAnimInstance.h"
+#include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/CombatComponent.h"
 #include "Components/LockOnComponent.h"
 #include "Core/RougeDemoGameMode.h"
 #include "Core/RougeDemoPlayerController.h"
 #include "Curves/CurveVector.h"
-
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Struct/AttributeInfo.h"
+#include "Weapon/Weapon.h"
 
 
 // Sets default values
@@ -605,6 +606,16 @@ void ARougeDemoCharacter::UpdateGroundedRotation(float DeltaTime)
 			TargetRotation = GetActorRotation();
 		}
 	}*/
+}
+
+void ARougeDemoCharacter::ReGenerateOverlap()
+{
+	//重新开启碰撞检测
+	AWeapon* CurrentWeapon = CombatComp->GetCurrentWeapon();
+	if(CurrentWeapon)
+	{
+		CurrentWeapon->GetAttackBox()->SetGenerateOverlapEvents(true);
+	}
 }
 
 bool ARougeDemoCharacter::CanUpdateMovingRotation()

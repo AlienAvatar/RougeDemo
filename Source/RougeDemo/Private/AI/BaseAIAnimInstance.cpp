@@ -3,8 +3,8 @@
 
 #include "AI/BaseAIAnimInstance.h"
 
+#include "KismetAnimationLibrary.h"
 #include "AI/BaseAI.h"
-#include "Kismet/KismetMathLibrary.h"
 
 void UBaseAIAnimInstance::NativeInitializeAnimation()
 {
@@ -30,7 +30,7 @@ void UBaseAIAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Velocity = BaseAI->GetVelocity();
 	Speed = BaseAI->GetSpeed();
 	
-	
+	Direction = UKismetAnimationLibrary::CalculateDirection(Velocity,GetOwningActor()->GetActorRotation());
 }
 
 void UBaseAIAnimInstance::RotateInPlaceCheck()

@@ -35,6 +35,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	FORCEINLINE UStaticMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
+	FORCEINLINE UBoxComponent* GetAttackBox() const { return AttackBox; }
 
-
+	
 };

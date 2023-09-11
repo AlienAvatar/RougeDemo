@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "MovementSettings.h"
 #include "Engine/DataTable.h"
 
 #include "AttributeInfo.generated.h"
@@ -19,4 +20,7 @@ struct FAttributeInfo : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float MaxToughnessValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	FMovementSettings MovementSettings;
 };

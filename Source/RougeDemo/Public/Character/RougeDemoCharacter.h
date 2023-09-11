@@ -312,4 +312,7 @@ public:
 	//控制翻滚
 	UPROPERTY(BlueprintReadWrite)
 	bool bRolling = false;
+
+	UFUNCTION(BlueprintCallable)
+	void ReGenerateOverlap();
 };

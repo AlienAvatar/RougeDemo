@@ -4,11 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Perception/AIPerceptionTypes.h"
+#include "Enum/EAISense.h"
 #include "AIEnemyController.generated.h"
 
 class UBlackboardData;
 class UBlackboardComponent;
 class UBehaviorTreeComponent;
+class UAIPerceptionComponent;
 /**
  * 
  */
@@ -37,7 +40,23 @@ protected:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UBehaviorTree* EnemyBehaviorTree;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UAIPerceptionComponent* AIPerceptionComponent;
 private:
 
 	bool bIsRanged = false;
+
+	UFUNCTION()
+	void OnPerceptionUpdatedHandle(const TArray<AActor*>& UpdatedActors);
+
+	bool CanSenseActor(AActor* Actor, EAISense AISense, FAIStimulus& AIStimulus);
+
+	void HandleSightSensed(AActor* Actor);
+
+	void HandleHearingSensed(FVector Location);
+
+	void HandleDamageSensed(AActor* Actor);
+
+	
 };
