@@ -82,19 +82,27 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ActivateRangeAttack();
 
+	//播放远程攻击动画
 	void PlayRangeAttackAnim();
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnProjectile(AActor* TargetActor);
 
+	//攻击发射的Projectile
 	UPROPERTY(EditAnywhere, Category = "AI")
 	TSubclassOf<AActor> ProjectileClass;
 
+	//阶段
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	EAIStage Stage;
 
+	//获取当前状态
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE EState GetCurrentState() const { return State; }
+
+	//获取理想范围
+	UFUNCTION(BlueprintCallable)
+	virtual float GetIdealRange() override;
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UBoxComponent* LeftAttackSphere;
@@ -192,13 +200,14 @@ protected:
 
 	virtual bool SetMovementSpeed(EGait Gait) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category="Attribute")
 	UDataTable* AttributeDataTable;
 
-	FAttributeInfo* AttributeData;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category="Attribute")
 	float ToughRecoverTimeRate = 0.75f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category="Attribute")
+	FName AttributeRowName;
 private:
 	//轨迹检测受击
 	virtual float OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser, AController* InstigatedByController, AActor* DamageCauserActor);

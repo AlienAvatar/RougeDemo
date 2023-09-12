@@ -55,6 +55,11 @@ ABaseAI::ABaseAI()
 	State = EState::ES_Passive;
 }
 
+float ABaseAI::GetIdealRange()
+{
+	return 50.f;
+}
+
 // Called when the game starts or when spawned
 void ABaseAI::BeginPlay()
 {
@@ -271,7 +276,7 @@ void ABaseAI::ToughRecoverTimerCallback()
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 		bIsRecoveringToughness = false;
 	}
-	
+	//更新UI
 	UpdateHUDTough();
 }
 
@@ -300,11 +305,11 @@ EMovementDirection ABaseAI::ReceDamageDirection(AActor* DamagedActor, AActor* Ca
 
 void ABaseAI::SetAttributeInfo()
 {
+	if(!AttributeRowName.IsValid()) { return; }
 	if(AttributeDataTable)
 	{
-		const FName RowName("CPRD_Elite");
 		const FString ContextString = TEXT("Attempting to find Skill_01 in SkillTable");
-		AttributeData = AttributeDataTable->FindRow<FAttributeInfo>(RowName,ContextString);
+		AttributeInfo = *AttributeDataTable->FindRow<FAttributeInfo>(AttributeRowName,ContextString);
 	}
 }
 

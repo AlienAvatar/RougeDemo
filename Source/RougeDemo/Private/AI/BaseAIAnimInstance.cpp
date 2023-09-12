@@ -3,8 +3,10 @@
 
 #include "AI/BaseAIAnimInstance.h"
 
+#include "AIController.h"
 #include "KismetAnimationLibrary.h"
 #include "AI/BaseAI.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 
 void UBaseAIAnimInstance::NativeInitializeAnimation()
 {
@@ -31,6 +33,14 @@ void UBaseAIAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Speed = BaseAI->GetSpeed();
 	
 	Direction = UKismetAnimationLibrary::CalculateDirection(Velocity,GetOwningActor()->GetActorRotation());
+
+	//是否聚焦目标
+	AAIController* AIController = UAIBlueprintHelperLibrary::GetAIController(GetOwningActor());
+	if(AIController)
+	{
+		bFocusTarget = IsValid(AIController->GetFocusActor());
+	}
+	
 }
 
 void UBaseAIAnimInstance::RotateInPlaceCheck()

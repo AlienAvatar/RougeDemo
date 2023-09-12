@@ -27,7 +27,10 @@ public:
 
 	virtual void OnPossess(APawn* InPawn) override;
 
-	FORCEINLINE UBlackboardComponent* GetBlackboardComponent() const { return BlackboardComponent; } 
+	FORCEINLINE UBlackboardComponent* GetBlackboardComponent() const { return BlackboardComponent; }
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	AActor* AttackTarget;
 protected:
 	UPROPERTY(EditAnywhere)
 	UBlackboardComponent* BlackboardComponent;

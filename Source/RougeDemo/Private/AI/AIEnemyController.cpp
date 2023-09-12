@@ -48,6 +48,9 @@ void AAIEnemyController::OnPossess(APawn* InPawn)
 				RunBehaviorTree(EnemyBehaviorTree);
 			}
 		}
+		float AttackRadius = BaseAI->GetIdealRange();
+		//给黑板设定初始值
+		BlackboardComponent->SetValueAsFloat(FName("AttackRadius"),AttackRadius);
 	}
 }
 
@@ -130,6 +133,7 @@ void AAIEnemyController::HandleSightSensed(AActor* Actor)
 	{
 		BaseAI->State = EState::ES_Attacking;
 	}
+	AttackTarget = Actor;
 	GetBlackboardComponent()->SetValueAsObject(FName("TargetActor"),Actor);
 }
 
@@ -144,5 +148,6 @@ void AAIEnemyController::HandleDamageSensed(AActor* Actor)
 	{
 		BaseAI->State = EState::ES_Attacking;
 	}
+	AttackTarget = Actor;
 	GetBlackboardComponent()->SetValueAsObject(FName("TargetActor"),Actor);
 }

@@ -26,4 +26,6 @@ public:
 
 
 	virtual bool SetMovementSpeed(EGait Gait);
+
+	virtual float GetIdealRange();
 };

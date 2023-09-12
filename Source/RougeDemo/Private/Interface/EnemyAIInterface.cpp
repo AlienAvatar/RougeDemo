@@ -8,3 +8,8 @@ bool IEnemyAIInterface::SetMovementSpeed(EGait Gait)
 {
 	return false;
 }
+
+float IEnemyAIInterface::GetIdealRange()
+{
+	return 0.f;
+}
