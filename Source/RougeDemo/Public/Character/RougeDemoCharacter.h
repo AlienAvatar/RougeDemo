@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "Enum/EMovementState.h"
 #include "Enum/EGait.h"
+#include "Enum/EMovementDirection.h"
 #include "Enum/EOverlayState.h"
 #include "Enum/ERotationMode.h"
 #include "Enum/EStance.h"
@@ -89,9 +90,9 @@ private:
 	bool CanUpdateMovingRotation();
 
 	//旋转用插值做平滑处理
-	void SmoothCharacterRotation(FRotator Target,float TargetInterpSpeed,float ActorInterpSpeed);
+	void SmoothCharacterRotation(FRotator TargetRotation,float TargetInterpSpeed,float ActorInterpSpeed);
 
-	FRotator TargetRotation;
+	FRotator CurrentTargetRotation;
 
 	//映射当前速度，0代表停止，1代表走路，2代表跑步，3代表冲刺
 	float GetMappedSpeed();
@@ -176,7 +177,7 @@ private:
 
 	bool CanSprint();
 
-
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -265,6 +266,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera)
 	UCameraComponent* FollowCamera;
 
+	float AttackYaw = 0.f;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -303,6 +305,7 @@ public:
 	FORCEINLINE bool IsAlive() const { return AttributeInfo.Health > 0; }
 
 	FORCEINLINE float GetMoveF() const { return MoveF; }
+	FORCEINLINE float GetMoveR() const { return MoveR; }
 
 	void UpdateGroundedRotation(float DeltaTime);
 
@@ -315,4 +318,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ReGenerateOverlap();
+
+	EMovementDirection CalculateInputDirection();
 };

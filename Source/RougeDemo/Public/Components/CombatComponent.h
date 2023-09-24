@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Enum/ECombatType.h"
+#include "Enum/EMovementDirection.h"
 #include "CombatComponent.generated.h"
 
 
@@ -63,6 +64,8 @@ private:
 	bool IsIdleAndFalling();
 
 	//bool ApplyRiosteEffect(float Duration,AActor* Applier,float Damage);
+
+	
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

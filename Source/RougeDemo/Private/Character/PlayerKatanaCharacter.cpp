@@ -75,7 +75,7 @@ void APlayerKatanaCharacter::EquipOrUnarmAction()
 void APlayerKatanaCharacter::EquippedMontageFinishTimerCallBack()
 {
 	bEquipped = true;
-	bCanPlayMontage = true;
+	//bCanPlayMontage = true;
 }
 
 
@@ -131,13 +131,20 @@ void APlayerKatanaCharacter::PlayUnarmAnim()
 			LocalDuration = RougeDemoAnimInstance->Montage_Play(UnArmAnimMontageInPlace,1.5f);
 		}
 	}
-
-	GetWorld()->GetTimerManager().SetTimer(
+	bEquipped = true;
+	//RougeDemoAnimInstance->OnMontageEnded.AddDynamic(this,&APlayerKatanaCharacter::EndMontageCallback);
+	
+	/*GetWorld()->GetTimerManager().SetTimer(
 		UnarmMontageFinishTimer,
 		this,
 		&APlayerKatanaCharacter::UnarmMontageFinishTimerCallBack,
 		LocalDuration
-	);
+	);*/
+}
+
+void APlayerKatanaCharacter::EndMontageCallback(UAnimMontage* Montage, bool bInterrupted)
+{
+	Montage->PostLoad();
 }
 
 void APlayerKatanaCharacter::UnarmMontageFinishTimerCallBack()

@@ -70,6 +70,7 @@ void UCombatComponent::Attack()
 					
 					FHitResult HitResult;
 					bool bTraceChannel = GetWorld()->LineTraceSingleByChannel(HitResult,Start,End,ECC_Pawn);
+					
 					//判断前方是否有敌人，true代表有，false 执行默认
 					if(bTraceChannel)
 					{
@@ -91,15 +92,6 @@ void UCombatComponent::Attack()
 						{
 							Player->PlayAttackAnim();
 						}
-
-						//会产生抖动
-						FRotator LerpRotation = UKismetMathLibrary::RLerp(
-							FRotator(0.f,Player->GetActorRotation().Yaw,0.f),
-							FRotator(0.f,Player->GetControlRotation().Yaw,0.f),
-							0.1,
-							true
-						);
-						Player->SetActorRotation(LerpRotation);
 					}
 				}else
 				{
@@ -148,6 +140,7 @@ void UCombatComponent::EquipWeapon()
 		APlayerKatanaCharacter* PlayerKatanaCharacter = Cast<APlayerKatanaCharacter>(RougeDemoCharacter);
 		if(PlayerKatanaCharacter)
 		{
+			//在Content中查找
 			UStaticMesh* KatanaAndScabbardMeshRef = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/RougeDemo/RES/Mesh/Weapon/Katana/SM_Scabbard01.SM_Scabbard01"));
 			if(KatanaAndScabbardMeshRef)
 			{
@@ -241,6 +234,8 @@ bool UCombatComponent::IsIdleAndFalling()
 
 	return !RougeDemoCharacter->GetCharacterMovement()->IsFalling();
 }
+
+
 
 // Called every frame
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

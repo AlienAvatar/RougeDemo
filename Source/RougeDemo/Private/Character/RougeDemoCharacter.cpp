@@ -109,7 +109,7 @@ void ARougeDemoCharacter::OnBeginPlay()
 	SetMovementModel();
 	
 	//设置默认初始值
-	TargetRotation = GetActorRotation();
+	CurrentTargetRotation = GetActorRotation();
 	LastVelocityRotation = GetActorRotation();
 	LastMovementInputRotation = GetActorRotation();
 
@@ -122,15 +122,6 @@ void ARougeDemoCharacter::OnBeginPlay()
 		true
 	);
 
-	//控制方向TimerHandle
-	//问题，会发生抽帧现象
-	/*GetWorld()->GetTimerManager().SetTimer(
-		ControlRotationTimerHandle,
-		this,
-		&ARougeDemoCharacter::ControlRotationCallback,
-		0.01f,
-		true
-	);*/
 }
 
 // Called every frame
@@ -185,8 +176,41 @@ bool ARougeDemoCharacter::CanSprint()
 	}
 }
 
+EMovementDirection ARougeDemoCharacter::CalculateInputDirection()
+{
+	//前进输入
+	if(MoveF == 1.0 && MoveR == 0.f)
+	{
+		return EMovementDirection::EMD_Forward;
+	}else if(MoveF == -1.f && MoveR == 0.f)
+	{
+		return EMovementDirection::EMD_Backward;
+	}else if(MoveF == 0.f && MoveR == 1.f)
+	{
+		return EMovementDirection::EMD_Right;
+	}else if(MoveF == 0.f && MoveR == -1.f)
+	{
+		return EMovementDirection::EMD_Left;
+	}else if(MoveF == 1.f && MoveR == 1.f)
+	{
+		return EMovementDirection::EMD_ForwardRight;
+	}else if(MoveF == 1.f && MoveR == -1.f)
+	{
+		return EMovementDirection::EMD_ForwardLeft;
+	}else if(MoveF == -1.f && MoveR == 1.f)
+	{
+		return EMovementDirection::EMD_BackwardRight;
+	}else if(MoveF == -1.f && MoveR == -1.f)
+	{
+		return EMovementDirection::EMD_ForwardLeft;
+	}else
+	{
+		return EMovementDirection::EMD_MAX;
+	}
+}
+
 void ARougeDemoCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
-	AController* InstigatorController, AActor* DamageCauser)
+                                        AController* InstigatorController, AActor* DamageCauser)
 {
 	AttributeInfo.Health = FMath::Clamp(AttributeInfo.Health - Damage, 0.f, AttributeInfo.MaxHealth);
 
@@ -362,7 +386,7 @@ void ARougeDemoCharacter::RollTimerHandlerCallback()
 
 void ARougeDemoCharacter::SetActorLocationAndRotationFromTarget(FVector NewLocation,FRotator NewRotation,bool bSweep,bool bTeleport)
 {
-	TargetRotation = NewRotation;
+	CurrentTargetRotation = NewRotation;
 	SetActorLocationAndRotation(
 		NewLocation,
 		NewRotation
@@ -571,10 +595,41 @@ FMovementSettings ARougeDemoCharacter::GetTargetMovementSettings()
 
 void ARougeDemoCharacter::UpdateGroundedRotation(float DeltaTime)
 {
+	//当攻击时，转向攻击方向
 	if(bSwingBeforeAttack)
 	{
-		const FRotator YawRotation(0.f,Controller->GetControlRotation().Yaw,0.f);
-		//UE_LOG(LogTemp,Warning,TEXT("YawRotation[%f]"),YawRotation.Yaw);
+		//判断输入方向
+		EMovementDirection InputDirection = CalculateInputDirection();
+		
+		switch (InputDirection)
+		{
+		case EMovementDirection::EMD_Forward:
+			AttackYaw = GetControlRotation().Yaw;
+			break;
+		case EMovementDirection::EMD_ForwardRight:
+			AttackYaw = GetControlRotation().Yaw + 45.f;
+			break;
+		case EMovementDirection::EMD_Right:
+			AttackYaw = GetControlRotation().Yaw + 90.f;
+			break;
+		case EMovementDirection::EMD_BackwardRight:
+			AttackYaw = GetControlRotation().Yaw + 135.f;
+			break;
+		case EMovementDirection::EMD_ForwardLeft:
+			AttackYaw = GetControlRotation().Yaw - 45.f;
+			break;
+		case EMovementDirection::EMD_Left:
+			AttackYaw = GetControlRotation().Yaw - 90.f;
+			break;
+		case EMovementDirection::EMD_BackwardLeft:
+			AttackYaw = GetControlRotation().Yaw - 135.f;
+			break;
+		case EMovementDirection::EMD_Backward:
+			AttackYaw = GetControlRotation().Yaw  + 180.f;
+			break;
+		}
+		const FRotator YawRotation(0.f,AttackYaw,0.f);
+		
 		const float RotationRate = CalculateGroundedRotationRate();
 		SmoothCharacterRotation(YawRotation,800.f,RotationRate);
 	}
@@ -623,22 +678,23 @@ bool ARougeDemoCharacter::CanUpdateMovingRotation()
 	return ((bIsMoving && bHasMovementInput) || Speed > 150.f) && HasAnyRootMotion();
 }
 
-void ARougeDemoCharacter::SmoothCharacterRotation(FRotator Target,float TargetInterpSpeed,float ActorInterpSpeed)
+void ARougeDemoCharacter::SmoothCharacterRotation(FRotator TargetRotation,float TargetInterpSpeed,float ActorInterpSpeed)
 {
-	TargetRotation = UKismetMathLibrary::RInterpTo_Constant(
+	//当前TargetRotation插值到TargetRotation
+	CurrentTargetRotation = UKismetMathLibrary::RInterpTo_Constant(
+		CurrentTargetRotation,
 		TargetRotation,
-		Target,
 		UGameplayStatics::GetWorldDeltaSeconds(GetWorld()),
 		TargetInterpSpeed);
 
+	//Actor的Rotation平滑到当前TargetRotation
 	FRotator ActorRotation = UKismetMathLibrary::RInterpTo(
 		GetActorRotation(),
-		TargetRotation,
+		CurrentTargetRotation,
 		UGameplayStatics::GetWorldDeltaSeconds(GetWorld()),
 		ActorInterpSpeed);
 
 	SetActorRotation(ActorRotation);
-	
 }
 
 float ARougeDemoCharacter::GetMappedSpeed()
@@ -661,7 +717,7 @@ float ARougeDemoCharacter::GetMappedSpeed()
 		2.f
 	);
 	
-	return  Speed > LocWalkSpeed ? WalkRange : RunRange;;
+	return Speed > LocWalkSpeed ? WalkRange : RunRange;;
 }
 
 float ARougeDemoCharacter::CalculateGroundedRotationRate()
@@ -789,6 +845,7 @@ void ARougeDemoCharacter::MoveForward(float Value)
 		AddMovementInput(2 * Direction,Value);	 
 	}
 	MoveF = Value;
+	//UE_LOG(LogTemp,Warning,TEXT("MoveF[%f]"),MoveF);
 }
 
 void ARougeDemoCharacter::MoveRight(float Value)
@@ -800,7 +857,7 @@ void ARougeDemoCharacter::MoveRight(float Value)
 		AddMovementInput(2 * Direction,Value);
 	}
 
-	MoveR = Value * (-1);
+	MoveR = Value;
 }
 
 void ARougeDemoCharacter::Turn(float Value)

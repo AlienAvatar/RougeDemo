@@ -14,7 +14,7 @@ void USwingBeforeAttack::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequ
 	APlayerKatanaCharacter* Player = Cast<APlayerKatanaCharacter>(MeshComp->GetOwner());
 	if(Player)
 	{
-		if(Player -> GetMoveF() != 0.f)
+		if(Player -> GetMoveF() != 0.f || Player->GetMoveR() != 0.f)
 		{
 			Player->bSwingBeforeAttack = true;
 		}

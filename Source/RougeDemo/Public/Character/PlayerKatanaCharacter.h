@@ -63,6 +63,8 @@ protected:
 	int32 AttackIndex = 0;
 
 	void PlayUnarmAnim();
+
+	void EndMontageCallback(UAnimMontage* Montage, bool bInterrupted);
 public:
 	FORCEINLINE UStaticMeshComponent* GetKatanaMeshComp() const { return KatanaMeshComp; }
 
