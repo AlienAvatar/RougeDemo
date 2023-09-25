@@ -103,6 +103,8 @@ public:
 	//获取理想范围
 	UFUNCTION(BlueprintCallable)
 	virtual float GetIdealRange() override;
+
+	FORCEINLINE UBaseAIAnimInstance* GetBaseAIAnimInstance() const { return BaseAIAnimInstance; }
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UBoxComponent* LeftAttackSphere;

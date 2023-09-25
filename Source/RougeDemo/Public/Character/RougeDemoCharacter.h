@@ -191,9 +191,6 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=MovementSystem)
 	FMovementSettings CurrentMovementSettings;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Anim")
-	UAnimMontage* AnimMontage;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UDataTable* MovementModelDataTable;
 
@@ -255,7 +252,7 @@ protected:
 
 	void UpdateHealthHUD();
 
-	void PlayHitReactMontage();
+	void PlayHitReactMontage(EMovementDirection HitDirection);
 	
 	UPROPERTY(EditDefaultsOnly, Category=Hit)
 	UAnimMontage* F_HitMontage;
@@ -320,4 +317,7 @@ public:
 	void ReGenerateOverlap();
 
 	EMovementDirection CalculateInputDirection();
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bHitting = false;
 };

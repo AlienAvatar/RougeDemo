@@ -23,4 +23,16 @@ struct FAttributeInfo : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	FMovementSettings MovementSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit")
+	UAnimMontage* F_HitMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit")
+	UAnimMontage* R_HitMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit")
+	UAnimMontage* B_HitMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit")
+	UAnimMontage* L_HitMontage;
 };

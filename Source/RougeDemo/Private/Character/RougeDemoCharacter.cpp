@@ -3,6 +3,8 @@
 
 #include "Character/RougeDemoCharacter.h"
 
+#include "AI/BaseAI.h"
+#include "AI/BaseAIAnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Character/RougeDemoAnimInstance.h"
 #include "Components/BoxComponent.h"
@@ -16,6 +18,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Lib/ReceiveDamageLibrary.h"
 #include "Struct/AttributeInfo.h"
 #include "Weapon/Weapon.h"
 
@@ -209,14 +212,43 @@ EMovementDirection ARougeDemoCharacter::CalculateInputDirection()
 	}
 }
 
+
+
 void ARougeDemoCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                         AController* InstigatorController, AActor* DamageCauser)
 {
-	AttributeInfo.Health = FMath::Clamp(AttributeInfo.Health - Damage, 0.f, AttributeInfo.MaxHealth);
+	//角色不可受到连续攻击
+	if(!bHitting)
+	{
+		bHitting = true;
+		AttributeInfo.Health = FMath::Clamp(AttributeInfo.Health - Damage, 0.f, AttributeInfo.MaxHealth);
 
-	UpdateHealthHUD();
-	PlayHitReactMontage();
-
+		UpdateHealthHUD();
+		//判断DamageCauser的受击方向
+		const EMovementDirection LocalHitDirection = UReceiveDamageLibrary::CalculateDamageCauserDirection(DamagedActor,DamageCauser);
+		UE_LOG(LogTemp, Warning, TEXT("DamageType[%s]"), *DamageType->GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("DamageType.DestructibleImpulse[%f]"), DamageType->);
+		
+		//判断伤害类型，目前判断的是一次攻击的削韧强度
+		ABaseAI* BaseAI = Cast<ABaseAI>(DamagedActor);
+		if(BaseAI)
+		{
+			UBaseAIAnimInstance* BaseAIAnimInstance = BaseAI->GetBaseAIAnimInstance();
+			if(BaseAIAnimInstance)
+			{
+				UAnimMontage* CurrentActiveMontage = BaseAIAnimInstance->GetCurrentActiveMontage();
+				if(CurrentActiveMontage)
+				{
+					
+				}
+			}
+		}
+		//To do 判断是Projectile的攻击
+		
+		//根据受击方向播放动画
+		PlayHitReactMontage(LocalHitDirection);
+	}
+	
 	if(AttributeInfo.Health == 0.f)
 	{
 		RagdollAction();
@@ -232,14 +264,34 @@ void ARougeDemoCharacter::UpdateHealthHUD()
 	}
 }
 
-void ARougeDemoCharacter::PlayHitReactMontage()
+void ARougeDemoCharacter::PlayHitReactMontage(EMovementDirection HitDirection)
 {
 	URougeDemoAnimInstance* AnimInstance = Cast<URougeDemoAnimInstance>(GetMesh()->GetAnimInstance());
 	if(AnimInstance)
 	{
-		if(F_HitMontage)
+		UAnimMontage* HitMontage = nullptr;
+		switch(HitDirection)
 		{
-			AnimInstance->Montage_Play(F_HitMontage);
+		case EMovementDirection::EMD_Forward:
+			HitMontage = AttributeInfo.F_HitMontage;
+			break;
+		case EMovementDirection::EMD_Left:
+			HitMontage = AttributeInfo.L_HitMontage;
+			break;
+		case EMovementDirection::EMD_Right:
+			HitMontage = AttributeInfo.R_HitMontage;
+			break;
+		case EMovementDirection::EMD_Backward:
+			HitMontage = AttributeInfo.B_HitMontage;
+			break;
+		default:
+			UE_LOG(LogTemp,Error,TEXT("No Montage to found"));
+			return;
+		}
+		
+		if(HitMontage)
+		{
+			AnimInstance->Montage_Play(HitMontage);
 		}
 	}
 }
@@ -748,14 +800,6 @@ float ARougeDemoCharacter::GetAnimCurveValue(FName CurveName)
 	}else
 	{
 		return 0.f;
-	}
-}
-
-void ARougeDemoCharacter::RollEvent()
-{
-	if(RougeDemoAnimInstance && AnimMontage)
-	{
-		RougeDemoAnimInstance->Montage_Play(AnimMontage,1.15);
 	}
 }
 
