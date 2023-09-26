@@ -34,34 +34,33 @@ void AMeleeWeapon::BeginPlay()
 void AMeleeWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 	bool bFromSweep, const FHitResult& SweepResult)
 {
-	AttackBox->SetGenerateOverlapEvents(false);
-	
-	UE_LOG(LogTemp,Warning,TEXT("OnBeginOverlap"));
-	ABaseAI* BaseAI = Cast<ABaseAI>(OtherActor);
-	if(BaseAI)
+	if(!bIsOverlaping)
 	{
-		FDamageEvent DamageEvent;
-		APlayerKatanaCharacter* OwnerCharacter = Cast<APlayerKatanaCharacter>(GetOwner());
-		if(OwnerCharacter)
+		bIsOverlaping = true;
+		//UE_LOG(LogTemp,Warning,TEXT("OnBeginOverlap"));
+		UE_LOG(LogTemp,Warning,TEXT("OverlappedComponent[%s]"),*OverlappedComponent->GetName());
+		UE_LOG(LogTemp,Warning,TEXT("OtherComp[%s]"),*OtherComp->GetName());
+		UE_LOG(LogTemp,Warning,TEXT("OtherActor[%s]"),*OtherActor->GetName());
+
+		DrawDebugSphere(GetWorld(),SweepResult.Location,10.f,-1,FColor::Red);
+		UE_LOG(LogTemp,Warning,TEXT("SweepResult.Location[%s]"),*SweepResult.Location.ToString());
+		UE_LOG(LogTemp,Warning,TEXT("OtherBodyIndex[%d]"),OtherBodyIndex);
+		
+		ABaseAI* BaseAI = Cast<ABaseAI>(OtherActor);
+		if(BaseAI)
 		{
-			//添加打击感
-			/*URougeDemoAnimInstance* AnimInstance = OwnerCharacter->GetRougeDemoAnimationInstance();
-			if(AnimInstance)
-			{
-				//获取当前播放的蒙太奇
-				UAnimMontage* CurrentActiveMontage = AnimInstance->GetCurrentActiveMontage();
-				if(CurrentActiveMontage)
-				{
-					CurrentActiveMontage->RateScale = 0.2f;
-				}
-			}*/
+			//To Do 做伤害类型判断，根据不同的蒙太奇动画，选择不同的削韧和伤害
 			
-			AController* OwnerController = OwnerCharacter->Controller;
-			if(OwnerController)
+			FDamageEvent DamageEvent;
+			APlayerKatanaCharacter* OwnerCharacter = Cast<APlayerKatanaCharacter>(GetOwner());
+			if(OwnerCharacter)
 			{
-				UE_LOG(LogTemp,Warning,TEXT("DamageCount[%f]"),DamageCount);
-				UAISense_Damage::ReportDamageEvent(GetWorld(),BaseAI,this,DamageCount,GetActorLocation(),BaseAI->GetActorLocation());
-				UGameplayStatics::ApplyDamage(OtherActor,DamageCount,OwnerController,this,UDamageType::StaticClass());
+				AController* OwnerController = OwnerCharacter->Controller;
+				if(OwnerController)
+				{
+					UE_LOG(LogTemp,Warning,TEXT("DamageCount[%f]"),DamageCount);
+					UGameplayStatics::ApplyDamage(OtherActor,DamageCount, OwnerController,this,UDamageType::StaticClass());
+				}
 			}
 		}
 	}
@@ -70,8 +69,9 @@ void AMeleeWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 void AMeleeWeapon::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	UE_LOG(LogTemp,Warning,TEXT("OnEndOverlap"));
-	ABaseAI* BaseAI = Cast<ABaseAI>(OtherActor);
+	//UE_LOG(LogTemp,Warning,TEXT("OnEndOverlap"));
+	bIsOverlaping = false;
+	/*ABaseAI* BaseAI = Cast<ABaseAI>(OtherActor);
 	if(BaseAI)
 	{
 		FDamageEvent DamageEvent;
@@ -90,7 +90,7 @@ void AMeleeWeapon::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 				}
 			}
 		}
-	}
+	}*/
 }
 
 void AMeleeWeapon::ActivateWeaponAttack()

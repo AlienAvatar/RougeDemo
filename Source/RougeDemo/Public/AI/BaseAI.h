@@ -126,9 +126,6 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	FVector Velocity;
 
-	UPROPERTY(EditDefaultsOnly, Category=Hit)
-	UAnimMontage* F_HitMontage;
-
 	UFUNCTION()
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, class AController* InstigatorController,AActor* DamageCauser);
 
@@ -211,14 +208,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category="Attribute")
 	FName AttributeRowName;
 private:
-	//轨迹检测受击
-	virtual float OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser, AController* InstigatedByController, AActor* DamageCauserActor);
-
-	virtual float InternalTakePointDamage(float Damage, FPointDamageEvent const& PointDamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-	
 	void Dead();
 
-	void PlayHitReactMontage();
+	void PlayHitReactMontage(EMovementDirection HitDirection);
 	
 	void DestroyCallBack();
 
@@ -239,9 +231,6 @@ private:
 	FTimerHandle ToughRecoverTimer;
 
 	void ToughRecoverTimerCallback();
-
-	//受击方向
-	EMovementDirection ReceDamageDirection(AActor* DamagedActor,AActor* CauseActor);
 
 	FRotator TargetRotation;
 

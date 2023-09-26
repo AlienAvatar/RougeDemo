@@ -49,6 +49,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UParticleSystemComponent* TrailComp;
 
-	
+	bool bIsOverlaping = false;
 private:
 };

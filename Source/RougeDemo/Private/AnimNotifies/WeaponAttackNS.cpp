@@ -17,7 +17,6 @@ void UWeaponAttackNS::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenc
 		AMeleeWeapon* MeleeWeapon = Cast<AMeleeWeapon>(KatanaCharacter->GetCombatComponent()->GetCurrentWeapon());
 		if(MeleeWeapon)
 		{
-			//MeleeWeapon->BeginWeaponAttack(0.04f,2);
 			//不同武器播放粒子Trail
 			if(MeleeWeapon)
 			{
@@ -37,8 +36,6 @@ void UWeaponAttackNS::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 		AMeleeWeapon* MeleeWeapon = Cast<AMeleeWeapon>(KatanaCharacter->GetCombatComponent()->GetCurrentWeapon());
 		if(MeleeWeapon)
 		{
-			//MeleeWeapon->EndWeaponAttack();
-
 			MeleeWeapon->EndTrailFX();
 		}
 	}

@@ -18,6 +18,8 @@
 #include "HUD/EnemyToughBarWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Lib/ReceiveDamageLibrary.h"
+#include "Perception/AISense_Damage.h"
 #include "Weapon/MeleeWeapon.h"
 
 // Sets default values
@@ -93,30 +95,24 @@ void ABaseAI::Tick(float DeltaTime)
 	//UpdateGroundedRotation(DeltaTime);
 }
 
-// Called to bind functionality to input
-void ABaseAI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
-void ABaseAI::ToggleMarket(bool bLockOn)
-{
-	if(TargetWidget)
-	{
-		TargetWidget->SetVisibility(bLockOn);
-	}
-}
-
 void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
 	AController* InstigatorController, AActor* DamageCauser)
 {
 	AttributeInfo.Health = FMath::Clamp(AttributeInfo.Health - Damage, 0.f, AttributeInfo.MaxHealth);
+
+	//根据Player攻击时的朝向，判断DamageCauser的受击方向
+	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(),0);
+	const EMovementDirection LocalHitDirection = UReceiveDamageLibrary::CalculateDamageCauserDirection(DamagedActor,Player);
+	UE_LOG(LogTemp, Warning, TEXT("LocalHitDirection[%s]"), *UEnum::GetValueAsString(LocalHitDirection));
+
+	//无论多少距离攻击AI，都可以获取其Player的Location
+	UAISense_Damage::ReportDamageEvent(GetWorld(),this,DamageCauser, DamageCount,DamageCauser->GetActorLocation(),GetActorLocation());
+	
 	//在恢复的时候，无法增加韧值
-	if(!bIsRecoveringToughness)
+	/*if(!bIsRecoveringToughness)
 	{
 		AttributeInfo.ToughnessValue = FMath::Clamp(AttributeInfo.ToughnessValue + 50.f, 0.f, AttributeInfo.MaxToughnessValue);
-	}
+	}*/
 	
 	//UE_LOG(LogTemp,Warning,TEXT("AttributeInfo.ToughnessValue[%f]"),AttributeInfo.ToughnessValue);
 
@@ -125,7 +121,7 @@ void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageTyp
 	UpdateHUDTough();
 
 	//处于Stun状态，可以被角色处决
-	if(AttributeInfo.Health > 0.f && AttributeInfo.ToughnessValue >= 100.f)
+	/*if(AttributeInfo.Health > 0.f && AttributeInfo.ToughnessValue >= 100.f)
 	{
 		//设置状态，禁止移动
 		State = EState::ES_Stun;
@@ -138,11 +134,11 @@ void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageTyp
 			&ABaseAI::ToughRecoverTimerCallback,
 			ToughRecoverTimeRate,
 			true,
-			1.f
+			0.f
 		);
 		
 		FinisherWidget->SetVisibility(true);
-	}
+	}*/
 	
 	if(AttributeInfo.Health == 0.f)
 	{
@@ -159,10 +155,26 @@ void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageTyp
 	}else
 	{
 		//播放受击动画
-		PlayHitReactMontage();
-		ReceDamageDirection(DamagedActor,DamageCauser);
+		PlayHitReactMontage(LocalHitDirection);
 	}
 }
+
+// Called to bind functionality to input
+void ABaseAI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+}
+
+void ABaseAI::ToggleMarket(bool bLockOn)
+{
+	if(TargetWidget)
+	{
+		TargetWidget->SetVisibility(bLockOn);
+	}
+}
+
+
 
 void ABaseAI::UpdateHUDHealth()
 {
@@ -278,29 +290,6 @@ void ABaseAI::ToughRecoverTimerCallback()
 	}
 	//更新UI
 	UpdateHUDTough();
-}
-
-EMovementDirection ABaseAI::ReceDamageDirection(AActor* DamagedActor, AActor* CauseActor)
-{
-	const FVector DamageVector = DamagedActor->GetActorLocation();
-	const FVector CauseVector = CauseActor->GetActorLocation();
-	
-	FRotator Damage2CauseRotator = UKismetMathLibrary::FindLookAtRotation(
-		DamageVector,
-		CauseVector
-	);
-	UE_LOG(LogTemp,Warning,TEXT("Damage2CauseRotator[%f]"),Damage2CauseRotator.Yaw);
-	
-	float DirectionValue = UKismetMathLibrary::NormalizedDeltaRotator(
-		Damage2CauseRotator,
-		DamagedActor->GetActorRotation()
-	).Yaw;
-
-	UE_LOG(LogTemp,Warning,TEXT("DirectionValue[%f]"),DirectionValue);
-	EMovementDirection Direction = EMovementDirection::EMD_Forward;
-
-	
-	return Direction;
 }
 
 void ABaseAI::SetAttributeInfo()
@@ -426,26 +415,6 @@ void ABaseAI::UpdateGroundedRotation(float DeltaTime)
 	}
 }
 
-float ABaseAI::OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation,
-                                 UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, AActor* DamageCauser,
-                                 AController* InstigatedByController, AActor* DamageCauserActor)
-{
-	UE_LOG(LogTemp,Warning,TEXT("OnTakePointDamage Damage[%f]"),Damage);
-	return 0.f;
-}
-
-float ABaseAI::InternalTakePointDamage(float Damage, FPointDamageEvent const& PointDamageEvent,
-	AController* EventInstigator, AActor* DamageCauser)
-{
-	/*AttributeInfo.Health = AttributeInfo.Health - Damage;
-	if(AttributeInfo.Health <= 0.f)
-	{
-		Dead();
-	}*/
-	
-	return Super::InternalTakePointDamage(Damage, PointDamageEvent, EventInstigator, DamageCauser);
-}
-
 void ABaseAI::Dead()
 {
 	//解除锁定
@@ -538,14 +507,38 @@ void ABaseAI::SpawnProjectile(AActor* TargetActor)
 	AActor* NewProj = GetWorld()->SpawnActor<AActor>(ProjectileClass, MuzzleLocation, MuzzleRotation, Params);
 }
 
-void ABaseAI::PlayHitReactMontage()
+void ABaseAI::PlayHitReactMontage(EMovementDirection HitDirection)
 {
 	UBaseAIAnimInstance* AnimInstance = Cast<UBaseAIAnimInstance>(GetMesh()->GetAnimInstance());
 	if(AnimInstance)
 	{
-		if(F_HitMontage)
+		UAnimMontage* HitMontage = nullptr;
+		switch(HitDirection)
 		{
-			AnimInstance->Montage_Play(F_HitMontage);
+		case EMovementDirection::EMD_Forward:
+			HitMontage = AttributeInfo.F_HitMontage;
+			break;
+		case EMovementDirection::EMD_Left:
+			HitMontage = AttributeInfo.L_HitMontage;
+			break;
+		case EMovementDirection::EMD_Right:
+			HitMontage = AttributeInfo.R_HitMontage;
+			break;
+		case EMovementDirection::EMD_Backward:
+			HitMontage = AttributeInfo.B_HitMontage;
+			break;
+		default:
+			UE_LOG(LogTemp,Error,TEXT("Not Setting EMovementDirection"));
+			return;
+		}
+		
+		if(HitMontage)
+		{
+			AnimInstance->Montage_Play(HitMontage);
+		}else
+		{
+			UE_LOG(LogTemp,Error,TEXT("No Montage to find"));
+			return;
 		}
 	}
 }
