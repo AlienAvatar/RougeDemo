@@ -21,8 +21,20 @@ bool UAction::IsRunning() const
 	return RepData.bIsRunning;
 }
 
+UWorld* UAction::GetWorld() const
+{
+	AActor* Actor = Cast<AActor>(GetOuter());
+	if (Actor)
+	{
+		return Actor->GetWorld();
+	}
+
+	return nullptr;
+}
+
 void UAction::StopAction_Implementation(AActor* Instigator)
 {
+	UE_LOG(LogTemp, Log, TEXT("Stopped: %s"), *GetNameSafe(this));
 }
 
 void UAction::StartAction_Implementation(AActor* Instigator)

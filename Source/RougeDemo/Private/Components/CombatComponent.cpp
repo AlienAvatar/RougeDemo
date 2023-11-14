@@ -61,7 +61,7 @@ void UCombatComponent::Attack()
 			//判断是否可以攻击，如在游泳状态下不能攻击
 			if(CheckAttackState())
 			{
-				//是否在战斗中
+				//是否已经攻击
 				if(!bIsInCombat)
 				{
 					//后续更改为扇形检测，现检测前方150的位置是否有敌人
@@ -106,7 +106,7 @@ bool UCombatComponent::CheckAttackState()
 {
 	if(RougeDemoCharacter == nullptr) { return false; }
 
-	bool result = RougeDemoCharacter->GetCharacterMovement()->IsSwimming();
+	const bool result = RougeDemoCharacter->GetCharacterMovement()->IsSwimming();
 	return !result;
 }
 

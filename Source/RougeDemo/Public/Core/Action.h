@@ -18,7 +18,10 @@ class ROUGEDEMO_API UAction : public UObject
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TSoftObjectPtr<UTexture2D> Icon;
+	
+	UPROPERTY(Replicated)
 	UActionComponent* ActionComp;
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
@@ -33,7 +36,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
 	FGameplayTagContainer BlockedTags;
 
-	
 public:
 	void Initialize(UActionComponent* NewActionComp);
 
@@ -43,6 +45,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	bool IsRunning() const;
 
+	// 当加入到ActionComponent中时马上开始
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	bool bAutoStart;
 
@@ -54,4 +57,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Action")
 	void StopAction(AActor* Instigator);
+
+	UWorld* GetWorld() const override;
+
+	bool IsSupportedForNetworking() const override
+	{
+		return true;
+	}
 };

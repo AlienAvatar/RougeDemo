@@ -31,6 +31,11 @@ void UActionComponent::BeginPlay()
 	}
 }
 
+void UActionComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+}
+
 
 // Called every frame
 void UActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -116,6 +121,7 @@ bool UActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 			return true;
 		}
 	}
+	
 	return false;
 }
 
@@ -134,5 +140,14 @@ bool UActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 	}
 
 	return false;
+}
+
+void UActionComponent::ServerStopAction_Implementation(AActor* Instigator, FName ActionName)
+{
+	
+}
+
+void UActionComponent::ServerStartAction_Implementation(AActor* Instigator, FName ActionName)
+{
 }
 
