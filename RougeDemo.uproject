@@ -12,8 +12,14 @@
 				"Engine",
 				"UMG",
 				"AIModule",
-				"CoreUObject"
+				"CoreUObject",
+				"GameplayAbilities"
 			]
+		},
+		{
+			"Name": "LoadModule",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [
@@ -26,6 +32,14 @@
 		},
 		{
 			"Name": "Landmass",
+			"Enabled": true
+		},
+		{
+			"Name": "MotionWarping",
+			"Enabled": true
+		},
+		{
+			"Name": "GameplayAbilities",
 			"Enabled": true
 		}
 	]
