@@ -9,4 +9,6 @@
 
 //#define ECC_AIPawn ECollisionChannel::ECC_GameCollisionChannel1
 
-
+DECLARE_LOG_CATEGORY_EXTERN(GameInstance, Log, All);
+#define GAME_INSTANCE_LOG(Verbosity, Format, ...) \
+UE_LOG(GameInstance, Verbosity, Format, ##__VA_ARGS__)
