@@ -15,5 +15,12 @@ class ROUGEDEMO_API URougeDemoFunctionLibary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	static void GetRougeDemoGameInstance(UObject* WorldContextObject);
+	UFUNCTION()
+	static URougeDemoInstance* GetRougeDemoGameInstance(UObject* WorldContextObject);
+
+	UFUNCTION()
+	static void PlayLoadingScreen(bool bPlayUntilStopped, float PlayTime);
+
+	UFUNCTION(BlueprintCallable, Category = Loading)
+	static void StopLoadingScreen();
 };

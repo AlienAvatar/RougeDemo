@@ -3,6 +3,7 @@
 
 #include "Core/RougeDemoInstance.h"
 
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Core/RougeDemoSaveGame.h"
 #include "Kismet/GameplayStatics.h"
 #include "RougeDemo/RougeDemo.h"
@@ -23,7 +24,9 @@ void URougeDemoInstance::Init()
 	
 	FString SlotName;
 	int32 UserIndex;
+	//给SlotName和UserIndex赋值
 	GetSaveSlotInfo(SlotName,UserIndex);
+	
 	UGameplayStatics::AsyncLoadGameFromSlot(SlotName, UserIndex, LoadGameFromSlotDelegate);
 	if(LoadGameFromSlotDelegate.IsBound())
 	{
@@ -38,6 +41,16 @@ void URougeDemoInstance::Init()
 URougeDemoSaveGame* URougeDemoInstance::GetCurrentSaveGame()
 {
 	return CurrentSaveGame;
+}
+
+void URougeDemoInstance::FadeInAndShowLoadingScreen()
+{
+	
+}
+
+void URougeDemoInstance::PlayLoadingScreen()
+{
+	
 }
 
 FGlobalOptionsStruct URougeDemoInstance::GetGlobalOptions()
@@ -71,7 +84,12 @@ void URougeDemoInstance::SetGlobalOptions(FGlobalOptionsStruct NewGlobalOptions)
 		SaveGame->GlobalOptions = GlobalOptions;
 		UGameplayStatics::SaveGameToSlot(SaveGame, GlobalOptionsName, 0);
 	}
-	
+}
+
+void URougeDemoInstance::LoadGameLevel()
+{
+	UWidgetLayoutLibrary::RemoveAllWidgets(GetWorld());
+	FadeInAndShowLoadingScreen();
 }
 
 void URougeDemoInstance::SetSavingEnabled(bool bEnabled)

@@ -16,13 +16,14 @@ void AMainGameMode::BeginPlay()
 		MainWidget->AddToViewport();
 	}else
 	{
-		//MainWidget = Cast<UMainWidget>(CreateWidget(UMainWidget::StaticClass()));
+		MainWidget = CreateWidget<UMainWidget>(GetWorld(), MainWidgetClass);
 	}
-
-	/*URougeDemoInstance* GameInstance = URougeDemoFunctionLibary::GetRougeDemoGameInstance(GetWorld());
+	MainWidget->AddToViewport();
+	
+	URougeDemoInstance* GameInstance = URougeDemoFunctionLibary::GetRougeDemoGameInstance(GetWorld());
 	if(GameInstance)
 	{
 		const FGlobalOptionsStruct GlobalOptions = GameInstance->GetGlobalOptions();
 		GameInstance->SetGlobalOptions(GlobalOptions);
-	}*/
+	}
 }

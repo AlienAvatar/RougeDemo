@@ -31,6 +31,8 @@ public:
 	FGlobalOptionsStruct GetGlobalOptions();
 
 	void SetGlobalOptions(FGlobalOptionsStruct NewGlobalOptions);
+
+	void LoadGameLevel();
 protected:
 	void SetSavingEnabled(bool bEnabled);
 
@@ -61,4 +63,8 @@ private:
 	FString GlobalOptionsName = "GlobalOptions";
 
 	FGlobalOptionsStruct GlobalOptions;
+
+	void FadeInAndShowLoadingScreen();
+
+	void PlayLoadingScreen();
 };

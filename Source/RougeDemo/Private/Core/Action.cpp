@@ -9,8 +9,6 @@ UActionComponent* UAction::GetOwningComponent() const
 	return ActionComp;
 }
 
-
-
 void UAction::Initialize(UActionComponent* NewActionComp)
 {
 	ActionComp = NewActionComp;

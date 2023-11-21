@@ -18,8 +18,12 @@ class ROUGEDEMO_API AMainGameMode : public AGameModeBase
 public:
 	virtual void BeginPlay() override;
 
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> MainWidgetClass;
 private:
 	UPROPERTY()
 	UMainWidget* MainWidget;
-
+	
+	
 };

@@ -3,10 +3,23 @@
 
 #include "Lib/RougeDemoFunctionLibary.h"
 
+#include "LoadingScreen.h"
 #include "Core/RougeDemoInstance.h"
 #include "Kismet/GameplayStatics.h"
 
-void URougeDemoFunctionLibary::GetRougeDemoGameInstance(UObject* WorldContextObject)
+URougeDemoInstance* URougeDemoFunctionLibary::GetRougeDemoGameInstance(UObject* WorldContextObject)
 {
-	//return Cast<URougeDemoInstance>(UGameplayStatics::GetGameInstance(WorldContextObject));
+	return Cast<URougeDemoInstance>(UGameplayStatics::GetGameInstance(WorldContextObject));
+}
+
+void URougeDemoFunctionLibary::PlayLoadingScreen(bool bPlayUntilStopped, float PlayTime)
+{
+	IRougeDemoLoadingScreenModule& LoadingScreenModule = IRougeDemoLoadingScreenModule::Get();
+	LoadingScreenModule.StartInGameLoadingScreen(bPlayUntilStopped, PlayTime);
+}
+
+void URougeDemoFunctionLibary::StopLoadingScreen()
+{
+	IRougeDemoLoadingScreenModule& LoadingScreenModule = IRougeDemoLoadingScreenModule::Get();
+	LoadingScreenModule.StopInGameLoadingScreen();
 }
