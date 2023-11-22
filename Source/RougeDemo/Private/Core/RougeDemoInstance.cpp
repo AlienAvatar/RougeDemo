@@ -6,6 +6,7 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Core/RougeDemoSaveGame.h"
 #include "Kismet/GameplayStatics.h"
+#include "Lib/RougeDemoFunctionLibary.h"
 #include "RougeDemo/RougeDemo.h"
 #include "SaveGame/GlobalOptionsSaveGame.h"
 
@@ -45,12 +46,12 @@ URougeDemoSaveGame* URougeDemoInstance::GetCurrentSaveGame()
 
 void URougeDemoInstance::FadeInAndShowLoadingScreen()
 {
-	
+	URougeDemoFunctionLibary::PlayLoadingScreen(true, 3.f);
 }
 
-void URougeDemoInstance::PlayLoadingScreen()
+void URougeDemoInstance::FadeOutAndHideLoadingScreen()
 {
-	
+	URougeDemoFunctionLibary::StopLoadingScreen();
 }
 
 FGlobalOptionsStruct URougeDemoInstance::GetGlobalOptions()
@@ -90,6 +91,8 @@ void URougeDemoInstance::LoadGameLevel()
 {
 	UWidgetLayoutLibrary::RemoveAllWidgets(GetWorld());
 	FadeInAndShowLoadingScreen();
+
+	UGameplayStatics::OpenLevel(GetWorld(),FName("TestMap"));
 }
 
 void URougeDemoInstance::SetSavingEnabled(bool bEnabled)

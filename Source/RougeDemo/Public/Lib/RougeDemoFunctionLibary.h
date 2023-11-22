@@ -18,9 +18,11 @@ public:
 	UFUNCTION()
 	static URougeDemoInstance* GetRougeDemoGameInstance(UObject* WorldContextObject);
 
-	UFUNCTION()
+	//开始加载画面
+	UFUNCTION(Category = Loading)
 	static void PlayLoadingScreen(bool bPlayUntilStopped, float PlayTime);
 
-	UFUNCTION(BlueprintCallable, Category = Loading)
+	//关闭加载画面
+	UFUNCTION(Category = Loading)
 	static void StopLoadingScreen();
 };

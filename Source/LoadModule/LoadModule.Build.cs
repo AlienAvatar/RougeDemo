@@ -23,7 +23,8 @@ public class LoadModule : ModuleRules
                 "Slate",
                 "SlateCore",
                 "InputCore", 
-                "MoviePlayer"
+                "MoviePlayer",
+                "UMG"
             }
         );
     }

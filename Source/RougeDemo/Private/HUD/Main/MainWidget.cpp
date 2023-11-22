@@ -4,8 +4,10 @@
 #include "HUD/Main/MainWidget.h"
 
 #include "Components/Button.h"
+#include "Core/RougeDemoInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Lib/RougeDemoFunctionLibary.h"
 #include "RougeDemo/RougeDemo.h"
 
 DEFINE_LOG_CATEGORY(Widget);
@@ -23,12 +25,17 @@ void UMainWidget::NativeConstruct()
 
 void UMainWidget::OnStartButtonClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("StartButton"));
+	WIDGET_LOG(Log, TEXT("StartButton"));
+	URougeDemoInstance* RougeDemoInstance = URougeDemoFunctionLibary::GetRougeDemoGameInstance(GetWorld());
+	if(RougeDemoInstance)
+	{
+		RougeDemoInstance->LoadGameLevel();
+	}
 }
 
 void UMainWidget::OnOptionsButtonClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Options"));
+	WIDGET_LOG(Log, TEXT("Options"));
 }
 
 void UMainWidget::OnQuitButtonClicked()

@@ -1,5 +1,8 @@
-﻿#include "LoadingScreen.h"
+﻿#include "..\Public\LoadMoudle.h"
+
+#include "LoadingScreenWidget.h"
 #include "MoviePlayer.h"
+#include "Blueprint/UserWidget.h"
 #include "Widgets/Images/SThrobber.h"
 
 
@@ -37,7 +40,7 @@ class RougeDemoLoadingScreen : public SCompoundWidget
 		void Construct(const FArguments& InArgs)
 		{
 			// Load version of the logo with text baked in, path is hardcoded because this loads very early in startup
-			static const FName LoadingScreenName(TEXT("/Game/UI/T_ActionRPG_TransparentLogo.T_ActionRPG_TransparentLogo"));
+			static const FName LoadingScreenName(TEXT("/Game/RougeDemo/RES/UI/Texture/Test/T_Test1.T_Test1'"));
 
 			//初始化图像Brush
 			LoadingScreenBrush = MakeShareable(new FRPGLoadingScreenBrush(LoadingScreenName, FVector2D(1024, 256)));
@@ -98,12 +101,14 @@ public:
 	virtual void StartupModule() override
 	{
 		// Force load for cooker reference
-		LoadObject<UObject>(nullptr, TEXT("/Game/UI/T_ActionRPG_TransparentLogo.T_ActionRPG_TransparentLogo") );
+		LoadObject<UObject>(nullptr, TEXT("/Game/RougeDemo/RES/UI/Texture/Test/T_Test2.T_Test2'") );
 
 		if (IsMoviePlayerEnabled())
 		{
 			CreateScreen();
 		}
+
+		
 	}
 	
 	virtual bool IsGameModule() const override
@@ -114,11 +119,27 @@ public:
 	virtual void StartInGameLoadingScreen(bool bPlayUntilStopped, float PlayTime) override
 	{
 		FLoadingScreenAttributes LoadingScreen;
+		//是否加载后消失
 		LoadingScreen.bAutoCompleteWhenLoadingCompletes = !bPlayUntilStopped;
+		//是否手动停止
 		LoadingScreen.bWaitForManualStop = bPlayUntilStopped;
 		LoadingScreen.bAllowEngineTick = bPlayUntilStopped;
+		//Movie 最少播放时间
 		LoadingScreen.MinimumLoadingScreenDisplayTime = PlayTime;
-		LoadingScreen.WidgetLoadingScreen = SNew(RougeDemoLoadingScreen);
+
+		LoadingScreen.WidgetLoadingScreen = FLoadingScreenAttributes::NewTestLoadingScreenWidget();
+
+		//APlayerController* PC = GetWorld()->GetFirstPlayerController()
+		/*LoadingScreenWidget = CreateWidget<UUserWidget>(this, UserWidgetClass);
+		if(LoadingScreenWidget)
+		{
+			TSharedPtr<SWidget> LoadScreen = LoadingScreenWidget->TakeWidget();
+			LoadingScreen.WidgetLoadingScreen = LoadScreen;
+		}else
+		{
+			UE_LOG(LogTemp, Error, TEXT("LoadingScreenWidget is nullptr"));
+		}*/
+		
 		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
 	}
 	

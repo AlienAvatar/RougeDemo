@@ -3,7 +3,7 @@
 
 #include "Lib/RougeDemoFunctionLibary.h"
 
-#include "LoadingScreen.h"
+#include "..\..\..\LoadModule\Public\LoadMoudle.h"
 #include "Core/RougeDemoInstance.h"
 #include "Kismet/GameplayStatics.h"
 

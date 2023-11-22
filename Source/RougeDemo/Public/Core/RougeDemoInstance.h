@@ -66,5 +66,5 @@ private:
 
 	void FadeInAndShowLoadingScreen();
 
-	void PlayLoadingScreen();
+	void FadeOutAndHideLoadingScreen();
 };
