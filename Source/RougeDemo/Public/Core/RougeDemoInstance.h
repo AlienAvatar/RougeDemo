@@ -41,6 +41,12 @@ protected:
 	FAsyncLoadGameFromSlotDelegate LoadGameFromSlotDelegate;
 
 	FAsyncSaveGameToSlotDelegate SaveGameToSlotDelegate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Loading Screen")
+	TSubclassOf<UUserWidget> LoadingScreenClass;
+
+	UPROPERTY()
+	UUserWidget* LoadingScreenWidget;
 private:
 	bool bSavingEnabled;
 
@@ -67,4 +73,11 @@ private:
 	void FadeInAndShowLoadingScreen();
 
 	void FadeOutAndHideLoadingScreen();
+
+	UFUNCTION()
+	virtual void BeginLoadingScreen(const FString& MapName);
+
+	UFUNCTION()
+	virtual void EndLoadingScreen(UWorld* LoadedWorld);
+
 };

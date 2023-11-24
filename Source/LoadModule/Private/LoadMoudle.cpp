@@ -108,7 +108,8 @@ public:
 			CreateScreen();
 		}
 
-		
+		//FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &IRougeDemoLoadingScreenModule::BeginLoadingScreen);
+		//FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &IRougeDemoLoadingScreenModule::EndLoadingScreen);
 	}
 	
 	virtual bool IsGameModule() const override
@@ -120,26 +121,14 @@ public:
 	{
 		FLoadingScreenAttributes LoadingScreen;
 		//是否加载后消失
-		LoadingScreen.bAutoCompleteWhenLoadingCompletes = !bPlayUntilStopped;
+		LoadingScreen.bAutoCompleteWhenLoadingCompletes = false;
 		//是否手动停止
 		LoadingScreen.bWaitForManualStop = bPlayUntilStopped;
 		LoadingScreen.bAllowEngineTick = bPlayUntilStopped;
 		//Movie 最少播放时间
-		LoadingScreen.MinimumLoadingScreenDisplayTime = PlayTime;
-
-		LoadingScreen.WidgetLoadingScreen = FLoadingScreenAttributes::NewTestLoadingScreenWidget();
-
-		//APlayerController* PC = GetWorld()->GetFirstPlayerController()
-		/*LoadingScreenWidget = CreateWidget<UUserWidget>(this, UserWidgetClass);
-		if(LoadingScreenWidget)
-		{
-			TSharedPtr<SWidget> LoadScreen = LoadingScreenWidget->TakeWidget();
-			LoadingScreen.WidgetLoadingScreen = LoadScreen;
-		}else
-		{
-			UE_LOG(LogTemp, Error, TEXT("LoadingScreenWidget is nullptr"));
-		}*/
+		LoadingScreen.MinimumLoadingScreenDisplayTime = 10.f;
 		
+		LoadingScreen.WidgetLoadingScreen = SNew(RougeDemoLoadingScreen);
 		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
 	}
 	
@@ -157,4 +146,16 @@ public:
 		GetMoviePlayer()->StopMovie();
 	}
 };
+
+
+/*void IRougeDemoLoadingScreenModule::BeginLoadingScreen(const FString& MapName)
+{
+	UE_LOG(LogTemp, Log, TEXT("BeginLoadingScreen"));
+}
+
+void IRougeDemoLoadingScreenModule::EndLoadingScreen(UWorld* LoadedWorld)
+{
+	UE_LOG(LogTemp, Log, TEXT("EndLoadingScreen"));
+}*/
+
 IMPLEMENT_GAME_MODULE(FRougeDemoLoadingScreenModule, LoadingScreen);

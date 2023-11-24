@@ -20,6 +20,4 @@ public:
     virtual void StopInGameLoadingScreen() = 0;
 
     UUserWidget* LoadingScreenWidget;
-
-    TSubclassOf<UUserWidget> UserWidgetClass;
 };

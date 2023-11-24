@@ -5,10 +5,14 @@
 
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Core/RougeDemoSaveGame.h"
+#include "Engine/StreamableManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Lib/RougeDemoFunctionLibary.h"
 #include "RougeDemo/RougeDemo.h"
 #include "SaveGame/GlobalOptionsSaveGame.h"
+#include "ContentStreaming.h"
+#include "MoviePlayer.h"
+#include "Blueprint/UserWidget.h"
 
 DEFINE_LOG_CATEGORY(GameInstance);
 
@@ -37,6 +41,9 @@ void URougeDemoInstance::Init()
 		WriteSaveGame();
 		GAME_INSTANCE_LOG(Log, TEXT("New Save Game"));
 	}
+
+	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &URougeDemoInstance::BeginLoadingScreen);
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &URougeDemoInstance::EndLoadingScreen);
 }
 
 URougeDemoSaveGame* URougeDemoInstance::GetCurrentSaveGame()
@@ -46,12 +53,55 @@ URougeDemoSaveGame* URougeDemoInstance::GetCurrentSaveGame()
 
 void URougeDemoInstance::FadeInAndShowLoadingScreen()
 {
-	URougeDemoFunctionLibary::PlayLoadingScreen(true, 3.f);
+	FString MapName = "TestMap";
+	BeginLoadingScreen(MapName);
 }
 
 void URougeDemoInstance::FadeOutAndHideLoadingScreen()
 {
-	URougeDemoFunctionLibary::StopLoadingScreen();
+	EndLoadingScreen(GetWorld());
+}
+
+void URougeDemoInstance::BeginLoadingScreen(const FString& MapName)
+{
+	FLoadingScreenAttributes LoadingScreen;
+	//如果加载完成 自动关闭
+	LoadingScreen.bAutoCompleteWhenLoadingCompletes = true;
+	//需要玩家主动中断
+	LoadingScreen.bWaitForManualStop = true;
+	LoadingScreen.bAllowEngineTick = true;
+	LoadingScreen.PlaybackType = EMoviePlaybackType::MT_Normal;
+
+	if(LoadingScreenClass)
+	{
+		LoadingScreenWidget = CreateWidget<UUserWidget>(this, LoadingScreenClass);
+		if(LoadingScreenWidget)
+		{
+			TSharedPtr<SWidget> LoadScreen = LoadingScreenWidget->TakeWidget();
+			LoadingScreen.WidgetLoadingScreen = LoadScreen;
+		}else
+		{
+			UE_LOG(LogTemp, Error, TEXT("LoadingScreenWidget is nullptr"));
+		}
+
+		//LoadingScreen.MoviePaths.Add("Loading_Screen_HD_with_Sound");
+		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
+		//GetMoviePlayer()->OnMoviePlaybackFinished();
+	}
+	
+}
+
+void URougeDemoInstance::EndLoadingScreen(UWorld* LoadedWorld)
+{
+	UE_LOG(LogTemp, Log, TEXT("EndLoadingScreen"));
+	if (!IsRunningDedicatedServer())
+	{
+		if (LoadingScreenWidget)
+		{
+			LoadingScreenWidget->RemoveFromParent();
+			LoadingScreenWidget->MarkAsGarbage();
+		}
+	}
 }
 
 FGlobalOptionsStruct URougeDemoInstance::GetGlobalOptions()
@@ -91,8 +141,8 @@ void URougeDemoInstance::LoadGameLevel()
 {
 	UWidgetLayoutLibrary::RemoveAllWidgets(GetWorld());
 	FadeInAndShowLoadingScreen();
-
-	UGameplayStatics::OpenLevel(GetWorld(),FName("TestMap"));
+	
+	//UGameplayStatics::OpenLevel(GetWorld(),FName("TestMap"));
 }
 
 void URougeDemoInstance::SetSavingEnabled(bool bEnabled)

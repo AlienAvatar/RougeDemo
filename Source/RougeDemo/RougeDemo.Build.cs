@@ -26,7 +26,8 @@ public class RougeDemo : ModuleRules
 			"LoadModule",
 			"GameplayAbilities",
 			"GameplayTags",
-			"GameplayTasks",
+			"GameplayTasks", 
+			"MoviePlayer",
 		});
 
 		// Uncomment if you are using Slate UI
