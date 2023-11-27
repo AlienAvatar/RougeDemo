@@ -18,8 +18,8 @@
 		},
 		{
 			"Name": "LoadModule",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"Type": "ClientOnly",
+			"LoadingPhase": "PreLoadingScreen"
 		}
 	],
 	"Plugins": [

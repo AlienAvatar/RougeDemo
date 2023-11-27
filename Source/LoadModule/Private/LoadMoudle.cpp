@@ -40,10 +40,10 @@ class RougeDemoLoadingScreen : public SCompoundWidget
 		void Construct(const FArguments& InArgs)
 		{
 			// Load version of the logo with text baked in, path is hardcoded because this loads very early in startup
-			static const FName LoadingScreenName(TEXT("/Game/RougeDemo/RES/UI/Texture/Test/T_Test1.T_Test1'"));
-
+			static const FName LoadingScreenName(TEXT("/Game/RougeDemo/RES/UI/Texture/Test/T_Test1.T_Test1"));
+			///Script/Engine.Texture2D'/Game/RougeDemo/RES/UI/Texture/Test/T_Test1.T_Test1'
 			//初始化图像Brush
-			LoadingScreenBrush = MakeShareable(new FRPGLoadingScreenBrush(LoadingScreenName, FVector2D(1024, 256)));
+			LoadingScreenBrush = MakeShareable(new FRPGLoadingScreenBrush(LoadingScreenName, FVector2D(1024, 1024)));
 
 			FSlateBrush *BGBrush = new FSlateBrush();
 			BGBrush->TintColor = FLinearColor(0.034f, 0.034f, 0.034f, 1.0f);
@@ -107,9 +107,6 @@ public:
 		{
 			CreateScreen();
 		}
-
-		//FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &IRougeDemoLoadingScreenModule::BeginLoadingScreen);
-		//FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &IRougeDemoLoadingScreenModule::EndLoadingScreen);
 	}
 	
 	virtual bool IsGameModule() const override

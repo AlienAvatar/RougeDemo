@@ -11,6 +11,7 @@
 #include "RougeDemo/RougeDemo.h"
 #include "SaveGame/GlobalOptionsSaveGame.h"
 #include "ContentStreaming.h"
+#include "LoadMoudle.h"
 #include "MoviePlayer.h"
 #include "Blueprint/UserWidget.h"
 
@@ -42,8 +43,8 @@ void URougeDemoInstance::Init()
 		GAME_INSTANCE_LOG(Log, TEXT("New Save Game"));
 	}
 
-	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &URougeDemoInstance::BeginLoadingScreen);
-	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &URougeDemoInstance::EndLoadingScreen);
+	//FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &URougeDemoInstance::BeginLoadingScreen);
+	//FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &URougeDemoInstance::EndLoadingScreen);
 }
 
 URougeDemoSaveGame* URougeDemoInstance::GetCurrentSaveGame()
@@ -65,16 +66,20 @@ void URougeDemoInstance::FadeOutAndHideLoadingScreen()
 void URougeDemoInstance::BeginLoadingScreen(const FString& MapName)
 {
 	FLoadingScreenAttributes LoadingScreen;
-	//如果加载完成 自动关闭
-	LoadingScreen.bAutoCompleteWhenLoadingCompletes = true;
+	//如果加载页面完成，加载界面是否自动关闭
+	LoadingScreen.bAutoCompleteWhenLoadingCompletes = false;
 	//需要玩家主动中断
-	LoadingScreen.bWaitForManualStop = true;
-	LoadingScreen.bAllowEngineTick = true;
+	//LoadingScreen.bWaitForManualStop = true;
+	
+	LoadingScreen.bMoviesAreSkippable = true;
+	//LoadingScreen.bAllowEngineTick = true;
+	//视频播放的循环方式
 	LoadingScreen.PlaybackType = EMoviePlaybackType::MT_Normal;
-
+	//加载页面显示最短时间
+	LoadingScreen.MinimumLoadingScreenDisplayTime = 10.f;
 	if(LoadingScreenClass)
 	{
-		LoadingScreenWidget = CreateWidget<UUserWidget>(this, LoadingScreenClass);
+		/*LoadingScreenWidget = CreateWidget<UUserWidget>(this, LoadingScreenClass);
 		if(LoadingScreenWidget)
 		{
 			TSharedPtr<SWidget> LoadScreen = LoadingScreenWidget->TakeWidget();
@@ -82,19 +87,22 @@ void URougeDemoInstance::BeginLoadingScreen(const FString& MapName)
 		}else
 		{
 			UE_LOG(LogTemp, Error, TEXT("LoadingScreenWidget is nullptr"));
-		}
+		}*/
 
-		//LoadingScreen.MoviePaths.Add("Loading_Screen_HD_with_Sound");
+		
+		LoadingScreen.MoviePaths.Add("Loading_Screen_HD_with_Sound");
+		LoadingScreen.WidgetLoadingScreen = FLoadingScreenAttributes::NewTestLoadingScreenWidget();
+		
 		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
+		GetMoviePlayer()->PlayMovie();
 		//GetMoviePlayer()->OnMoviePlaybackFinished();
 	}
-	
 }
 
 void URougeDemoInstance::EndLoadingScreen(UWorld* LoadedWorld)
 {
 	UE_LOG(LogTemp, Log, TEXT("EndLoadingScreen"));
-	if (!IsRunningDedicatedServer())
+	/*if (!IsRunningDedicatedServer())
 	{
 		if (LoadingScreenWidget)
 		{
@@ -102,6 +110,7 @@ void URougeDemoInstance::EndLoadingScreen(UWorld* LoadedWorld)
 			LoadingScreenWidget->MarkAsGarbage();
 		}
 	}
+	GetMoviePlayer()->StopMovie();*/
 }
 
 FGlobalOptionsStruct URougeDemoInstance::GetGlobalOptions()
@@ -141,8 +150,10 @@ void URougeDemoInstance::LoadGameLevel()
 {
 	UWidgetLayoutLibrary::RemoveAllWidgets(GetWorld());
 	FadeInAndShowLoadingScreen();
+	IRougeDemoLoadingScreenModule& RougeDemoLoadingScreenModule = IRougeDemoLoadingScreenModule::Get();
+	RougeDemoLoadingScreenModule.StartInGameLoadingScreen(true, 3.f);
 	
-	//UGameplayStatics::OpenLevel(GetWorld(),FName("TestMap"));
+	UGameplayStatics::OpenLevel(GetWorld(),FName("TestMap"));
 }
 
 void URougeDemoInstance::SetSavingEnabled(bool bEnabled)
@@ -154,6 +165,15 @@ void URougeDemoInstance::GetSaveSlotInfo(FString& SlotName, int32& UserIndex) co
 {
 	SlotName = SaveSlot;
 	UserIndex = SaveUserIndex;
+}
+
+void URougeDemoInstance::LoadingScreenTimerCallback()
+{
+	//流式加载
+	FLatentActionInfo LatentInfo;
+	UGameplayStatics::LoadStreamLevel(GetWorld(), FName("TestMap"), true, false, LatentInfo);
+	LoadingScreenWidget->RemoveFromParent();
+	
 }
 
 bool URougeDemoInstance::WriteSaveGame()
