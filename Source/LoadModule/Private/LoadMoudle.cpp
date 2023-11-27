@@ -40,7 +40,7 @@ class RougeDemoLoadingScreen : public SCompoundWidget
 		void Construct(const FArguments& InArgs)
 		{
 			// Load version of the logo with text baked in, path is hardcoded because this loads very early in startup
-			static const FName LoadingScreenName(TEXT("/Game/RougeDemo/RES/UI/Texture/Test/T_Test1.T_Test1"));
+			static const FName LoadingScreenName(TEXT("/Game/RougeDemo/RES/UI/Texture/ScreenLoading/ScreenLoading1.ScreenLoading1"));
 			///Script/Engine.Texture2D'/Game/RougeDemo/RES/UI/Texture/Test/T_Test1.T_Test1'
 			//初始化图像Brush
 			LoadingScreenBrush = MakeShareable(new FRPGLoadingScreenBrush(LoadingScreenName, FVector2D(1024, 1024)));
@@ -101,7 +101,8 @@ public:
 	virtual void StartupModule() override
 	{
 		// Force load for cooker reference
-		LoadObject<UObject>(nullptr, TEXT("/Game/RougeDemo/RES/UI/Texture/Test/T_Test2.T_Test2'") );
+		///Script/Engine.Texture2D'/Game/RougeDemo/RES/UI/Texture/ScreenLoading/ScreenLoading1.ScreenLoading1'
+		LoadObject<UObject>(nullptr, TEXT("/Game/RougeDemo/RES/UI/Texture/ScreenLoading/ScreenLoading1.ScreenLoading1") );
 
 		if (IsMoviePlayerEnabled())
 		{

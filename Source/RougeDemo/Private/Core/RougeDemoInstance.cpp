@@ -148,12 +148,19 @@ void URougeDemoInstance::SetGlobalOptions(FGlobalOptionsStruct NewGlobalOptions)
 
 void URougeDemoInstance::LoadGameLevel()
 {
-	UWidgetLayoutLibrary::RemoveAllWidgets(GetWorld());
+	UGameplayStatics::OpenLevel(GetWorld(),FName("TestMap"));
+	/*UWidgetLayoutLibrary::RemoveAllWidgets(GetWorld());
 	FadeInAndShowLoadingScreen();
 	IRougeDemoLoadingScreenModule& RougeDemoLoadingScreenModule = IRougeDemoLoadingScreenModule::Get();
 	RougeDemoLoadingScreenModule.StartInGameLoadingScreen(true, 3.f);
 	
-	UGameplayStatics::OpenLevel(GetWorld(),FName("TestMap"));
+	GetTimerManager().SetTimer(
+		LoadingScreenTimer,
+		this,
+		&URougeDemoInstance::LoadingScreenTimerCallback,
+		2.f,
+		false
+	);*/
 }
 
 void URougeDemoInstance::SetSavingEnabled(bool bEnabled)
@@ -170,9 +177,10 @@ void URougeDemoInstance::GetSaveSlotInfo(FString& SlotName, int32& UserIndex) co
 void URougeDemoInstance::LoadingScreenTimerCallback()
 {
 	//流式加载
-	FLatentActionInfo LatentInfo;
+	/*FLatentActionInfo LatentInfo;
 	UGameplayStatics::LoadStreamLevel(GetWorld(), FName("TestMap"), true, false, LatentInfo);
-	LoadingScreenWidget->RemoveFromParent();
+	LoadingScreenWidget->RemoveFromParent();*/
+
 	
 }
 

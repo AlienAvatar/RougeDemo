@@ -64,4 +64,6 @@ public:
 	{
 		return true;
 	}
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
