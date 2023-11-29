@@ -23,7 +23,6 @@ public class RougeDemo : ModuleRules
 			"GameplayTasks",
 			"NavigationSystem",
 			"Niagara",
-			"LoadModule",
 			"GameplayAbilities",
 			"GameplayTags",
 			"GameplayTasks", 

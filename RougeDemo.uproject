@@ -15,11 +15,6 @@
 				"CoreUObject",
 				"GameplayAbilities"
 			]
-		},
-		{
-			"Name": "LoadModule",
-			"Type": "ClientOnly",
-			"LoadingPhase": "PreLoadingScreen"
 		}
 	],
 	"Plugins": [

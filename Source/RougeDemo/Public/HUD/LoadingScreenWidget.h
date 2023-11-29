@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class LOADMODULE_API ULoadingScreenWidget : public UUserWidget
+class ROUGEDEMO_API ULoadingScreenWidget : public UUserWidget
 {
 	GENERATED_BODY()
 };

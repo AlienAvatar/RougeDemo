@@ -11,7 +11,6 @@
 #include "RougeDemo/RougeDemo.h"
 #include "SaveGame/GlobalOptionsSaveGame.h"
 #include "ContentStreaming.h"
-#include "LoadMoudle.h"
 #include "MoviePlayer.h"
 #include "Blueprint/UserWidget.h"
 
@@ -42,9 +41,6 @@ void URougeDemoInstance::Init()
 		WriteSaveGame();
 		GAME_INSTANCE_LOG(Log, TEXT("New Save Game"));
 	}
-
-	//FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &URougeDemoInstance::BeginLoadingScreen);
-	//FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &URougeDemoInstance::EndLoadingScreen);
 }
 
 URougeDemoSaveGame* URougeDemoInstance::GetCurrentSaveGame()
@@ -55,62 +51,11 @@ URougeDemoSaveGame* URougeDemoInstance::GetCurrentSaveGame()
 void URougeDemoInstance::FadeInAndShowLoadingScreen()
 {
 	FString MapName = "TestMap";
-	BeginLoadingScreen(MapName);
 }
 
 void URougeDemoInstance::FadeOutAndHideLoadingScreen()
 {
-	EndLoadingScreen(GetWorld());
-}
-
-void URougeDemoInstance::BeginLoadingScreen(const FString& MapName)
-{
-	FLoadingScreenAttributes LoadingScreen;
-	//如果加载页面完成，加载界面是否自动关闭
-	LoadingScreen.bAutoCompleteWhenLoadingCompletes = false;
-	//需要玩家主动中断
-	//LoadingScreen.bWaitForManualStop = true;
 	
-	LoadingScreen.bMoviesAreSkippable = true;
-	//LoadingScreen.bAllowEngineTick = true;
-	//视频播放的循环方式
-	LoadingScreen.PlaybackType = EMoviePlaybackType::MT_Normal;
-	//加载页面显示最短时间
-	LoadingScreen.MinimumLoadingScreenDisplayTime = 10.f;
-	if(LoadingScreenClass)
-	{
-		/*LoadingScreenWidget = CreateWidget<UUserWidget>(this, LoadingScreenClass);
-		if(LoadingScreenWidget)
-		{
-			TSharedPtr<SWidget> LoadScreen = LoadingScreenWidget->TakeWidget();
-			LoadingScreen.WidgetLoadingScreen = LoadScreen;
-		}else
-		{
-			UE_LOG(LogTemp, Error, TEXT("LoadingScreenWidget is nullptr"));
-		}*/
-
-		
-		LoadingScreen.MoviePaths.Add("Loading_Screen_HD_with_Sound");
-		LoadingScreen.WidgetLoadingScreen = FLoadingScreenAttributes::NewTestLoadingScreenWidget();
-		
-		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
-		GetMoviePlayer()->PlayMovie();
-		//GetMoviePlayer()->OnMoviePlaybackFinished();
-	}
-}
-
-void URougeDemoInstance::EndLoadingScreen(UWorld* LoadedWorld)
-{
-	UE_LOG(LogTemp, Log, TEXT("EndLoadingScreen"));
-	/*if (!IsRunningDedicatedServer())
-	{
-		if (LoadingScreenWidget)
-		{
-			LoadingScreenWidget->RemoveFromParent();
-			LoadingScreenWidget->MarkAsGarbage();
-		}
-	}
-	GetMoviePlayer()->StopMovie();*/
 }
 
 FGlobalOptionsStruct URougeDemoInstance::GetGlobalOptions()
