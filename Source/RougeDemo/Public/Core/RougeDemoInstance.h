@@ -49,8 +49,6 @@ protected:
 	UUserWidget* LoadingScreenWidget;
 
 	FTimerHandle LoadingScreenTimer;
-
-	void LoadingScreenTimerCallback();
 private:
 	bool bSavingEnabled;
 
