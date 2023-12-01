@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "HUD/Main/ButtonComponentWidget.h"
 #include "MainWidget.generated.h"
 
 class UButton;
+class UButtonComponentWidget;
 /**
  * 
  */
@@ -18,14 +20,14 @@ class ROUGEDEMO_API UMainWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 	
-	UPROPERTY(meta=(BindWidget))
+	/*UPROPERTY(meta=(BindWidget))
 	UButton* Btn_StartGame;
 
 	UPROPERTY(meta=(BindWidget))
-	UButton* Btn_Options;
+	UButton* Btn_Options;*/
 
 	UPROPERTY(meta=(BindWidget))
-	UButton* Btn_QuitGame;
+	UButtonComponentWidget* Btn_QuitGame;
 	
 	UFUNCTION()
 	void OnStartButtonClicked();
@@ -35,4 +37,6 @@ public:
 
 	UFUNCTION()
 	void OnQuitButtonClicked();
+
+	FTest Test;
 };

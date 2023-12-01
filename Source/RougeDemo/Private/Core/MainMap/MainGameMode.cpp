@@ -11,7 +11,7 @@ void AMainGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(MainWidget)
+	/*if(MainWidget)
 	{
 		MainWidget->AddToViewport();
 	}else
@@ -25,5 +25,5 @@ void AMainGameMode::BeginPlay()
 	{
 		const FGlobalOptionsStruct GlobalOptions = GameInstance->GetGlobalOptions();
 		GameInstance->SetGlobalOptions(GlobalOptions);
-	}
+	}*/
 }

@@ -5,6 +5,7 @@
 
 #include "Components/Button.h"
 #include "Core/RougeDemoInstance.h"
+#include "HUD/Main/ButtonComponentWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Lib/RougeDemoFunctionLibary.h"
@@ -16,11 +17,13 @@ void UMainWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	Btn_StartGame->SetUserFocus(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	/*Btn_StartGame->SetUserFocus(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	//绑定按键
 	Btn_StartGame->OnClicked.AddDynamic(this, &UMainWidget::OnStartButtonClicked);
-	Btn_Options->OnClicked.AddDynamic(this, &UMainWidget::OnOptionsButtonClicked);
-	Btn_QuitGame->OnClicked.AddDynamic(this, &UMainWidget::OnQuitButtonClicked);
+	Btn_Options->OnClicked.AddDynamic(this, &UMainWidget::OnOptionsButtonClicked);*/
+	//Btn_QuitGame.AddDynamic(this, &UMainWidget::OnQuitButtonClicked);
+
+	
 }
 
 void UMainWidget::OnStartButtonClicked()
