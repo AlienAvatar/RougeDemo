@@ -27,10 +27,10 @@ void AMainHUD::OnBegin()
 		MainWidget->AddToViewport();
 	}
 	
-	URougeDemoInstance* GameInstance = URougeDemoFunctionLibary::GetRougeDemoGameInstance(GetWorld());
-	if(GameInstance)
+	URougeDemoInstance* RougeGameInstance = URougeDemoFunctionLibary::GetRougeDemoGameInstance(GetWorld());
+	if(RougeGameInstance)
 	{
-		const FGlobalOptionsStruct GlobalOptions = GameInstance->GetGlobalOptions();
-		GameInstance->SetGlobalOptions(GlobalOptions);
+		const FGlobalOptionsStruct GlobalOptions = RougeGameInstance->GetGlobalOptions();
+		RougeGameInstance->SetGlobalOptions(GlobalOptions);
 	}
 }
