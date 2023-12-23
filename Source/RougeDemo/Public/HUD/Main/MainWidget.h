@@ -20,23 +20,14 @@ class ROUGEDEMO_API UMainWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 	
-	/*UPROPERTY(meta=(BindWidget))
-	UButton* Btn_StartGame;
+	UPROPERTY(meta=(BindWidget))
+	UButtonComponentWidget* Btn_StartGame;
 
 	UPROPERTY(meta=(BindWidget))
-	UButton* Btn_Options;*/
+	UButtonComponentWidget* Btn_Options;
 
 	UPROPERTY(meta=(BindWidget))
 	UButtonComponentWidget* Btn_QuitGame;
 	
-	UFUNCTION()
-	void OnStartButtonClicked();
-
-	UFUNCTION()
-	void OnOptionsButtonClicked();
-
-	UFUNCTION()
-	void OnQuitButtonClicked();
-
 	FTest Test;
 };

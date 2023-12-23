@@ -5,11 +5,13 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Enum/EUIState.h"
+#include "Enum/UI/EUIMainMenu.h"
 #include "ButtonComponentWidget.generated.h"
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FTest, EUIState, UIState);
 
 class UButton;
+class URougeDemoInstance;
 /**
  * 
  */
@@ -27,5 +29,11 @@ public:
 	UFUNCTION()
 	void OnElementButtonClicked();
 
+	UPROPERTY(EditDefaultsOnly)
+	EUIMainMenu UIMainMenu = EUIMainMenu::EUI_MM_None;
+private:
+	void OptionsWidgetHandle();
 
+	void StartWidgetHandle();
+	
 };

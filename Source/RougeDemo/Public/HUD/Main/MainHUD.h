@@ -17,7 +17,7 @@ class ROUGEDEMO_API AMainHUD : public AHUD
 
 public:
 	virtual void BeginPlay() override;
-
+	UMainWidget* GetMainWidget() const { return MainWidget; }
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> MainWidgetClass;

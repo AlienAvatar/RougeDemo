@@ -3,12 +3,8 @@
 
 #include "HUD/Main/MainWidget.h"
 
-#include "Components/Button.h"
-#include "Core/RougeDemoInstance.h"
 #include "HUD/Main/ButtonComponentWidget.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "Lib/RougeDemoFunctionLibary.h"
 #include "RougeDemo/RougeDemo.h"
 
 DEFINE_LOG_CATEGORY(Widget);
@@ -21,27 +17,9 @@ void UMainWidget::NativeConstruct()
 	//绑定按键
 	Btn_StartGame->OnClicked.AddDynamic(this, &UMainWidget::OnStartButtonClicked);
 	Btn_Options->OnClicked.AddDynamic(this, &UMainWidget::OnOptionsButtonClicked);*/
-	//Btn_QuitGame.AddDynamic(this, &UMainWidget::OnQuitButtonClicked);
+	//Btn_QuitGame->OnElementButtonClicked().AddDynamic(this, &UMainWidget::OnQuitButtonClicked);
 
-	
-}
-
-void UMainWidget::OnStartButtonClicked()
-{
-	WIDGET_LOG(Log, TEXT("StartButton"));
-	URougeDemoInstance* RougeDemoInstance = URougeDemoFunctionLibary::GetRougeDemoGameInstance(GetWorld());
-	if(RougeDemoInstance)
-	{
-		RougeDemoInstance->LoadGameLevel();
-	}
-}
-
-void UMainWidget::OnOptionsButtonClicked()
-{
-	WIDGET_LOG(Log, TEXT("Options"));
-}
-
-void UMainWidget::OnQuitButtonClicked()
-{
-	UKismetSystemLibrary::QuitGame(GetWorld(),nullptr, EQuitPreference::Quit,false);
+	Btn_QuitGame->UIMainMenu = EUIMainMenu::EUI_MM_Quit;
+	Btn_StartGame->UIMainMenu = EUIMainMenu::EUI_MM_Start;
+	Btn_Options->UIMainMenu = EUIMainMenu::EUI_MM_Options;
 }
