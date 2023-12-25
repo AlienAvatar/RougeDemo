@@ -7,6 +7,7 @@
 #include "AI/BaseAIAnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Character/RougeDemoAnimInstance.h"
+#include "Components/AbilityComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/CombatComponent.h"
@@ -62,6 +63,8 @@ ARougeDemoCharacter::ARougeDemoCharacter()
 	Tags.Add(FName("Player"));
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	AbilityComp = CreateDefaultSubobject<UAbilityComponent>(TEXT("AbilityComp"));
 }
 
 
@@ -212,6 +215,9 @@ EMovementDirection ARougeDemoCharacter::CalculateInputDirection()
 	}
 }
 
+void ARougeDemoCharacter::GetAbilityComponent()
+{
+}
 
 
 void ARougeDemoCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,

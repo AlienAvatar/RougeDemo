@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "MainHUD.generated.h"
 
+class UChooseWidget;
 class UMainWidget;
 /**
  * 
@@ -18,12 +19,21 @@ class ROUGEDEMO_API AMainHUD : public AHUD
 public:
 	virtual void BeginPlay() override;
 	UMainWidget* GetMainWidget() const { return MainWidget; }
+	void ShowChooseWidget();
+	void HideMainWidget();
+	
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> MainWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> ChooseWidgetClass;
+	
 	void OnBegin();
 private:
 	UPROPERTY()
 	UMainWidget* MainWidget;
+
+	UPROPERTY()
+	UChooseWidget* ChooseWidget;
 };

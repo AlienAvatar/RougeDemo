@@ -4,6 +4,8 @@
 #include "HUD/Main/ButtonComponentWidget.h"
 #include "Components/Button.h"
 #include "Core/RougeDemoInstance.h"
+#include "HUD/Main/MainHUD.h"
+#include "HUD/Main/MainWidget.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Lib/RougeDemoFunctionLibary.h"
 #include "RougeDemo/RougeDemo.h"
@@ -38,6 +40,13 @@ void UButtonComponentWidget::OptionsWidgetHandle()
 
 void UButtonComponentWidget::StartWidgetHandle()
 {
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if(!PlayerController) { return; }
+	AMainHUD* MainHUD = Cast<AMainHUD>(PlayerController->GetHUD());
+	if(!MainHUD) { return; }
+
+	MainHUD->GetMainWidget()->RemoveFromParent();
+	
 	//RemoveFromParent();
 	URougeDemoInstance* RougeDemoInstance = URougeDemoFunctionLibary::GetRougeDemoGameInstance(GetWorld());
 	if(RougeDemoInstance)

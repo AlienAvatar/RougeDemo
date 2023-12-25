@@ -3,10 +3,13 @@
 
 #include "Core/RougeDemoPlayerController.h"
 
+#include "Blueprint/WidgetLayoutLibrary.h"
+#include "Character/RougeDemoCharacter.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "HUD/PlayerOverlayWidget.h"
 #include "HUD/RougeDemoHUD.h"
+#include "HUD/Game/LevelMasterWidget.h"
 
 void ARougeDemoPlayerController::BeginPlay()
 {
@@ -60,4 +63,53 @@ void ARougeDemoPlayerController::SetHUDSkillValue(float SkillValue,float MaxSkil
 		const float HealthPercent = SkillValue / MaxSkillValue;
 		RougeDemoHUD->PlayerOverlayWidget->HealthBar->SetPercent(HealthPercent);
 	}
+}
+
+void ARougeDemoPlayerController::OnLevelUp()
+{
+	CreateLevelUpUI();
+}
+
+void ARougeDemoPlayerController::SetupPlayer()
+{
+	//检查是否是本地
+	if(IsLocalPlayerController())
+	{
+		ARougeDemoCharacter* RougeDemoCharacter = Cast<ARougeDemoCharacter>(GetPawn());
+		/*AbilityComponent = RougeDemoCharacter*/
+		
+	}
+}
+
+void ARougeDemoPlayerController::SetReference()
+{
+	
+}
+
+void ARougeDemoPlayerController::CreateLevelUpUI()
+{
+	if(HasAuthority())
+	{
+		PrepareLevelUp();
+	}
+}
+
+void ARougeDemoPlayerController::PrepareLevelUp()
+{
+	//创建LevelUpUI
+	if(!LevelMasterWidget)
+	{
+		LevelMasterWidget = CreateWidget<ULevelMasterWidget>(this, ULevelMasterWidget::StaticClass());
+		ExecuteLevelUp();
+	}else
+	{
+		LevelMasterWidget->ResetUI();
+	}
+	LevelMasterWidget->AddToViewport();
+	
+}
+
+void ARougeDemoPlayerController::ExecuteLevelUp()
+{
+	
 }

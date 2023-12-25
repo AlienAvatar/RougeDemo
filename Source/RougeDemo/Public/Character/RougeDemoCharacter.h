@@ -11,11 +11,13 @@
 #include "Enum/EOverlayState.h"
 #include "Enum/ERotationMode.h"
 #include "Enum/EStance.h"
+#include "Interface/CharacterInterface.h"
 #include "Struct/AttributeInfo.h"
 #include "Struct/MovementSettings.h"
 #include "Struct/MovementSettingsState.h"
 #include "RougeDemoCharacter.generated.h"
 
+class UAbilityComponent;
 class URougeDemoAnimInstance;
 class UCombatComponent;
 class ULockOnComponent;
@@ -24,7 +26,7 @@ class USpringArmComponent;
 class ARougeDemoPlayerController;
 
 UCLASS()
-class ROUGEDEMO_API ARougeDemoCharacter : public ACharacter
+class ROUGEDEMO_API ARougeDemoCharacter : public ACharacter, public ICharacterInterface
 {
 	GENERATED_BODY()
 
@@ -264,6 +266,9 @@ protected:
 	UCameraComponent* FollowCamera;
 
 	float AttackYaw = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat)
+	UAbilityComponent* AbilityComp;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -320,4 +325,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	bool bHitting = false;
+
+	virtual void GetAbilityComponent() override;
 };

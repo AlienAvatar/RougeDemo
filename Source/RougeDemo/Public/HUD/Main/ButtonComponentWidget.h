@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Enum/EUIState.h"
+#include "Enum/UI/EUIChoosePanel.h"
 #include "Enum/UI/EUIMainMenu.h"
 #include "ButtonComponentWidget.generated.h"
 
@@ -31,6 +32,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	EUIMainMenu UIMainMenu = EUIMainMenu::EUI_MM_None;
+
+	UPROPERTY(EditDefaultsOnly)
+	EUIChoosePanel UIChoosePanel = EUIChoosePanel::EUI_CP_None;
 private:
 	void OptionsWidgetHandle();
 

@@ -4,6 +4,7 @@
 #include "HUD/RougeDemoHUD.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "HUD/PlayerOverlayWidget.h"
 
 void ARougeDemoHUD::BeginPlay()
@@ -18,6 +19,7 @@ void ARougeDemoHUD::AddPlayerOverlay()
 	APlayerController* PlayerController = GetOwningPlayerController();
 	if(PlayerController && PlayerOverlayClass)
 	{
+		UWidgetLayoutLibrary::RemoveAllWidgets(GetWorld());
 		PlayerOverlayWidget = CreateWidget<UPlayerOverlayWidget>(PlayerController,PlayerOverlayClass);	
 		PlayerOverlayWidget->AddToViewport();
 	}
