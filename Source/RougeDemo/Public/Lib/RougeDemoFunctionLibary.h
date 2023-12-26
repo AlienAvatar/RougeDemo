@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enum/EActiveAbilities.h"
+#include "Enum/EPassiveAbilities.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "RougeDemoFunctionLibary.generated.h"
 
@@ -25,4 +27,10 @@ public:
 	//关闭加载画面
 	UFUNCTION(Category = Loading)
 	static void StopLoadingScreen();
+
+	UFUNCTION()
+	static UTexture2D* FindActionIcon(EActiveAbilities AAbility);
+
+	UFUNCTION()
+	static UTexture2D* FindPassiveIcon(EPassiveAbilities PAbility);
 };

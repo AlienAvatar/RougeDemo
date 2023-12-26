@@ -24,4 +24,7 @@ class ROUGEDEMO_API IControllerManagerInterface
 public:
 	UFUNCTION()
 	virtual void OnLevelUp() = 0;
+
+	UFUNCTION()
+	virtual void UpdateLevelBar(float Percent, int32 Level) = 0;
 };

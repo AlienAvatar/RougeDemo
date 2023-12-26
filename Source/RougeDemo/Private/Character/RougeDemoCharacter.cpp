@@ -215,11 +215,6 @@ EMovementDirection ARougeDemoCharacter::CalculateInputDirection()
 	}
 }
 
-void ARougeDemoCharacter::GetAbilityComponent()
-{
-}
-
-
 void ARougeDemoCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                         AController* InstigatorController, AActor* DamageCauser)
 {

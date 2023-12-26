@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Enum/EActiveAbilities.h"
+#include "Enum/EPassiveAbilities.h"
 #include "AbilityComponent.generated.h"
 
 
@@ -26,6 +28,16 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	void SetStartingAbility();
+
+	TMap<EActiveAbilities, int32> ActiveAbilitiesMap;
+
+	TMap<EPassiveAbilities, int32> PassiveAbilitiesMap;
+
+	int32 MaxAbilityLevel;
+
+	TMap<EActiveAbilities, EPassiveAbilities> EvolutionMap;
+
+	TArray<EPassiveAbilities> EvolutionPassiveArr;
 private:
-	void LevelUpHarmmer();
+	void LevelUpHammer();
 };

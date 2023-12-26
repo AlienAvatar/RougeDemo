@@ -39,7 +39,7 @@ void UAbilityComponent::SetStartingAbility()
 	
 }
 
-void UAbilityComponent::LevelUpHarmmer()
+void UAbilityComponent::LevelUpHammer()
 {
 	
 }

@@ -326,5 +326,5 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool bHitting = false;
 
-	virtual void GetAbilityComponent() override;
+	UAbilityComponent* GetAbilityComponent() const { return AbilityComp; };
 };

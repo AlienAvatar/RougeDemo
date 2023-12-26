@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "PlayerOverlayWidget.generated.h"
 
+class UVerticalBox;
 class UTextBlock;
 class UProgressBar;
 /**
@@ -28,4 +29,13 @@ public:
 
 	UPROPERTY(meta=(BindWidget))
 	UProgressBar* SkillValueBar;
+
+	UPROPERTY()
+	UVerticalBox* VB_Skill;
+
+	UPROPERTY(meta=(BindWidget))
+	UProgressBar* PB_XP;
+
+	UPROPERTY(meta=(BindWidget))
+	UTextBlock* TB_Level;
 };

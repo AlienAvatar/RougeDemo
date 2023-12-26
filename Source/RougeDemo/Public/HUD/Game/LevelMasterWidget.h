@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Enum/EAbilityType.h"
+#include "Enum/EActiveAbilities.h"
+#include "Enum/EPassiveAbilities.h"
 #include "LevelMasterWidget.generated.h"
 
 class ULevelUpItemsComponentWidget;
@@ -25,6 +28,11 @@ public:
 
 	UPROPERTY(meta=(BindWidget))
 	ULevelUpItemsComponentWidget* WBP_LevelUpItems;
+
+	void AddSelection(FText Name, int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility,
+		EPassiveAbilities PAbility,EAbilityType Type);
+
+	
 private:
 	void ResetLevelUpItems();
 };
