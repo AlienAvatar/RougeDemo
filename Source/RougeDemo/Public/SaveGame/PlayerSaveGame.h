@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
+#include "Struct/AvailableCharacter.h"
 #include "PlayerSaveGame.generated.h"
 
 /**
@@ -16,4 +17,6 @@ class ROUGEDEMO_API UPlayerSaveGame : public USaveGame
 
 public:
 	int32 GoldCount;
+
+	FAvailableCharacter AvailableCharacter;
 };

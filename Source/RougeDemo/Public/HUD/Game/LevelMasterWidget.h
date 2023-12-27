@@ -9,6 +9,7 @@
 #include "Enum/EPassiveAbilities.h"
 #include "LevelMasterWidget.generated.h"
 
+class UButton;
 class ULevelUpItemsComponentWidget;
 class UWidgetSwitcher;
 /**
@@ -20,6 +21,8 @@ class ROUGEDEMO_API ULevelMasterWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
+	
 	UPROPERTY(meta=(BindWidget))
 	UWidgetSwitcher* WS_LevelUp;
 
@@ -32,7 +35,13 @@ public:
 	void AddSelection(FText Name, int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility,
 		EPassiveAbilities PAbility,EAbilityType Type);
 
-	
+	UPROPERTY(meta=(BindWidget))
+	UButton* Btn_Intro;
+
 private:
 	void ResetLevelUpItems();
+
+	UFUNCTION()
+	void Btn_IntroClickedCallBack();
+
 };

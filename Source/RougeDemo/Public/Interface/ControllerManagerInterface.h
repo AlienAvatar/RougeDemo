@@ -27,4 +27,7 @@ public:
 
 	UFUNCTION()
 	virtual void UpdateLevelBar(float Percent, int32 Level) = 0;
+
+	UFUNCTION()
+	virtual void UpdateTime(FText Time) = 0;
 };

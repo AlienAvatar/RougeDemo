@@ -8,6 +8,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "RougeDemoFunctionLibary.generated.h"
 
+class UPlayerSaveGame;
 /**
  * 
  */
@@ -33,4 +34,6 @@ public:
 
 	UFUNCTION()
 	static UTexture2D* FindPassiveIcon(EPassiveAbilities PAbility);
+
+	static UPlayerSaveGame* LoadPlayerData();
 };

@@ -38,4 +38,9 @@ public:
 
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* TB_Level;
+
+	UPROPERTY(meta=(BindWidget))
+	UTextBlock* TB_Time;
+
+	void UpdateTime(FText Time);
 };

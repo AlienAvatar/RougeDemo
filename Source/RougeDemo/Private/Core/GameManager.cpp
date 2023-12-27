@@ -6,6 +6,7 @@
 #include "Core/RougeDemoPlayerController.h"
 #include "Interface/ControllerManagerInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 // Sets default values
@@ -19,8 +20,10 @@ AGameManager::AGameManager()
 void AGameManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	GameSetUp();
 }
+
+
 
 // Called every frame
 void AGameManager::Tick(float DeltaTime)
@@ -28,9 +31,14 @@ void AGameManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AGameManager::GameSetUp()
+{
+	StartTimer();
+}
+
 void AGameManager::UpdateCharactersXP(float Percent, int32 Level)
 {
-	ARougeDemoPlayerController* RougeDemoPlayerController = Cast<ARougeDemoPlayerController>((UGameplayStatics::GetPlayerController(GetWorld(), 0)));
+	ARougeDemoPlayerController* RougeDemoPlayerController = Cast<ARougeDemoPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if(RougeDemoPlayerController == nullptr) { return; }
 	if (IControllerManagerInterface* ControllerImpl = Cast<IControllerManagerInterface>(RougeDemoPlayerController))
 	{
@@ -49,5 +57,56 @@ void AGameManager::PrepareLevelUp()
 	{
 		ControllerRef->OnLevelUp();
 	}*/
+}
+
+void AGameManager::StartTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(
+		UpdateTimerTimerHandle,
+		this,
+		&AGameManager::UpdateTimerCallBack,
+		1.0f,
+		true
+	);
+}
+
+void AGameManager::EndGame()
+{
+	GetWorld()->GetTimerManager().ClearTimer(UpdateTimerTimerHandle);
+}
+
+void AGameManager::UpdateTimer()
+{
+	Time++;
+	if(Time > 59)
+	{
+		Time = Time - 60;
+		++Minutes;
+	}else
+	{
+		const FText S1 = Time < 10 ? FText::FromString(FString::FromInt(0)) : FText::FromString(TEXT(""));
+		const FText S2 = FText::FromString(FString::FromInt(Time));
+		const FText S = FText::Format(FText::FromString(TEXT("{S1}{S2}")), S1, S2);
+
+		FText M = FText::FromString(FString::FromInt(Minutes));
+		GameTime = FText::Format(FText::FromString(TEXT("{M}:{S}")), Minutes, S);
+
+		if(Minutes > MaxGameTime)
+		{
+			EndGame();
+		}
+	}
+}
+
+void AGameManager::UpdateTimerCallBack()
+{
+	UpdateTimer();
+
+	ARougeDemoPlayerController* RougeDemoPlayerController = Cast<ARougeDemoPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if(RougeDemoPlayerController == nullptr) { return; }
+	if (IControllerManagerInterface* ControllerImpl = Cast<IControllerManagerInterface>(RougeDemoPlayerController))
+	{
+		ControllerImpl->UpdateTime(GameTime);
+	}
 }
 

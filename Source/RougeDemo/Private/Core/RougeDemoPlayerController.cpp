@@ -3,6 +3,7 @@
 
 #include "Core/RougeDemoPlayerController.h"
 
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Character/RougeDemoCharacter.h"
 #include "Components/AbilityComponent.h"
 #include "Components/ProgressBar.h"
@@ -13,7 +14,6 @@
 #include "HUD/Game/LevelMasterWidget.h"
 #include "Kismet/DataTableFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetArrayLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetTextLibrary.h"
@@ -99,6 +99,9 @@ void ARougeDemoPlayerController::SetupPlayer()
 	{
 		ARougeDemoCharacter* RougeDemoCharacter = Cast<ARougeDemoCharacter>(GetPawn());
 		AbilityComponent = RougeDemoCharacter->GetAbilityComponent();
+		
+		AbilityComponent->SetStartingAbility();
+		
 	}
 }
 
@@ -117,17 +120,21 @@ void ARougeDemoPlayerController::CreateLevelUpUI()
 
 void ARougeDemoPlayerController::PrepareLevelUp()
 {
+	if(LevelMasterWidgetClass == nullptr) { return; } 
 	//创建LevelUpUI
 	if(!LevelMasterWidget)
 	{
-		LevelMasterWidget = CreateWidget<ULevelMasterWidget>(this, ULevelMasterWidget::StaticClass());
+		LevelMasterWidget = CreateWidget<ULevelMasterWidget>(this, LevelMasterWidgetClass);
 		ExecuteLevelUp();
+		//ProcessLevelup Bind to Selected 处理点击选择后
+		
 	}else
 	{
 		LevelMasterWidget->ResetUI();
 	}
 	LevelMasterWidget->AddToViewport();
-	
+	//只能UI
+	UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(this, LevelMasterWidget);
 }
 
 void ARougeDemoPlayerController::ExecuteLevelUp()
@@ -147,7 +154,8 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 	int32 Local_MaxCount = 4;
 
 	int Local_CardCount = 0;
-	//如果Local_EvoReady = true， 就升级技能
+	
+	//如果Local_EvoReady = true， 升级技能
 	if(bLocal_EvoReady)
 	{
 		++Local_CardCount;
@@ -169,8 +177,16 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 				FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
 				if(AbilityLevelUp)
 				{
-					AbilityLevelUp->LevelUpText;
-					//LevelMasterWidget->AddSelection()
+					FString NameStr = UEnum::GetValueAsString(Local_EvoAbility);
+					LevelMasterWidget->AddSelection(
+						FText::FromString(NameStr),
+						-1,
+						AbilityLevelUp->LevelUpText,
+						URougeDemoFunctionLibary::FindActionIcon(Local_EvoAbility),
+						Local_EvoAbility,
+						EPassiveAbilities::EPA_AbilityDamage,
+						EAbilityType::EAT_Evolution
+					);
 				}
 			}
 		}
@@ -183,12 +199,6 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 	{
 		bLocal_CanAddActiveAbility = false;
 	}
-	TArray<int32> Local_ActiveRandomArr;
-	const UEnum* ActiveEnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EActiveAbilities"), true);
-	for(int i = 0; i < Local_AvailableActiveAbilities.Num(); ++i)
-	{
-		Local_ActiveRandomArr.Add(ActiveEnumPtr->GetValueByIndex(i));
-	}
 	
 	//检查被动技能
 	bool bLocal_CanAddPassiveAbility = true;
@@ -196,12 +206,6 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 	if(Local_AvailablePassiveAbilities.IsEmpty())
 	{
 		bLocal_CanAddPassiveAbility = false;
-	}
-	TArray<int32> Local_PassiveRandomArr;
-	const UEnum* PassiveEnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EPassiveAbilities"), true);
-	for(int i = 0; i < Local_AvailablePassiveAbilities.Num(); ++i)
-	{
-		Local_PassiveRandomArr.Add(PassiveEnumPtr->GetValueByIndex(i));
 	}
 	
 	//运行循环，直到我们打出我们想要的卡牌或不能添加被动/主动技能
@@ -215,9 +219,6 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 			{
 				//从本地数组中删除，这样我们就没有重复项了
 				EActiveAbilities Local_ActiveAbility;
-				/*int32 OutIndex;
-				int32 RandomIndex;
-				UKismetArrayLibrary::Array_Random(Local_ActiveRandomArr,RandomIndex, OutIndex);*/
 				int32 RandomIndex = UKismetMathLibrary::RandomInteger(Local_MaxCount);
 				
 				Local_ActiveAbility = Local_AvailableActiveAbilities[RandomIndex];
@@ -250,6 +251,7 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 						if(AbilityLevelUp)
 						{
 							FString NameStr = UEnum::GetValueAsString(Local_ActiveAbility);
+							//添加到UI
 							LevelMasterWidget->AddSelection(
 								FText::FromString(NameStr),
 								Level,
@@ -273,9 +275,6 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 			{
 				//从本地数组中删除，这样我们就没有重复项了
 				EPassiveAbilities Local_PassiveAbility;
-				/*int32 OutIndex;
-				int32 RandomIndex;
-				UKismetArrayLibrary::Array_Random(Local_PassiveRandomArr,RandomIndex, OutIndex);*/
 				int32 RandomIndex = UKismetMathLibrary::RandomInteger(Local_MaxCount);
 				
 				Local_PassiveAbility = Local_AvailablePassiveAbilities[RandomIndex];
@@ -309,6 +308,7 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 						if(AbilityLevelUp)
 						{
 							FString NameStr = UEnum::GetValueAsString(Local_PassiveAbility);
+							//添加到UI
 							LevelMasterWidget->AddSelection(
 								FText::FromString(NameStr),
 								Level,
@@ -498,9 +498,18 @@ void ARougeDemoPlayerController::TestAction()
 			GameManager->UpdateCharactersXP(Percent, 2);
 			if(Percent > 0.9)
 			{
-				Percent = 0;
+				Percent = 0.0f;
 				GameManager->PrepareLevelUp();
 			}
 		}
+	}
+}
+
+void ARougeDemoPlayerController::UpdateTime(FText Time)
+{
+	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeDemoHUD>(GetHUD()) : RougeDemoHUD;
+	if(RougeDemoHUD->PlayerOverlayWidget)
+	{
+		RougeDemoHUD->PlayerOverlayWidget->UpdateTime(Time);
 	}
 }

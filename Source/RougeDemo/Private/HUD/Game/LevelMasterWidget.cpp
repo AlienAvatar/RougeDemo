@@ -3,14 +3,22 @@
 
 #include "HUD/Game/LevelMasterWidget.h"
 
+#include "Components/Button.h"
 #include "Components/VerticalBox.h"
 #include "Components/WidgetSwitcher.h"
 #include "HUD/Game/LevelUpCardComponentWidget.h"
 #include "HUD/Game/LevelUpItemsComponentWidget.h"
 
+void ULevelMasterWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+	Btn_Intro->OnClicked.AddDynamic(this, &ULevelMasterWidget::Btn_IntroClickedCallBack);
+}
+
 void ULevelMasterWidget::ResetUI()
 {
-	WS_LevelUp->SetActiveWidget(0);
+	WS_LevelUp->SetActiveWidgetIndex(0);
 }
 
 void ULevelMasterWidget::AddSelection(FText Name, int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility,
@@ -36,3 +44,11 @@ void ULevelMasterWidget::ResetLevelUpItems()
 
 	
 }
+
+void ULevelMasterWidget::Btn_IntroClickedCallBack()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Btn_IntroCallBack"));
+	WS_LevelUp->SetActiveWidgetIndex(1);
+}
+
+

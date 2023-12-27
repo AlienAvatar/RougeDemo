@@ -38,6 +38,9 @@ protected:
 	UDataTable* DT_PassiveAbilities;
 
 	virtual void SetupInputComponent() override;
+
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<ULevelMasterWidget> LevelMasterWidgetClass;
 public:
 	void SetHUDHealth(float Health, float MaxHealth);
 	void SetHUDScore(float Score);
@@ -78,4 +81,6 @@ private:
 	void UpdateCharacterUI(float Percent, int32 Level);
 
 	void TestAction();
+
+	virtual void UpdateTime(FText Time) override;
 };

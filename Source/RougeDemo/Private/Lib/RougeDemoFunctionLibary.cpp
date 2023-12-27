@@ -4,7 +4,9 @@
 #include "Lib/RougeDemoFunctionLibary.h"
 
 #include "Core/RougeDemoInstance.h"
+#include "Kismet/DataTableFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "SaveGame/PlayerSaveGame.h"
 
 URougeDemoInstance* URougeDemoFunctionLibary::GetRougeDemoGameInstance(UObject* WorldContextObject)
 {
@@ -87,4 +89,35 @@ UTexture2D* URougeDemoFunctionLibary::FindPassiveIcon(EPassiveAbilities PAbility
 		Texture2D = Texture.Object;
 	}
 	return Texture2D;
+}
+
+UPlayerSaveGame* URougeDemoFunctionLibary::LoadPlayerData()
+{
+	FString SlotName = "PlayerData1";
+	bool bExist = UGameplayStatics::DoesSaveGameExist(SlotName, 0);
+	if(bExist)
+	{
+		USaveGame* SaveGame = UGameplayStatics::LoadGameFromSlot(SlotName, 0);
+		return Cast<UPlayerSaveGame>(SaveGame);
+	}else
+	{
+		USaveGame* SaveGame = UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass());
+		UPlayerSaveGame* PlayerSaveGame = Cast<UPlayerSaveGame>(SaveGame);
+		if(PlayerSaveGame)
+		{
+			FString Path = "/Script/Engine.DataTable'/Game/RougeDemo/SRC/Data/DataTables/DT_AvaliableCharacter.DT_AvaliableCharacter'";
+			UDataTable* Table =  Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *Path));
+			
+			if(Table)
+			{
+				FAvailableCharacter* AvailableCharacter = Table->FindRow<FAvailableCharacter>(FName("Char1"),"");
+				if(AvailableCharacter)
+				{
+					PlayerSaveGame->AvailableCharacter = *AvailableCharacter;
+				}
+			}
+			return PlayerSaveGame;
+		}
+		return Cast<UPlayerSaveGame>(SaveGame);
+	}
 }

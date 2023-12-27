@@ -9,6 +9,7 @@
 #include "Enum/EAbilityType.h"
 #include "LevelUpCardComponentWidget.generated.h"
 
+class UButton;
 /**
  * 
  */
@@ -18,6 +19,14 @@ class ROUGEDEMO_API ULevelUpCardComponentWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+	virtual void NativeConstruct() override;
+	
 	void SetLevelUpCardComponentWidget(FText Name, int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility,
 	EPassiveAbilities PAbility, EAbilityType Type);
+
+	UPROPERTY(meta=(BindWidget))
+	UButton* Btn_Selected;
+
+private:
+	void Btn_SelectedCallBack();
 };

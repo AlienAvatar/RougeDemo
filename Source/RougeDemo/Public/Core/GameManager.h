@@ -22,7 +22,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	TArray<ARougeDemoPlayerController*> PlayerControllerArr;
-	
+
+	void GameSetUp();
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -30,6 +31,25 @@ public:
 	void UpdateCharactersXP(float Percent, int32 Level);
 
 	void PrepareLevelUp();
+
+	void StartTimer();
+
+	void EndGame();
+private:
+	void UpdateTimer();
+
+	int32 Time = 0;
+
+	int32 Minutes = 0;
+
+	FText GameTime;
+
+	//单位 Minute
+	int32 MaxGameTime = 10;
+
+	FTimerHandle UpdateTimerTimerHandle;
+
+	void UpdateTimerCallBack();
 
 	
 };
