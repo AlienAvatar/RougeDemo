@@ -7,17 +7,11 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "RougeDemo/RougeDemo.h"
 
-DEFINE_LOG_CATEGORY(Widget);
+DEFINE_LOG_CATEGORY(LogRougeWidget);
 
 void UMainWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	/*Btn_StartGame->SetUserFocus(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	//绑定按键
-	Btn_StartGame->OnClicked.AddDynamic(this, &UMainWidget::OnStartButtonClicked);
-	Btn_Options->OnClicked.AddDynamic(this, &UMainWidget::OnOptionsButtonClicked);*/
-	//Btn_QuitGame->OnElementButtonClicked().AddDynamic(this, &UMainWidget::OnQuitButtonClicked);
 
 	Btn_QuitGame->UIMainMenu = EUIMainMenu::EUI_MM_Quit;
 	Btn_StartGame->UIMainMenu = EUIMainMenu::EUI_MM_Start;

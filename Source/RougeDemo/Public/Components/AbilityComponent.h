@@ -8,6 +8,7 @@
 #include "Enum/EPassiveAbilities.h"
 #include "AbilityComponent.generated.h"
 
+class UNiagaraSystem;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ROUGEDEMO_API UAbilityComponent : public UActorComponent
@@ -23,7 +24,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly)
-	UParticleSystem* HammerFX;
+	UNiagaraSystem* HammerFX;
+
 	
 public:
 	// Called every frame

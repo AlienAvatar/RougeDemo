@@ -14,7 +14,7 @@
 #include "MoviePlayer.h"
 #include "Blueprint/UserWidget.h"
 
-DEFINE_LOG_CATEGORY(GameInstance);
+DEFINE_LOG_CATEGORY(LogGameInstance);
 
 URougeDemoInstance::URougeDemoInstance()
 	: SaveSlot(TEXT("SaveGameSlot"))

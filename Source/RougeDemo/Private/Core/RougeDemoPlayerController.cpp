@@ -15,10 +15,14 @@
 #include "Kismet/DataTableFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetStringLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetTextLibrary.h"
 #include "Lib/RougeDemoFunctionLibary.h"
+#include "RougeDemo/RougeDemo.h"
 #include "Struct/AbilityLevelUp.h"
+
+DEFINE_LOG_CATEGORY(LogRougeController);
 
 void ARougeDemoPlayerController::BeginPlay()
 {
@@ -98,10 +102,14 @@ void ARougeDemoPlayerController::SetupPlayer()
 	if(IsLocalPlayerController())
 	{
 		ARougeDemoCharacter* RougeDemoCharacter = Cast<ARougeDemoCharacter>(GetPawn());
-		AbilityComponent = RougeDemoCharacter->GetAbilityComponent();
-		
-		AbilityComponent->SetStartingAbility();
-		
+		if(RougeDemoCharacter)
+		{
+			AbilityComponent = RougeDemoCharacter->GetAbilityComponent();
+			if(AbilityComponent)
+			{
+				AbilityComponent->SetStartingAbility();
+			}
+		}
 	}
 }
 
@@ -163,13 +171,17 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 		//检查升级的技能是否和表中的相等
 		TArray<FName> OutRowNames;
 		UDataTableFunctionLibrary::GetDataTableRowNames(DT_ActiveAbilities, OutRowNames);
+		
 		for(FName RowName : OutRowNames)
 		{
 			FText RowNameText = UKismetTextLibrary::Conv_NameToText(RowName);
-
+			
 			FString EvoAbilityStr = UEnum::GetValueAsString(Local_EvoAbility);
 			const FText EvoAbilityText = UKismetTextLibrary::Conv_StringToText(EvoAbilityStr);
-			FText SkillLevelText = FText::Format(FText::FromString(TEXT("{skill}{level}")), EvoAbilityText, UKismetSystemLibrary::MakeLiteralInt(-1));
+			int32 Num = UKismetSystemLibrary::MakeLiteralInt(-1);
+			FText LevelNum = FText::FromString(FString::FromInt(Num));
+			FText SkillLevelText = FText::Format(FText::FromString(TEXT("{skill}{level}")), EvoAbilityText, LevelNum);
+			CONTROLLER_LOG(Warning, TEXT("SkillLevelText[%s]"), *SkillLevelText.ToString());
 
 			//相等的话，获取表中数据
 			if(SkillLevelText.EqualTo(RowNameText))
@@ -191,137 +203,63 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 			}
 		}
 	}
+
 	//获得其他技能，防止某个技能重复出现（刷爆）
 	//检查主动技能
-	bool bLocal_CanAddActiveAbility = true;
+	CanAddActiveAbility = true;
 	TArray<EActiveAbilities> Local_AvailableActiveAbilities = CheckActiveAbilities(Local_ActiveAbilitiesMap, Local_MaxAbilityLevel);
 	if(Local_AvailableActiveAbilities.IsEmpty())
 	{
-		bLocal_CanAddActiveAbility = false;
+		CanAddActiveAbility = false;
 	}
 	
 	//检查被动技能
-	bool bLocal_CanAddPassiveAbility = true;
+	CanAddPassiveAbility = true;
 	TArray<EPassiveAbilities> Local_AvailablePassiveAbilities = CheckPassiveAbilities(Local_PassiveAbilitiesMap, Local_MaxAbilityLevel);
 	if(Local_AvailablePassiveAbilities.IsEmpty())
 	{
-		bLocal_CanAddPassiveAbility = false;
+		CanAddPassiveAbility = false;
 	}
 	
 	//运行循环，直到我们打出我们想要的卡牌或不能添加被动/主动技能
-	while((Local_CardCount < Local_MaxCount) && (bLocal_CanAddActiveAbility || bLocal_CanAddPassiveAbility))
+	while((Local_CardCount < Local_MaxCount) && (CanAddActiveAbility || CanAddPassiveAbility))
 	{
 		++Local_CardCount;
-		//确定主动或被动的随机bool，如果不允许，则为failsafe
+		//CONTROLLER_LOG(Warning, TEXT("Local_CardCount[%d]"), Local_CardCount); 4
+		//确定主动或被动的随机bool，如果不允许，则为failsafe, 50%概率优先抽主动卡片
 		if(UKismetMathLibrary::RandomBoolWithWeight(0.5))
 		{
-			if(bLocal_CanAddActiveAbility)
+			if(CanAddActiveAbility)
 			{
-				//从本地数组中删除，这样我们就没有重复项了
-				EActiveAbilities Local_ActiveAbility;
-				int32 RandomIndex = UKismetMathLibrary::RandomInteger(Local_MaxCount);
-				
-				Local_ActiveAbility = Local_AvailableActiveAbilities[RandomIndex];
-				Local_AvailableActiveAbilities.Remove(Local_ActiveAbility);
-				bLocal_CanAddActiveAbility = Local_AvailableActiveAbilities.IsEmpty();
-
-				//检查升级的技能是否和表中的相等
-				TArray<FName> OutRowNames;
-				UDataTableFunctionLibrary::GetDataTableRowNames(DT_ActiveAbilities, OutRowNames);
-				for(FName RowName : OutRowNames)
-				{
-					FText RowNameText = UKismetTextLibrary::Conv_NameToText(RowName);
-
-					//设置Level
-					int32 Level = 0;
-					if(Local_ActiveAbilitiesMap.Contains(Local_ActiveAbility))
-					{
-						Level = Local_ActiveAbilitiesMap[Local_ActiveAbility];
-					}
-					++Level;
-					
-					FString EvoAbilityStr = UEnum::GetValueAsString(Local_EvoAbility);
-					const FText EvoAbilityText = UKismetTextLibrary::Conv_StringToText(EvoAbilityStr);
-					FText SkillLevelText = FText::Format(FText::FromString(TEXT("{skill}{level}")), EvoAbilityText, Level);
-
-					//相等的话，获取表中数据
-					if(SkillLevelText.EqualTo(RowNameText))
-					{
-						FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
-						if(AbilityLevelUp)
-						{
-							FString NameStr = UEnum::GetValueAsString(Local_ActiveAbility);
-							//添加到UI
-							LevelMasterWidget->AddSelection(
-								FText::FromString(NameStr),
-								Level,
-								AbilityLevelUp->LevelUpText,
-								URougeDemoFunctionLibary::FindActionIcon(Local_ActiveAbility),
-								Local_ActiveAbility,
-								EPassiveAbilities::EPA_AbilityDamage,
-								EAbilityType::EAT_Active
-							);
-							break;
-						}
-					}
-				}
+				CreateActiveCard(
+					Local_MaxCount,
+					Local_AvailableActiveAbilities,
+					Local_ActiveAbilitiesMap
+				);
 			}else
 			{
-				
+				CreatePassiveCard(
+					Local_MaxCount,
+					Local_AvailablePassiveAbilities,
+					Local_PassiveAbilitiesMap
+				);
 			}
 		}else
 		{
-			if(bLocal_CanAddPassiveAbility)
+			if(CanAddPassiveAbility)
 			{
-				//从本地数组中删除，这样我们就没有重复项了
-				EPassiveAbilities Local_PassiveAbility;
-				int32 RandomIndex = UKismetMathLibrary::RandomInteger(Local_MaxCount);
-				
-				Local_PassiveAbility = Local_AvailablePassiveAbilities[RandomIndex];
-				Local_AvailablePassiveAbilities.Remove(Local_PassiveAbility);
-				bLocal_CanAddPassiveAbility = Local_AvailablePassiveAbilities.IsEmpty();
-
-				//检查升级的技能是否和表中的相等
-				TArray<FName> OutRowNames;
-				UDataTableFunctionLibrary::GetDataTableRowNames(DT_PassiveAbilities, OutRowNames);
-				
-				for(FName RowName : OutRowNames)
-				{
-					FText RowNameText = UKismetTextLibrary::Conv_NameToText(RowName);
-
-					//设置Level
-					int32 Level = 0;
-					if(Local_PassiveAbilitiesMap.Contains(Local_PassiveAbility))
-					{
-						Level = Local_PassiveAbilitiesMap[Local_PassiveAbility];
-					}
-					++Level;
-					
-					FString EvoAbilityStr = UEnum::GetValueAsString(Local_EvoAbility);
-					const FText EvoAbilityText = UKismetTextLibrary::Conv_StringToText(EvoAbilityStr);
-					FText SkillLevelText = FText::Format(FText::FromString(TEXT("{skill}{level}")), EvoAbilityText, Level);
-
-					//相等的话，获取表中数据
-					if(SkillLevelText.EqualTo(RowNameText))
-					{
-						FAbilityLevelUp* AbilityLevelUp = DT_PassiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
-						if(AbilityLevelUp)
-						{
-							FString NameStr = UEnum::GetValueAsString(Local_PassiveAbility);
-							//添加到UI
-							LevelMasterWidget->AddSelection(
-								FText::FromString(NameStr),
-								Level,
-								AbilityLevelUp->LevelUpText,
-								URougeDemoFunctionLibary::FindPassiveIcon(Local_PassiveAbility),
-								EActiveAbilities::EAA_Hammer,
-								Local_PassiveAbility,
-								EAbilityType::EAT_Passive
-							);
-							break;
-						}
-					}
-				}
+				CreatePassiveCard(
+					Local_MaxCount,
+					Local_AvailablePassiveAbilities,
+					Local_PassiveAbilitiesMap
+				);
+			}else
+			{
+				CreateActiveCard(
+					Local_MaxCount,
+					Local_AvailableActiveAbilities,
+					Local_ActiveAbilitiesMap
+				);
 			}
 		}
 	}
@@ -511,5 +449,126 @@ void ARougeDemoPlayerController::UpdateTime(FText Time)
 	if(RougeDemoHUD->PlayerOverlayWidget)
 	{
 		RougeDemoHUD->PlayerOverlayWidget->UpdateTime(Time);
+	}
+}
+
+void ARougeDemoPlayerController::CreateActiveCard(int32 Local_MaxCount, TArray<EActiveAbilities> Local_AvailableActiveAbilities,
+	TMap<EActiveAbilities, int32> Local_ActiveAbilitiesMap)
+{
+	//从本地数组中删除，这样我们就没有重复项了
+	EActiveAbilities Local_ActiveAbility;
+	int32 RandomIndex = UKismetMathLibrary::RandomInteger(Local_MaxCount);
+	
+	Local_ActiveAbility = Local_AvailableActiveAbilities[RandomIndex];
+	Local_AvailableActiveAbilities.Remove(Local_ActiveAbility);
+	CanAddActiveAbility = !Local_AvailableActiveAbilities.IsEmpty();
+
+	//从数据表中获取详细信息并创建升级卡
+	TArray<FName> OutRowNames;
+	UDataTableFunctionLibrary::GetDataTableRowNames(DT_ActiveAbilities, OutRowNames);
+	
+
+	for(FName RowName : OutRowNames)
+	{
+		FText RowNameText = UKismetTextLibrary::Conv_NameToText(RowName);
+		
+		
+		//设置Level
+		int32 Level = 0;
+		if(Local_ActiveAbilitiesMap.Contains(Local_ActiveAbility))
+		{
+			Level = Local_ActiveAbilitiesMap[Local_ActiveAbility];
+		}
+		++Level;
+		
+		FString EvoAbilityStr = UEnum::GetValueAsString(Local_ActiveAbility);
+		int32 Index_Local_ActiveAbility = EvoAbilityStr.Find("_");
+		EvoAbilityStr = UKismetStringLibrary::GetSubstring(EvoAbilityStr, Index_Local_ActiveAbility + 1,EvoAbilityStr.Len());
+		const FText EvoAbilityText = UKismetTextLibrary::Conv_StringToText(EvoAbilityStr);
+		FText LevelText = FText::FromString(FString::FromInt(Level));
+		FText SkillLevelText = FText::Format(FText::FromString(TEXT("{skill}{level}")), EvoAbilityText, LevelText);
+		
+		//检查升级的卡片是否和表中的相等
+		if(SkillLevelText.EqualTo(RowNameText))
+		{
+			FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
+			if(AbilityLevelUp)
+			{
+				FString NameStr = UEnum::GetValueAsString(Local_ActiveAbility);
+				//添加到UI
+				LevelMasterWidget->AddSelection(
+					FText::FromString(NameStr),
+					Level,
+					AbilityLevelUp->LevelUpText,
+					URougeDemoFunctionLibary::FindActionIcon(Local_ActiveAbility),
+					Local_ActiveAbility,
+					EPassiveAbilities::EPA_AbilityDamage,
+					EAbilityType::EAT_Active
+				);
+				break;
+			}
+		}
+	}
+}
+
+void ARougeDemoPlayerController::CreatePassiveCard(int32 Local_MaxCount,
+	TArray<EPassiveAbilities> Local_AvailablePassiveAbilities,TMap<EPassiveAbilities, int32> Local_PassiveAbilitiesMap)
+{
+	//从本地数组中删除，这样我们就没有重复项了
+	EPassiveAbilities Local_PassiveAbility;
+	int32 RandomIndex = UKismetMathLibrary::RandomInteger(Local_MaxCount);
+				
+	Local_PassiveAbility = Local_AvailablePassiveAbilities[RandomIndex];
+	Local_AvailablePassiveAbilities.Remove(Local_PassiveAbility);
+	CanAddPassiveAbility = !Local_AvailablePassiveAbilities.IsEmpty();
+
+	//检查升级的技能是否和表中的相等
+	TArray<FName> OutRowNames;
+	UDataTableFunctionLibrary::GetDataTableRowNames(DT_PassiveAbilities, OutRowNames);
+	CONTROLLER_LOG(Warning, TEXT("OutRowNames.Num[%d]"), OutRowNames.Num());
+
+	for(FName RowName : OutRowNames)
+	{
+		FText RowNameText = UKismetTextLibrary::Conv_NameToText(RowName);
+		CONTROLLER_LOG(Warning, TEXT("RowNameText[%s]"), *RowNameText.ToString());
+		
+		//设置Level
+		int32 Level = 0;
+		if(Local_PassiveAbilitiesMap.Contains(Local_PassiveAbility))
+		{
+			Level = Local_PassiveAbilitiesMap[Local_PassiveAbility];
+		}
+		++Level;
+					
+		FString EvoAbilityStr = UEnum::GetValueAsString(Local_PassiveAbility);
+		CONTROLLER_LOG(Warning, TEXT("EvoAbilityStr[%s]"), *EvoAbilityStr);
+		//?
+		int32 Index_Local_PassiveAbility = EvoAbilityStr.Find("_");
+		EvoAbilityStr = UKismetStringLibrary::GetSubstring(EvoAbilityStr, Index_Local_PassiveAbility + 1,EvoAbilityStr.Len());
+		const FText EvoAbilityText = UKismetTextLibrary::Conv_StringToText(EvoAbilityStr);
+		const FText LevelText = FText::FromString(FString::FromInt(Level));
+		FText SkillLevelText = FText::Format(FText::FromString(TEXT("{skill}{level}")), EvoAbilityText, Level);
+		CONTROLLER_LOG(Warning, TEXT("SkillLevelText[%s]"), *SkillLevelText.ToString());
+		//相等的话，获取表中数据
+		if(SkillLevelText.EqualTo(RowNameText))
+		{
+			FAbilityLevelUp* AbilityLevelUp = DT_PassiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
+
+			if(AbilityLevelUp)
+			{
+				FString NameStr = UEnum::GetValueAsString(Local_PassiveAbility);
+				//添加到UI
+				LevelMasterWidget->AddSelection(
+					FText::FromString(NameStr),
+					Level,
+					AbilityLevelUp->LevelUpText,
+					URougeDemoFunctionLibary::FindPassiveIcon(Local_PassiveAbility),
+					EActiveAbilities::EAA_Hammer,
+					Local_PassiveAbility,
+					EAbilityType::EAT_Passive
+				);
+				break;
+			}
+		}
 	}
 }

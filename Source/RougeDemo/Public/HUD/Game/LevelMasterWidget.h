@@ -9,6 +9,7 @@
 #include "Enum/EPassiveAbilities.h"
 #include "LevelMasterWidget.generated.h"
 
+class ULevelUpCardComponentWidget;
 class UButton;
 class ULevelUpItemsComponentWidget;
 class UWidgetSwitcher;
@@ -38,6 +39,9 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	UButton* Btn_Intro;
 
+protected:
+	UPROPERTY(EditDefaultsOnly, Category="Sub UI")
+	TSubclassOf<ULevelUpCardComponentWidget> LevelUpCardComponentClass;
 private:
 	void ResetLevelUpItems();
 

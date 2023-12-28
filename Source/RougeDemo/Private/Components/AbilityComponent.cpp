@@ -7,7 +7,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Lib/RougeDemoFunctionLibary.h"
 #include "SaveGame/PlayerSaveGame.h"
-
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values for this component's properties
 UAbilityComponent::UAbilityComponent()
@@ -56,28 +56,30 @@ void UAbilityComponent::SetStartingAbility()
 
 void UAbilityComponent::LevelUpHammer()
 {
+	int32 Local_Level = 1;
 	if(ActiveAbilitiesMap.Contains(EActiveAbilities::EAA_Hammer))
 	{
-		int32* Local_Level = ActiveAbilitiesMap.Find(EActiveAbilities::EAA_Hammer);
-		if(Local_Level)
-		{
-			switch (*Local_Level)
-			{
-				case 1:
-					
-				break;
-				case 2:
-					HammerDamage += 5;
-				case 3:
-					HammerDamage += 5;
-				break;
-				default:
-					UE_LOG(LogTemp, Warning, TEXT("LevelUpHammer Error"));
-			}
-		}
+		Local_Level = *ActiveAbilitiesMap.Find(EActiveAbilities::EAA_Hammer);
+		++Local_Level;
+		ActiveAbilitiesMap.Add(EActiveAbilities::EAA_Hammer, Local_Level);
 	}else
 	{
-		ActiveAbilitiesMap.Add(EActiveAbilities::EAA_Hammer, 1);
+		ActiveAbilitiesMap.Add(EActiveAbilities::EAA_Hammer, Local_Level);
+	}
+	
+	switch (Local_Level)
+	{
+	case 1:
+		GrantHammer(true);
+		break;
+	case 2:
+		HammerDamage += 5;
+		break;
+	case 3:
+		HammerDamage += 5;
+		break;
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("LevelUpHammer Error"));
 	}
 }
 
@@ -85,13 +87,13 @@ void UAbilityComponent::GrantHammer(bool Cast)
 {
 	PrepareHammer();
 
-	GetWorld()->GetTimerManager().SetTimer(
+	/*GetWorld()->GetTimerManager().SetTimer(
 		PrepareHammerTimerHandle,
 		this,
 		&UAbilityComponent::PrepareHammerTimerHandleCallback,
 		CalculateHammerCoolDown(),
 		true
-	);
+	);*/
 	//唯一添加
 	ActiveTimer.AddUnique(PrepareHammerTimerHandle);
 }
@@ -113,18 +115,19 @@ void UAbilityComponent::PrepareHammer()
 		OutArray,
 		true
 	);
+	
 	if(HammerFX)
 	{
-		UGameplayStatics::SpawnEmitterAttached(
+		UNiagaraFunctionLibrary::SpawnSystemAttached(
 			HammerFX,
 			GetOwner()->GetRootComponent(),
 			FName("None"),
 			FVector::ZeroVector,
 			FRotator::ZeroRotator,
-			FVector(HammerRadius / 100, HammerRadius / 100,  1.5),
-			EAttachLocation::KeepRelativeOffset,
+		    EAttachLocation::KeepRelativeOffset,
 			true,
-			EPSCPoolMethod::None,
+			true,
+			ENCPoolMethod::None,
 			true
 		);
 	}

@@ -29,6 +29,7 @@ UTexture2D* URougeDemoFunctionLibary::FindActionIcon(EActiveAbilities AAbility)
 {
 	UTexture2D* Texture2D = nullptr;
 	FString Path;
+	
 	switch (AAbility)
 	{
 	case EActiveAbilities::EAA_Hammer:
@@ -46,15 +47,12 @@ UTexture2D* URougeDemoFunctionLibary::FindActionIcon(EActiveAbilities AAbility)
 	}
 	if(Path.IsEmpty())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Texture2D not found"));
+		UE_LOG(LogTemp, Error, TEXT("Not exist the Texture in content brower"));
 		return Texture2D;
 	}
 	
-	static ConstructorHelpers::FObjectFinder<UTexture2D> Texture(*Path);
-	if (Texture.Succeeded())
-	{
-		Texture2D = Texture.Object;
-	}
+	Texture2D = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, *Path));
+
 	return Texture2D;
 }
 
@@ -82,12 +80,14 @@ UTexture2D* URougeDemoFunctionLibary::FindPassiveIcon(EPassiveAbilities PAbility
 		return Texture2D;
 	}
 	
-	static ConstructorHelpers::FObjectFinder<UTexture2D> Texture(*Path);
-	if (Texture.Succeeded())
+	if(Path.IsEmpty())
 	{
 		UE_LOG(LogTemp, Error, TEXT("Texture2D not found"));
-		Texture2D = Texture.Object;
+		return Texture2D;
 	}
+	
+	Texture2D = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, *Path));
+
 	return Texture2D;
 }
 

@@ -9,14 +9,14 @@
 
 //#define ECC_AIPawn ECollisionChannel::ECC_GameCollisionChannel1
 
-DECLARE_LOG_CATEGORY_EXTERN(GameInstance, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogGameInstance, Log, All);
 #define GAME_INSTANCE_LOG(Verbosity, Format, ...) \
-UE_LOG(GameInstance, Verbosity, Format, ##__VA_ARGS__)
+UE_LOG(LogGameInstance, Verbosity, Format, ##__VA_ARGS__)
 
-DECLARE_LOG_CATEGORY_EXTERN(Widget, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogRougeWidget, Log, All);
 #define WIDGET_LOG(Verbosity, Format, ...) \
-UE_LOG(Widget, Verbosity, Format, ##__VA_ARGS__)
+UE_LOG(LogRougeWidget, Verbosity, Format, ##__VA_ARGS__)
 
-DECLARE_LOG_CATEGORY_EXTERN(RougeController, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogRougeController, Log, All);
 #define CONTROLLER_LOG(Verbosity, Format, ...) \
-UE_LOG(RougeController, Verbosity, Format, ##__VA_ARGS__)
+UE_LOG(LogRougeController, Verbosity, Format, ##__VA_ARGS__)

@@ -4,6 +4,8 @@
 #include "HUD/Game/LevelUpCardComponentWidget.h"
 
 #include "Components/Button.h"
+#include "Components/Image.h"
+#include "Components/TextBlock.h"
 
 void ULevelUpCardComponentWidget::NativeConstruct()
 {
@@ -15,7 +17,16 @@ void ULevelUpCardComponentWidget::NativeConstruct()
 void ULevelUpCardComponentWidget::SetLevelUpCardComponentWidget(FText Name, int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility,
                                                                 EPassiveAbilities PAbility,EAbilityType Type)
 {
-	
+	TB_Name->SetText(Name);
+	TB_Desc->SetText(Desc);
+	Img_Icon->SetBrushFromTexture(Icon);
+	const FString LevelStr = Level == 0 ? TEXT("New") : FString::FromInt(Level);
+	const FText LevelText = FText::Format(FText::FromString("Level: {LevelStr}"), FText::FromString(LevelStr));
+	TB_Level->SetText(LevelText);
+
+	mAAbility = AAbility;
+	mPAbility = PAbility;
+	mType = Type;
 }
 
 void ULevelUpCardComponentWidget::Btn_SelectedCallBack()

@@ -24,7 +24,7 @@ void ULevelMasterWidget::ResetUI()
 void ULevelMasterWidget::AddSelection(FText Name, int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility,
 	EPassiveAbilities PAbility, EAbilityType Type)
 {
-	ULevelUpCardComponentWidget* LevelUpCardComponentWidget = CreateWidget<ULevelUpCardComponentWidget>(GetOwningPlayer(), ULevelUpCardComponentWidget::StaticClass());
+	ULevelUpCardComponentWidget* LevelUpCardComponentWidget = CreateWidget<ULevelUpCardComponentWidget>(GetOwningPlayer(), LevelUpCardComponentClass);
 	LevelUpCardComponentWidget->SetLevelUpCardComponentWidget(
 		Name,
 		Level,

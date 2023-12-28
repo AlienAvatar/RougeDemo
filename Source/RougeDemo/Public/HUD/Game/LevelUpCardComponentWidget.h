@@ -10,6 +10,8 @@
 #include "LevelUpCardComponentWidget.generated.h"
 
 class UButton;
+class UTextBlock;
+class UImage;
 /**
  * 
  */
@@ -27,6 +29,26 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	UButton* Btn_Selected;
 
-private:
+	UPROPERTY(meta=(BindWidget))
+	UTextBlock* TB_Name;
+
+	UPROPERTY(meta=(BindWidget))
+	UTextBlock* TB_Level;
+
+	UPROPERTY(meta=(BindWidget))
+	UTextBlock* TB_Desc;
+
+	UPROPERTY(meta=(BindWidget))
+	UImage* Img_Icon;
+
+	EActiveAbilities mAAbility;
+
+	EPassiveAbilities mPAbility;
+	
+	EAbilityType mType;
+protected:
+	UFUNCTION()
 	void Btn_SelectedCallBack();
+private:
+
 };

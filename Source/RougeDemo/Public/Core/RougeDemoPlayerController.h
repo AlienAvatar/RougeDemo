@@ -83,4 +83,13 @@ private:
 	void TestAction();
 
 	virtual void UpdateTime(FText Time) override;
+
+	//创建主动技能的升级卡片
+	void CreateActiveCard(int32 Local_MaxCount, TArray<EActiveAbilities> Local_AvailableActiveAbilities, TMap<EActiveAbilities, int32> Local_ActiveAbilitiesMap);
+
+	//创建被动技能的升级卡片
+	void CreatePassiveCard(int32 Local_MaxCount, TArray<EPassiveAbilities> Local_AvailablePassiveAbilities, TMap<EPassiveAbilities, int32> Local_PassiveAbilitiesMap);
+
+	bool CanAddActiveAbility = true;
+	bool CanAddPassiveAbility = true;
 };
