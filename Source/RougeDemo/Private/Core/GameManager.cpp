@@ -84,13 +84,14 @@ void AGameManager::UpdateTimer()
 		++Minutes;
 	}else
 	{
-		const FText S1 = Time < 10 ? FText::FromString(FString::FromInt(0)) : FText::FromString(TEXT(""));
-		const FText S2 = FText::FromString(FString::FromInt(Time));
-		const FText S = FText::Format(FText::FromString(TEXT("{S1}{S2}")), S1, S2);
-
+		FText S1 = Time < 10 ? FText::FromString(FString::FromInt(0)) : FText::FromString(TEXT(""));
+		FText S2 = FText::FromString(FString::FromInt(Time));
+		FText S = FText::Format(FText::FromString(TEXT("{0}{1}")), S1, S2);
+		
 		FText M = FText::FromString(FString::FromInt(Minutes));
-		GameTime = FText::Format(FText::FromString(TEXT("{M}:{S}")), Minutes, S);
+		GameTime = FText::Format(FText::FromString(TEXT("{0}:{1}")), Minutes, S);
 
+		
 		if(Minutes > MaxGameTime)
 		{
 			EndGame();

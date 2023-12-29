@@ -21,7 +21,7 @@ void ULevelUpCardComponentWidget::SetLevelUpCardComponentWidget(FText Name, int3
 	TB_Desc->SetText(Desc);
 	Img_Icon->SetBrushFromTexture(Icon);
 	const FString LevelStr = Level == 0 ? TEXT("New") : FString::FromInt(Level);
-	const FText LevelText = FText::Format(FText::FromString("Level: {LevelStr}"), FText::FromString(LevelStr));
+	const FText LevelText = FText::Format(FText::FromString("Level: {0}"), FText::FromString(LevelStr));
 	TB_Level->SetText(LevelText);
 
 	mAAbility = AAbility;
@@ -31,5 +31,5 @@ void ULevelUpCardComponentWidget::SetLevelUpCardComponentWidget(FText Name, int3
 
 void ULevelUpCardComponentWidget::Btn_SelectedCallBack()
 {
-	UE_LOG(LogTemp,Error,TEXT("ULevelUpCardComponentWidget::SelectedCallBack"));
+	UE_LOG(LogTemp,Warning,TEXT("ULevelUpCardComponentWidget::SelectedCallBack"));
 }
