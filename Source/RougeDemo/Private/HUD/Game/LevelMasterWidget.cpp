@@ -35,20 +35,38 @@ void ULevelMasterWidget::AddSelection(FText Name, int32 Level, FText Desc, UText
 		Type
 	);
 	WBP_LevelUpItems->VB_Items->AddChildToVerticalBox(LevelUpCardComponentWidget);
-	
+
+	Tmp_AAbility = AAbility;
+	Tmp_PAbility = PAbility;
+	Tmp_Type = Type;
+	//Bind on Selected
+	LevelUpCardComponentWidget->OnSelectedDelegate.BindUObject(this, &ULevelMasterWidget::OnSelectedDelegateEventFunction);
 }
 
 void ULevelMasterWidget::ResetLevelUpItems()
 {
 	WBP_LevelUpItems->VB_Items->ClearChildren();
-
-	
 }
 
 void ULevelMasterWidget::Btn_IntroClickedCallBack()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Btn_IntroCallBack"));
 	WS_LevelUp->SetActiveWidgetIndex(1);
+}
+
+void ULevelMasterWidget::Close()
+{
+	RemoveFromParent();
+}
+
+void ULevelMasterWidget::OnSelectedDelegateEventFunction()
+{
+	// CallOnClose()
+	OnCloseDelegate.Execute(
+		Tmp_Type,
+		Tmp_AAbility,
+		Tmp_PAbility
+	);
 }
 
 

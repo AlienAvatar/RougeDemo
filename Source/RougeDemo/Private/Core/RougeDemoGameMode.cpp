@@ -45,3 +45,18 @@ void ARougeDemoGameMode::RequetRespwan(ACharacter* ElimmedCharacter, AController
 		RestartPlayerAtPlayerStart(ElimmedController,Actors[Selection]);
 	}
 }
+
+void ARougeDemoGameMode::Pause(bool bPause, bool bOverride)
+{
+	if(bPause)
+	{
+		//时间膨胀, 时间膨胀为0时，相当于暂停
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(),0.0f);
+		bGameIsPaused = true;
+	}else
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(),1.0f);
+		bGameIsPaused = false;
+	}
+	
+}

@@ -43,8 +43,10 @@ public:
 	TMap<EActiveAbilities, EPassiveAbilities> EvolutionMap;
 
 	TArray<EPassiveAbilities> EvolutionPassiveArr;
-private:
+
 	void LevelUpHammer();
+private:
+
 
 	float HammerDamage = 0.5f;
 

@@ -326,5 +326,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool bHitting = false;
 
-	UAbilityComponent* GetAbilityComponent() const { return AbilityComp; };
+	UAbilityComponent* GetAbilityComponent() const { return AbilityComp; }
+
+	
 };

@@ -12,6 +12,9 @@
 class UButton;
 class UTextBlock;
 class UImage;
+
+DECLARE_DELEGATE(FOnSelectedDelegate);
+
 /**
  * 
  */
@@ -46,9 +49,13 @@ public:
 	EPassiveAbilities mPAbility;
 	
 	EAbilityType mType;
+
+	FOnSelectedDelegate OnSelectedDelegate;
 protected:
 	UFUNCTION()
 	void Btn_SelectedCallBack();
-private:
 
+	
+private:
+	
 };

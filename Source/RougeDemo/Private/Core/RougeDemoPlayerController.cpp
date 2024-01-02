@@ -9,9 +9,11 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Core/GameManager.h"
+#include "Core/RougeDemoGameMode.h"
 #include "HUD/PlayerOverlayWidget.h"
 #include "HUD/RougeDemoHUD.h"
 #include "HUD/Game/LevelMasterWidget.h"
+#include "Interface/GameModeInterface.h"
 #include "Kismet/DataTableFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -96,6 +98,23 @@ void ARougeDemoPlayerController::UpdateLevelBar(float Percent, int32 Level)
 	UpdateCharacterUI(Percent, Level);
 }
 
+void ARougeDemoPlayerController::LevelUpMaxHealth(bool PowerUp)
+{
+	
+}
+
+void ARougeDemoPlayerController::LevelUpMaxSpeed(bool PowerUp)
+{
+}
+
+void ARougeDemoPlayerController::LevelUpTimerReduction(bool PowerUp)
+{
+}
+
+void ARougeDemoPlayerController::LevelUpAbilityDamage(bool PowerUp)
+{
+}
+
 void ARougeDemoPlayerController::SetupPlayer()
 {
 	//检查是否是本地
@@ -135,15 +154,15 @@ void ARougeDemoPlayerController::PrepareLevelUp()
 		LevelMasterWidget = CreateWidget<ULevelMasterWidget>(this, LevelMasterWidgetClass);
 		//添加卡片
 		ExecuteLevelUp();
-		//ProcessLevelup Bind to Selected 处理点击选择后
-		
+		//ProcessLevelup Bind to OnClose 处理点击选择后
+		LevelMasterWidget->OnCloseDelegate.BindUObject(this, &ARougeDemoPlayerController::ProcessLevelUp);
 	}else
 	{
 		LevelMasterWidget->ResetUI();
 	}
 	LevelMasterWidget->AddToViewport();
 	//只能UI
-	UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(this, LevelMasterWidget);
+	UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(this, LevelMasterWidget);
 }
 
 void ARougeDemoPlayerController::ExecuteLevelUp()
@@ -586,5 +605,75 @@ void ARougeDemoPlayerController::CreatePassiveCard(int32 Local_MaxCount,
 				break;
 			}
 		}
+	}
+}
+
+void ARougeDemoPlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilities ActiveAbilities, EPassiveAbilities PassiveAbilities)
+{
+	FString EnumName = UEnum::GetValueAsString(Type);
+	UE_LOG(LogTemp, Warning, TEXT("EAbilityType[%s]"), *EnumName);
+
+	bLevelUpHudUp = false;
+	//是否触发了其他UI
+	
+	bPreparingUI = false;
+
+	//暂停
+	ARougeDemoGameMode* GameMode = Cast<ARougeDemoGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if(GameMode)
+	{
+		if (IGameModeInterface* GameModeImpl = Cast<IGameModeInterface>(GameMode))
+		{
+			GameModeImpl->Pause(false,false);
+		}
+	}
+	
+
+	SetShowMouseCursor(false);
+	UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
+	AssignAbility(Type, ActiveAbilities, PassiveAbilities);
+
+	//更新UI
+	
+	
+	//RefreshAbilities();
+}
+
+void ARougeDemoPlayerController::AssignAbility(EAbilityType Type, EActiveAbilities ActiveAbilities,
+	EPassiveAbilities PassiveAbilities)
+{
+	switch (Type)
+	{
+		case EAbilityType::EAT_Active:
+			switch (ActiveAbilities)
+			{
+				case EActiveAbilities::EAA_Hammer:
+					AbilityComponent->LevelUpHammer();
+					break;
+				case EActiveAbilities::EAA_Fireball:
+					break;
+			}
+			break;
+		case EAbilityType::EAT_Passive:
+			switch (PassiveAbilities)
+			{
+				case EPassiveAbilities::EPA_Health:
+					
+					break;
+				case EPassiveAbilities::EPA_Speed:
+					AbilityComponent->LevelUpHammer();
+					break;
+				case EPassiveAbilities::EPA_AbilityDamage:
+					break;
+				case EPassiveAbilities::EPA_CooldownReduction:
+					break;
+			}
+			break;
+		case EAbilityType::EAT_Evolution:
+			break;
+		case EAbilityType::EAT_Health:
+			break;
+		case EAbilityType::EAT_Gold:
+			break;
 	}
 }

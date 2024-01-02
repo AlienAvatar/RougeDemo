@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enum/EAbilityType.h"
 #include "Enum/EActiveAbilities.h"
 #include "Enum/EPassiveAbilities.h"
 #include "GameFramework/PlayerController.h"
@@ -52,6 +53,11 @@ public:
 	
 	UPROPERTY()
 	ULevelMasterWidget* LevelMasterWidget;
+
+	void LevelUpMaxHealth(bool PowerUp);
+	void LevelUpMaxSpeed(bool PowerUp);
+	void LevelUpTimerReduction(bool PowerUp);
+	void LevelUpAbilityDamage(bool PowerUp);
 private:
 	void SetupPlayer();
 
@@ -92,4 +98,8 @@ private:
 
 	bool CanAddActiveAbility = true;
 	bool CanAddPassiveAbility = true;
+
+	void ProcessLevelUp(EAbilityType Type, EActiveAbilities ActiveAbilities, EPassiveAbilities PassiveAbilities);
+
+	void AssignAbility(EAbilityType Type, EActiveAbilities ActiveAbilities, EPassiveAbilities PassiveAbilities);
 };

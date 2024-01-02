@@ -27,9 +27,11 @@ void ULevelUpCardComponentWidget::SetLevelUpCardComponentWidget(FText Name, int3
 	mAAbility = AAbility;
 	mPAbility = PAbility;
 	mType = Type;
+
+	
 }
 
 void ULevelUpCardComponentWidget::Btn_SelectedCallBack()
 {
-	UE_LOG(LogTemp,Warning,TEXT("ULevelUpCardComponentWidget::SelectedCallBack"));
+	OnSelectedDelegate.Execute();
 }

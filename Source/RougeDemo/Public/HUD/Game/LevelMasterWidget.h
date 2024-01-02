@@ -16,6 +16,9 @@ class UWidgetSwitcher;
 /**
  * 
  */
+
+DECLARE_DELEGATE_ThreeParams(FOnCloseDelegate, EAbilityType, EActiveAbilities, EPassiveAbilities);
+
 UCLASS()
 class ROUGEDEMO_API ULevelMasterWidget : public UUserWidget
 {
@@ -39,13 +42,26 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	UButton* Btn_Intro;
 
+	void OnSelectedDelegateEventFunction();
+
+	FOnCloseDelegate OnCloseDelegate;
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Sub UI")
 	TSubclassOf<ULevelUpCardComponentWidget> LevelUpCardComponentClass;
+
 private:
 	void ResetLevelUpItems();
 
 	UFUNCTION()
 	void Btn_IntroClickedCallBack();
 
+	void Close();
+
+	EActiveAbilities Tmp_AAbility;
+	
+	EPassiveAbilities Tmp_PAbility;
+
+	EAbilityType Tmp_Type;
+
+	
 };
