@@ -18,6 +18,7 @@ class UWidgetSwitcher;
  */
 
 DECLARE_DELEGATE_ThreeParams(FOnCloseDelegate, EAbilityType, EActiveAbilities, EPassiveAbilities);
+DECLARE_DELEGATE(FOnReadyOnDelegate);
 
 UCLASS()
 class ROUGEDEMO_API ULevelMasterWidget : public UUserWidget
@@ -45,6 +46,8 @@ public:
 	void OnSelectedDelegateEventFunction();
 
 	FOnCloseDelegate OnCloseDelegate;
+
+	FOnReadyOnDelegate OnReadyDelegate;
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Sub UI")
 	TSubclassOf<ULevelUpCardComponentWidget> LevelUpCardComponentClass;

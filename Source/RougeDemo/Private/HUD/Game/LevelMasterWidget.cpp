@@ -39,6 +39,7 @@ void ULevelMasterWidget::AddSelection(FText Name, int32 Level, FText Desc, UText
 	Tmp_AAbility = AAbility;
 	Tmp_PAbility = PAbility;
 	Tmp_Type = Type;
+	
 	//Bind on Selected
 	LevelUpCardComponentWidget->OnSelectedDelegate.BindUObject(this, &ULevelMasterWidget::OnSelectedDelegateEventFunction);
 }
@@ -46,6 +47,8 @@ void ULevelMasterWidget::AddSelection(FText Name, int32 Level, FText Desc, UText
 void ULevelMasterWidget::ResetLevelUpItems()
 {
 	WBP_LevelUpItems->VB_Items->ClearChildren();
+	//Call On Ready
+	OnReadyDelegate.Execute();
 }
 
 void ULevelMasterWidget::Btn_IntroClickedCallBack()
@@ -56,17 +59,18 @@ void ULevelMasterWidget::Btn_IntroClickedCallBack()
 
 void ULevelMasterWidget::Close()
 {
-	RemoveFromParent();
-}
-
-void ULevelMasterWidget::OnSelectedDelegateEventFunction()
-{
-	// CallOnClose()
 	OnCloseDelegate.Execute(
 		Tmp_Type,
 		Tmp_AAbility,
 		Tmp_PAbility
 	);
+	RemoveFromParent();
+}
+
+void ULevelMasterWidget::OnSelectedDelegateEventFunction()
+{
+	// Call OnClose()
+	Close();
 }
 
 

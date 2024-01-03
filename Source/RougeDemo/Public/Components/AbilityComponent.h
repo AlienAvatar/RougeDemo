@@ -18,19 +18,9 @@ class ROUGEDEMO_API UAbilityComponent : public UActorComponent
 public:
 	// Sets default values for this component's properties
 	UAbilityComponent();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-	UPROPERTY(EditDefaultsOnly)
-	UNiagaraSystem* HammerFX;
-
-	
-public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
+							   FActorComponentTickFunction* ThisTickFunction) override;
 
 	void SetStartingAbility();
 
@@ -45,9 +35,16 @@ public:
 	TArray<EPassiveAbilities> EvolutionPassiveArr;
 
 	void LevelUpHammer();
+
+	void RefreshAbilities();
+protected:
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly)
+	UNiagaraSystem* HammerFX;
+
 private:
-
-
 	float HammerDamage = 0.5f;
 
 	void GrantHammer(bool Cast);
@@ -61,7 +58,9 @@ private:
 	// Hammer CD
 	float CalculateHammerCoolDown();
 
-	TArray<FTimerHandle> ActiveTimer;
+	TArray<FTimerHandle> ActiveTimerArr;
 
 	float HammerRadius = 300.0f;
+
+
 };

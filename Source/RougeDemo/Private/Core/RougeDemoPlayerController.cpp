@@ -34,6 +34,8 @@ void ARougeDemoPlayerController::BeginPlay()
 	SetupPlayer();
 }
 
+
+
 void ARougeDemoPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -126,6 +128,7 @@ void ARougeDemoPlayerController::SetupPlayer()
 			AbilityComponent = RougeDemoCharacter->GetAbilityComponent();
 			if(AbilityComponent)
 			{
+				//初始化技能
 				AbilityComponent->SetStartingAbility();
 			}
 		}
@@ -141,6 +144,9 @@ void ARougeDemoPlayerController::CreateLevelUpUI()
 {
 	if(HasAuthority())
 	{
+		bPreparingUI = true;
+		bLevelUpHudUp = true;
+		SetShowMouseCursor(true);
 		PrepareLevelUp();
 	}
 }
@@ -154,6 +160,8 @@ void ARougeDemoPlayerController::PrepareLevelUp()
 		LevelMasterWidget = CreateWidget<ULevelMasterWidget>(this, LevelMasterWidgetClass);
 		//添加卡片
 		ExecuteLevelUp();
+		//Bind Event to On Ready
+		LevelMasterWidget->OnReadyDelegate.BindUObject(this, &ARougeDemoPlayerController::ExecuteLevelUp);
 		//ProcessLevelup Bind to OnClose 处理点击选择后
 		LevelMasterWidget->OnCloseDelegate.BindUObject(this, &ARougeDemoPlayerController::ProcessLevelUp);
 	}else
@@ -199,7 +207,7 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 			FString EvoAbilityStr = UEnum::GetValueAsString(Local_EvoAbility);
 			const FText EvoAbilityText = UKismetTextLibrary::Conv_StringToText(EvoAbilityStr);
 			int32 Num = UKismetSystemLibrary::MakeLiteralInt(-1);
-			FText LevelNum = FText::FromString(FString::FromInt(Num));
+			FText LevelNum = UKismetTextLibrary::Conv_IntToText(Num);
 			FText SkillLevelText = FText::Format(FText::FromString(TEXT("{0}{1}")), EvoAbilityText, LevelNum);
 			CONTROLLER_LOG(Warning, TEXT("SkillLevelText[%s]"), *SkillLevelText.ToString());
 
@@ -248,16 +256,17 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 		//CONTROLLER_LOG(Warning, TEXT("Local_CardCount[%d]"), Local_CardCount); 4
 		//确定主动或被动的随机bool，如果不允许，则为failsafe, 50%概率添加4个主动技能或4个被动技能
 		//当主动技能添加满时（所有主动技能都是满级），则添加被动技能
-
-		if(CanAddActiveAbility)
-		{
-			CreateActiveCard(
-				Local_MaxCount,
-				Local_AvailableActiveAbilities,
-				Local_ActiveAbilitiesMap
-			);
-		}
-		/*if(UKismetMathLibrary::RandomBoolWithWeight(0.5))
+		//Test
+		// if(CanAddActiveAbility)
+		// {
+		// 	CreateActiveCard(
+		// 		Local_MaxCount,
+		// 		Local_AvailableActiveAbilities,
+		// 		Local_ActiveAbilitiesMap
+		// 	);
+		// }
+		
+		if(UKismetMathLibrary::RandomBoolWithWeight(0.5))
 		{
 			if(CanAddActiveAbility)
 			{
@@ -291,7 +300,7 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 					Local_ActiveAbilitiesMap
 				);
 			}
-		}*/
+		}
 	}
 	//如果没有技能可以添加，就加血
 	
@@ -333,7 +342,7 @@ TArray<EActiveAbilities> ARougeDemoPlayerController::CheckActiveAbilities(
 
 	TArray<EActiveAbilities> LocalActiveAbilitiesArr;
 	//已经激活的主动技能Map数量小于Card的数量
-	if(Local_ActiveMap.Num() < 4)
+	if(LocalActiveAbilitiesArr.Num() < 4)
 	{
 		/* 用遍历枚举添加
 		const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EActiveAbilities"), true);
@@ -466,7 +475,7 @@ void ARougeDemoPlayerController::TestAction()
 		if(OutActorArr.Num() > 0)
 		{
 			AGameManager* GameManager = Cast<AGameManager>(OutActorArr[0]);
-			Percent = Percent+0.8f;
+			Percent = Percent + 0.8f;
 			GameManager->UpdateCharactersXP(Percent, 2);
 			if(Percent > 0.9)
 			{
@@ -628,15 +637,15 @@ void ARougeDemoPlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilit
 		}
 	}
 	
-
 	SetShowMouseCursor(false);
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
 	AssignAbility(Type, ActiveAbilities, PassiveAbilities);
 
 	//更新UI
-	
+	UpdateHotbar();
 	
 	//RefreshAbilities();
+	AbilityComponent->RefreshAbilities();
 }
 
 void ARougeDemoPlayerController::AssignAbility(EAbilityType Type, EActiveAbilities ActiveAbilities,
@@ -651,6 +660,10 @@ void ARougeDemoPlayerController::AssignAbility(EAbilityType Type, EActiveAbiliti
 					AbilityComponent->LevelUpHammer();
 					break;
 				case EActiveAbilities::EAA_Fireball:
+					break;
+				case EActiveAbilities::EAA_Lightning:
+					break;
+				case EActiveAbilities::EAA_FrostBolt:
 					break;
 			}
 			break;
@@ -677,3 +690,24 @@ void ARougeDemoPlayerController::AssignAbility(EAbilityType Type, EActiveAbiliti
 			break;
 	}
 }
+
+void ARougeDemoPlayerController::UpdateHudHotbar(TMap<EActiveAbilities, int32> ActiveMap,
+	TMap<EPassiveAbilities, int32> PassiveMap)
+{
+	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeDemoHUD>(GetHUD()) : RougeDemoHUD;
+	if(RougeDemoHUD->PlayerOverlayWidget)
+	{
+		RougeDemoHUD->PlayerOverlayWidget->BuildHotbar(ActiveMap, PassiveMap);
+	}
+}
+
+void ARougeDemoPlayerController::UpdateHotbar()
+{
+	if(AbilityComponent == nullptr) { return; }
+	UpdateHudHotbar(
+		AbilityComponent->ActiveAbilitiesMap,
+		AbilityComponent->PassiveAbilitiesMap
+	);
+}
+
+

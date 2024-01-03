@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enum/EActiveAbilities.h"
+#include "Enum/EPassiveAbilities.h"
 #include "UObject/Interface.h"
 #include "ControllerManagerInterface.generated.h"
 
@@ -30,4 +32,7 @@ public:
 
 	UFUNCTION()
 	virtual void UpdateTime(FText Time) = 0;
+
+	virtual void UpdateHudHotbar(TMap<EActiveAbilities, int32> ActiveMap, TMap<EPassiveAbilities, int32> PassiveMap) = 0;
+	
 };

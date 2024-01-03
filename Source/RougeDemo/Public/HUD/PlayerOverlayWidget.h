@@ -4,8 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Enum/EActiveAbilities.h"
+#include "Enum/EPassiveAbilities.h"
 #include "PlayerOverlayWidget.generated.h"
 
+class UAbilityTitleWidget;
+class UHorizontalBox;
 class UVerticalBox;
 class UTextBlock;
 class UProgressBar;
@@ -42,5 +46,16 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* TB_Time;
 
+	UPROPERTY(meta=(BindWidget))
+	UHorizontalBox* HB_Active;
+
+	UPROPERTY(meta=(BindWidget))
+	UHorizontalBox* HB_Passive;
+
+	UPROPERTY(EditAnywhere, Category= "SubUI")
+	TSubclassOf<UUserWidget> AbilityTitleWidgetClass;
+
 	void UpdateTime(FText Time);
+
+	void BuildHotbar(TMap<EActiveAbilities, int32> ActiveMap, TMap<EPassiveAbilities, int32> PassiveMap);
 };

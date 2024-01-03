@@ -58,6 +58,9 @@ public:
 	void LevelUpMaxSpeed(bool PowerUp);
 	void LevelUpTimerReduction(bool PowerUp);
 	void LevelUpAbilityDamage(bool PowerUp);
+
+	//更新UI
+	void UpdateHotbar();
 private:
 	void SetupPlayer();
 
@@ -102,4 +105,10 @@ private:
 	void ProcessLevelUp(EAbilityType Type, EActiveAbilities ActiveAbilities, EPassiveAbilities PassiveAbilities);
 
 	void AssignAbility(EAbilityType Type, EActiveAbilities ActiveAbilities, EPassiveAbilities PassiveAbilities);
+
+	virtual void UpdateHudHotbar(TMap<EActiveAbilities, int32> ActiveMap, TMap<EPassiveAbilities, int32> PassiveMap) override;
+
+
+
+
 };

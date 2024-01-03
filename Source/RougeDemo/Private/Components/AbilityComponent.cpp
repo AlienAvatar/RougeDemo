@@ -2,8 +2,6 @@
 
 
 #include "Components/AbilityComponent.h"
-
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Lib/RougeDemoFunctionLibary.h"
 #include "SaveGame/PlayerSaveGame.h"
@@ -41,6 +39,7 @@ void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UAbilityComponent::SetStartingAbility()
 {
+	//开始添加一个Hammer skill
 	UPlayerSaveGame* PlayerSaveGame = URougeDemoFunctionLibary::LoadPlayerData();
 	if(PlayerSaveGame)
 	{
@@ -95,7 +94,7 @@ void UAbilityComponent::GrantHammer(bool Cast)
 		true
 	);*/
 	//唯一添加
-	ActiveTimer.AddUnique(PrepareHammerTimerHandle);
+	ActiveTimerArr.AddUnique(PrepareHammerTimerHandle);
 }
 
 void UAbilityComponent::PrepareHammer()
@@ -141,5 +140,32 @@ void UAbilityComponent::PrepareHammerTimerHandleCallback()
 float UAbilityComponent::CalculateHammerCoolDown()
 {
 	return 1.0f;
+}
+
+void UAbilityComponent::RefreshAbilities()
+{
+	ActiveTimerArr.Empty();
+	TArray<EActiveAbilities> ActiveArr;
+	ActiveAbilitiesMap.GetKeys(ActiveArr);
+	for(auto ActiveAbility : ActiveArr)
+	{
+		switch (ActiveAbility)
+		{
+		case EActiveAbilities::EAA_Hammer:
+			GrantHammer(false);
+			break;
+		case EActiveAbilities::EAA_Lightning:
+			
+			break;
+		case EActiveAbilities::EAA_FrostBolt:
+			
+			break;
+		case EActiveAbilities::EAA_Fireball:
+			
+			break;
+		}
+	}
+
+	
 }
 
