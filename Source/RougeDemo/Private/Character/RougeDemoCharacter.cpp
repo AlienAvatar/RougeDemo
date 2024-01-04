@@ -12,6 +12,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/CombatComponent.h"
 #include "Components/LockOnComponent.h"
+#include "Components/SphereComponent.h"
 #include "Core/RougeDemoGameMode.h"
 #include "Core/RougeDemoPlayerController.h"
 #include "Curves/CurveVector.h"
@@ -65,6 +66,7 @@ ARougeDemoCharacter::ARougeDemoCharacter()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	AbilityComp = CreateDefaultSubobject<UAbilityComponent>(TEXT("AbilityComp"));
+	AbilitySphere = CreateDefaultSubobject<USphereComponent>(TEXT("AbilitySphere")); 
 }
 
 
@@ -215,6 +217,10 @@ EMovementDirection ARougeDemoCharacter::CalculateInputDirection()
 	}
 }
 
+USphereComponent* ARougeDemoCharacter::GetAbilitySphere()
+{
+	return AbilitySphere;
+}
 
 
 void ARougeDemoCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,

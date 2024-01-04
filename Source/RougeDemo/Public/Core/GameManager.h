@@ -51,5 +51,10 @@ private:
 
 	void UpdateTimerCallBack();
 
+	void SpawnUp();
+
+	void PrepareWaveElites();
+
+	void PrepareWaveEnemies();
 	
 };

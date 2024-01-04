@@ -269,6 +269,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat)
 	UAbilityComponent* AbilityComp;
+
+	//技能释放范围
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat)
+	USphereComponent* AbilitySphere;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -328,5 +332,5 @@ public:
 
 	UAbilityComponent* GetAbilityComponent() const { return AbilityComp; }
 
-	
+	virtual USphereComponent* GetAbilitySphere() override;
 };

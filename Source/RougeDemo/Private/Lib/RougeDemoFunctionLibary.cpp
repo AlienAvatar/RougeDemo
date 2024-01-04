@@ -35,7 +35,7 @@ UTexture2D* URougeDemoFunctionLibary::FindActionIcon(EActiveAbilities AAbility)
 	case EActiveAbilities::EAA_Hammer:
 		Path = "/Game/RougeDemo/RES/UI/Texture/GamePanel/hammer-drop.hammer-drop";
 		break;
-	case EActiveAbilities::EAA_Fireball:
+	case EActiveAbilities::EAA_FireBall:
 		Path = "/Game/RougeDemo/RES/UI/Texture/GamePanel/fireball.fireball";
 		break;
 	case EActiveAbilities::EAA_Lightning:
@@ -63,16 +63,16 @@ UTexture2D* URougeDemoFunctionLibary::FindPassiveIcon(EPassiveAbilities PAbility
 	switch (PAbility)
 	{
 	case EPassiveAbilities::EPA_Health:
-		Path = "/Game/StarterContent/Textures/T_Spark_Core.T_Spark_Core";
+		Path = "/Game/RougeDemo/RES/UI/Texture/GamePanel/health-increase.health-increase";
 		break;
 	case EPassiveAbilities::EPA_Speed:
-		Path = "/Game/StarterContent/Textures/T_Spark_Core.T_Spark_Core";
+		Path = "/Game/RougeDemo/RES/UI/Texture/GamePanel/run.run";
 		break;
 	case EPassiveAbilities::EPA_AbilityDamage:
-		Path = "/Game/StarterContent/Textures/T_Spark_Core.T_Spark_Core";
+		Path = "/Game/RougeDemo/RES/UI/Texture/GamePanel/upgrade.upgrade";
 		break;
 	case EPassiveAbilities::EPA_CooldownReduction:
-		Path = "/Game/StarterContent/Textures/T_Spark_Core.T_Spark_Core";
+		Path = "/Game/RougeDemo/RES/UI/Texture/GamePanel/speedometer.speedometer";
 		break;
 	}
 	if(Path.IsEmpty())
@@ -119,5 +119,32 @@ UPlayerSaveGame* URougeDemoFunctionLibary::LoadPlayerData()
 			return PlayerSaveGame;
 		}
 		return Cast<UPlayerSaveGame>(SaveGame);
+	}
+}
+
+void URougeDemoFunctionLibary::DamageEnemiesOnce(TArray<FHitResult> EnemyHits, float Damage,
+	AController* InstigatorController, AActor* Causer)
+{
+	if(InstigatorController == nullptr || Causer == nullptr) { return; }
+	TArray<AActor*> Local_HitActorArr;
+	for(int i = 0; i < EnemyHits.Num() - 1; ++i)
+	{
+		FHitResult HitResult = EnemyHits[i];
+		if(Local_HitActorArr.Contains(HitResult.GetActor()))
+		{
+			continue;
+		}else
+		{
+			Local_HitActorArr.Add(HitResult.GetActor());
+		}
+
+		UGameplayStatics::ApplyDamage(
+			HitResult.GetActor(),
+			Damage,
+			InstigatorController,
+			Causer,
+			nullptr
+		);
+		
 	}
 }

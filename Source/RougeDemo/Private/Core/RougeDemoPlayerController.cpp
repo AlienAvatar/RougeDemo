@@ -158,6 +158,9 @@ void ARougeDemoPlayerController::PrepareLevelUp()
 	if(!LevelMasterWidget)
 	{
 		LevelMasterWidget = CreateWidget<ULevelMasterWidget>(this, LevelMasterWidgetClass);
+		//暂停
+		SetPause(true);
+		
 		//添加卡片
 		ExecuteLevelUp();
 		//Bind Event to On Ready
@@ -209,7 +212,6 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 			int32 Num = UKismetSystemLibrary::MakeLiteralInt(-1);
 			FText LevelNum = UKismetTextLibrary::Conv_IntToText(Num);
 			FText SkillLevelText = FText::Format(FText::FromString(TEXT("{0}{1}")), EvoAbilityText, LevelNum);
-			CONTROLLER_LOG(Warning, TEXT("SkillLevelText[%s]"), *SkillLevelText.ToString());
 
 			//相等的话，获取表中数据
 			if(SkillLevelText.EqualTo(RowNameText))
@@ -217,9 +219,8 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 				FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
 				if(AbilityLevelUp)
 				{
-					FString NameStr = UEnum::GetValueAsString(Local_EvoAbility);
 					LevelMasterWidget->AddSelection(
-						FText::FromString(NameStr),
+						EvoAbilityText,
 						-1,
 						AbilityLevelUp->LevelUpText,
 						URougeDemoFunctionLibary::FindActionIcon(Local_EvoAbility),
@@ -236,6 +237,7 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 	CanAddActiveAbility = true;
 	//传入Local_MaxAbilityLevel = 5
 	TArray<EActiveAbilities> Local_AvailableActiveAbilities = CheckActiveAbilities(Local_ActiveAbilitiesMap, Local_MaxAbilityLevel);
+	//如果Local_AvailableActiveAbilities为空，证明所有主动技能都学习到满级
 	if(Local_AvailableActiveAbilities.IsEmpty())
 	{
 		CanAddActiveAbility = false;
@@ -257,12 +259,12 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 		//确定主动或被动的随机bool，如果不允许，则为failsafe, 50%概率添加4个主动技能或4个被动技能
 		//当主动技能添加满时（所有主动技能都是满级），则添加被动技能
 		//Test
-		// if(CanAddActiveAbility)
+		// if(CanAddPassiveAbility)
 		// {
-		// 	CreateActiveCard(
+		// 	CreatePassiveCard(
 		// 		Local_MaxCount,
-		// 		Local_AvailableActiveAbilities,
-		// 		Local_ActiveAbilitiesMap
+		// 		Local_AvailablePassiveAbilities,
+		// 		Local_PassiveAbilitiesMap
 		// 	);
 		// }
 		
@@ -270,6 +272,7 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 		{
 			if(CanAddActiveAbility)
 			{
+				//4, 
 				CreateActiveCard(
 					Local_MaxCount,
 					Local_AvailableActiveAbilities,
@@ -338,27 +341,26 @@ TArray<EActiveAbilities> ARougeDemoPlayerController::CheckActiveAbilities(
 	TMap<EActiveAbilities, int32> ActiveMap, int32 MaxLevel)
 {
 	int32 Local_MaxAbilityLevel = MaxLevel;
-	TMap<EActiveAbilities, int32> Local_ActiveMap = ActiveMap;
-
+	TMap<EActiveAbilities, int32> Local_ActiveMap = ActiveMap; //<Hammer, 1>
+	
 	TArray<EActiveAbilities> LocalActiveAbilitiesArr;
-	//已经激活的主动技能Map数量小于Card的数量
-	if(LocalActiveAbilitiesArr.Num() < 4)
+	//已经激活的主动技能Map数量小于枚举中的技能数量
+	//这里只有4个技能，数字要和枚举中的数量保持一致
+	if(Local_ActiveMap.Num() < 4)
 	{
-		/* 用遍历枚举添加
-		const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EActiveAbilities"), true);
+		//用遍历枚举添加
+		UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EActiveAbilities"), true);
 		for(int i  = 0; i < EnumPtr->GetMaxEnumValue(); ++i)
 		{
-			LocalActiveAbilitiesArr.Add();
-		}*/
-		LocalActiveAbilitiesArr.Add(EActiveAbilities::EAA_Fireball);
-		LocalActiveAbilitiesArr.Add(EActiveAbilities::EAA_Hammer);
-		LocalActiveAbilitiesArr.Add(EActiveAbilities::EAA_Lightning);
-		LocalActiveAbilitiesArr.Add(EActiveAbilities::EAA_FrostBolt);
+			int64 EnumMemberValue = EnumPtr->GetValueByIndex(i);
+			LocalActiveAbilitiesArr.Add(static_cast<EActiveAbilities>(EnumMemberValue));
+		}
 
 		//删除已经满级的技能
 		//Ex: 这里的满级是5，当某个主动技能5级时，则删除代表Card中不会再出现
 		TArray<int32> OutValues;
 		Local_ActiveMap.GenerateValueArray(OutValues);
+		//1 
 		for(auto Value : OutValues)
 		{
 			if(Value >= Local_MaxAbilityLevel)
@@ -385,7 +387,7 @@ TArray<EActiveAbilities> ARougeDemoPlayerController::CheckActiveAbilities(
 				TArray<EActiveAbilities> OutKeys;
 				Local_ActiveMap.GetKeys(OutKeys);
 				FString EnumString = UEnum::GetValueAsString(OutKeys[Value]);
-				CONTROLLER_LOG(Warning, TEXT("OutKeys[Value][%s]"), *EnumString)
+				//CONTROLLER_LOG(Warning, TEXT("OutKeys[Value][%s]"), *EnumString)
 				LocalActiveAbilitiesArr.Add(OutKeys[Value]);
 			}	
 		}
@@ -400,20 +402,17 @@ TArray<EPassiveAbilities> ARougeDemoPlayerController::CheckPassiveAbilities(TMap
 	TMap<EPassiveAbilities, int32> Local_PassiveMap = PassiveMap;
 
 	TArray<EPassiveAbilities> LocalPassiveAbilitiesArr;
-	//小于Card的数量
+	//已经激活的被动技能Map数量小于枚举中的技能数量
 	if(Local_PassiveMap.Num() < 4)
 	{
 		//用遍历枚举添加
-		// const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EPassiveAbilities"), true);
-		// for(int i  = 0; i < EnumPtr->NumEnums(); ++i)
-		// {
-		// 	LocalPassiveAbilitiesArr.Add(*EnumPtr);
-		// }
- 		LocalPassiveAbilitiesArr.Add(EPassiveAbilities::EPA_Health);
-		LocalPassiveAbilitiesArr.Add(EPassiveAbilities::EPA_Speed);
-		LocalPassiveAbilitiesArr.Add(EPassiveAbilities::EPA_AbilityDamage);
-		LocalPassiveAbilitiesArr.Add(EPassiveAbilities::EPA_CooldownReduction);
-
+		UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EPassiveAbilities"), true);
+		for(int i  = 0; i < EnumPtr->GetMaxEnumValue(); ++i)
+		{
+			int64 EnumMemberValue = EnumPtr->GetValueByIndex(i);
+			LocalPassiveAbilitiesArr.Add(static_cast<EPassiveAbilities>(EnumMemberValue));
+		}
+		
 		//删除已经满的技能
 		TArray<int32> OutValues;
 		Local_PassiveMap.GenerateValueArray(OutValues);
@@ -495,20 +494,18 @@ void ARougeDemoPlayerController::UpdateTime(FText Time)
 	}
 }
 
-void ARougeDemoPlayerController::CreateActiveCard(int32 Local_MaxCount, TArray<EActiveAbilities> Local_AvailableActiveAbilities,
-	TMap<EActiveAbilities, int32> Local_ActiveAbilitiesMap)
+void ARougeDemoPlayerController::CreateActiveCard(int32 Local_MaxCount, TArray<EActiveAbilities>& Local_AvailableActiveAbilities,
+	TMap<EActiveAbilities, int32>& Local_ActiveAbilitiesMap)
 {
-	//从[0-3]随机选择一个数
 	EActiveAbilities Local_ActiveAbility;
-	int32 RandomIndex = UKismetMathLibrary::RandomInteger(2);
-	
-	//随机选择一个随机技能 
+	//随机选择一个随机技能
+	int32 RandomIndex = UKismetMathLibrary::RandomIntegerInRange(0, Local_AvailableActiveAbilities.Num() - 1); //0 || 1 || 2 || 3
     Local_ActiveAbility = Local_AvailableActiveAbilities[RandomIndex];
-	//从本地数组中删除，这样我们就没有重复Card了
+	//从可升级技能数组中删除，防止产生重复技能的Card了
    	Local_AvailableActiveAbilities.Remove(Local_ActiveAbility);
  	CanAddActiveAbility = !Local_AvailableActiveAbilities.IsEmpty();
-
-	//从数据表中获取详细信息并创建升级卡
+	
+	//从DataTable中获取技能信息
 	TArray<FName> OutRowNames;
 	UDataTableFunctionLibrary::GetDataTableRowNames(DT_ActiveAbilities, OutRowNames);
 	
@@ -518,30 +515,30 @@ void ARougeDemoPlayerController::CreateActiveCard(int32 Local_MaxCount, TArray<E
 		
 		//设置Level
 		int32 Level = 0;
+		//当Map中包括Local_ActiveAbility代表该技能已经激活
 		if(Local_ActiveAbilitiesMap.Contains(Local_ActiveAbility))
 		{
 			Level = Local_ActiveAbilitiesMap[Local_ActiveAbility];
+			++Level;
 		}
-		++Level;
-		
+
+		//拆解字符串
 		FString EvoAbilityStr = UEnum::GetValueAsString(Local_ActiveAbility);
 		int32 Index_Local_ActiveAbility = EvoAbilityStr.Find("_");
 		EvoAbilityStr = UKismetStringLibrary::GetSubstring(EvoAbilityStr, Index_Local_ActiveAbility + 1,EvoAbilityStr.Len());
 		const FText EvoAbilityText = UKismetTextLibrary::Conv_StringToText(EvoAbilityStr);
-		FText LevelText = FText::FromString(FString::FromInt(Level));
+		FText LevelText = UKismetTextLibrary::Conv_IntToText(Level);
 		FText SkillLevelText = FText::Format(FText::FromString(TEXT("{0}{1}")), EvoAbilityText, LevelText);
-		CONTROLLER_LOG(Warning, TEXT("SkillLevelText[%s]"), *SkillLevelText.ToString());
-		CONTROLLER_LOG(Warning, TEXT("RowNameText[%s]"), *RowNameText.ToString());
+		
 		//检查升级的卡片是否和表中的相等
 		if(SkillLevelText.EqualTo(RowNameText))
 		{
 			FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
 			if(AbilityLevelUp)
 			{
-				FString NameStr = UEnum::GetValueAsString(Local_ActiveAbility);
 				//添加到UI
 				LevelMasterWidget->AddSelection(
-					FText::FromString(NameStr),
+					EvoAbilityText,
 					Level,
 					AbilityLevelUp->LevelUpText,
 					URougeDemoFunctionLibary::FindActionIcon(Local_ActiveAbility),
@@ -556,54 +553,51 @@ void ARougeDemoPlayerController::CreateActiveCard(int32 Local_MaxCount, TArray<E
 }
 
 void ARougeDemoPlayerController::CreatePassiveCard(int32 Local_MaxCount,
-	TArray<EPassiveAbilities> Local_AvailablePassiveAbilities,TMap<EPassiveAbilities, int32> Local_PassiveAbilitiesMap)
+	TArray<EPassiveAbilities>& Local_AvailablePassiveAbilities,TMap<EPassiveAbilities, int32>& Local_PassiveAbilitiesMap)
 {
 	//从本地数组中删除，这样我们就没有重复项了
 	EPassiveAbilities Local_PassiveAbility;
-	int32 RandomIndex = UKismetMathLibrary::RandomInteger(Local_MaxCount);
+	int32 RandomIndex = UKismetMathLibrary::RandomIntegerInRange(0, Local_AvailablePassiveAbilities.Num() - 1);
 				
 	Local_PassiveAbility = Local_AvailablePassiveAbilities[RandomIndex];
+	
 	Local_AvailablePassiveAbilities.Remove(Local_PassiveAbility);
 	CanAddPassiveAbility = !Local_AvailablePassiveAbilities.IsEmpty();
-
 	//检查升级的技能是否和表中的相等
 	TArray<FName> OutRowNames;
 	UDataTableFunctionLibrary::GetDataTableRowNames(DT_PassiveAbilities, OutRowNames);
-	CONTROLLER_LOG(Warning, TEXT("OutRowNames.Num[%d]"), OutRowNames.Num());
 
 	for(FName RowName : OutRowNames)
 	{
 		FText RowNameText = UKismetTextLibrary::Conv_NameToText(RowName);
-		CONTROLLER_LOG(Warning, TEXT("RowNameText[%s]"), *RowNameText.ToString());
+		//CONTROLLER_LOG(Warning, TEXT("RowNameText[%s]"), *RowNameText.ToString());
 		
 		//设置Level
 		int32 Level = 0;
 		if(Local_PassiveAbilitiesMap.Contains(Local_PassiveAbility))
 		{
 			Level = Local_PassiveAbilitiesMap[Local_PassiveAbility];
+			++Level;
 		}
-		++Level;
 					
 		FString EvoAbilityStr = UEnum::GetValueAsString(Local_PassiveAbility);
-		CONTROLLER_LOG(Warning, TEXT("EvoAbilityStr[%s]"), *EvoAbilityStr);
-		//?
 		int32 Index_Local_PassiveAbility = EvoAbilityStr.Find("_");
 		EvoAbilityStr = UKismetStringLibrary::GetSubstring(EvoAbilityStr, Index_Local_PassiveAbility + 1,EvoAbilityStr.Len());
 		const FText EvoAbilityText = UKismetTextLibrary::Conv_StringToText(EvoAbilityStr);
-		const FText LevelText = FText::FromString(FString::FromInt(Level));
-		FText SkillLevelText = FText::Format(FText::FromString(TEXT("{0}{1}")), EvoAbilityText, Level);
-		CONTROLLER_LOG(Warning, TEXT("SkillLevelText[%s]"), *SkillLevelText.ToString());
-		//相等的话，获取表中数据
-		if(SkillLevelText.EqualTo(RowNameText))
+		// const FText LevelText = UKismetTextLibrary::Conv_IntToText(Level);
+		// FText SkillLevelText = FText::Format(FText::FromString(TEXT("{0}{1}")), EvoAbilityText, Level);
+		// CONTROLLER_LOG(Warning, TEXT("SkillLevelText[%s]"), *SkillLevelText.ToString());
+		
+		//相等的话，从DataTable中获取技能信息
+		if(EvoAbilityText.EqualTo(RowNameText))
 		{
 			FAbilityLevelUp* AbilityLevelUp = DT_PassiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
 
 			if(AbilityLevelUp)
 			{
-				FString NameStr = UEnum::GetValueAsString(Local_PassiveAbility);
 				//添加到UI
 				LevelMasterWidget->AddSelection(
-					FText::FromString(NameStr),
+					EvoAbilityText,
 					Level,
 					AbilityLevelUp->LevelUpText,
 					URougeDemoFunctionLibary::FindPassiveIcon(Local_PassiveAbility),
@@ -627,15 +621,16 @@ void ARougeDemoPlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilit
 	
 	bPreparingUI = false;
 
-	//暂停
-	ARougeDemoGameMode* GameMode = Cast<ARougeDemoGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if(GameMode)
-	{
-		if (IGameModeInterface* GameModeImpl = Cast<IGameModeInterface>(GameMode))
-		{
-			GameModeImpl->Pause(false,false);
-		}
-	}
+	//继续游戏
+	// ARougeDemoGameMode* GameMode = Cast<ARougeDemoGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	// if(GameMode)
+	// {
+	// 	if (IGameModeInterface* GameModeImpl = Cast<IGameModeInterface>(GameMode))
+	// 	{
+	// 		GameModeImpl->Pause(false,false);
+	// 	}
+	// }
+	SetPause(false);
 	
 	SetShowMouseCursor(false);
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
@@ -659,7 +654,7 @@ void ARougeDemoPlayerController::AssignAbility(EAbilityType Type, EActiveAbiliti
 				case EActiveAbilities::EAA_Hammer:
 					AbilityComponent->LevelUpHammer();
 					break;
-				case EActiveAbilities::EAA_Fireball:
+				case EActiveAbilities::EAA_FireBall:
 					break;
 				case EActiveAbilities::EAA_Lightning:
 					break;

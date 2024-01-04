@@ -36,4 +36,7 @@ public:
 	static UTexture2D* FindPassiveIcon(EPassiveAbilities PAbility);
 
 	static UPlayerSaveGame* LoadPlayerData();
+
+	UFUNCTION()
+	static void DamageEnemiesOnce(TArray<FHitResult> EnemyHits, float Damage, AController* InstigatorController, AActor* Causer);
 };

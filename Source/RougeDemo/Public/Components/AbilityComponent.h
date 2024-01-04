@@ -8,6 +8,7 @@
 #include "Enum/EPassiveAbilities.h"
 #include "AbilityComponent.generated.h"
 
+class ABaseExplosion;
 class UNiagaraSystem;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -37,6 +38,8 @@ public:
 	void LevelUpHammer();
 
 	void RefreshAbilities();
+
+	void LevelUpLightning();
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -44,23 +47,53 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UNiagaraSystem* HammerFX;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ABaseExplosion> LightningClass;
 private:
+	//Hammer
 	float HammerDamage = 0.5f;
 
+	float HammerRadius = 300.0f;
+	
 	void GrantHammer(bool Cast);
 
 	void PrepareHammer();
 
+	void ExecuteHammer(TArray<FHitResult> Hits, float Damage, float Radius, APlayerController* Controller);
+
 	FTimerHandle PrepareHammerTimerHandle;
-
+	
 	void PrepareHammerTimerHandleCallback();
+	
+	//Lightning
+	float LightningDamage = 20.0f;
+	
+	float LightningRadius = 150.0f;
+	
+	void PrepareLightning();
 
+	void ExecuteLightning(FVector TargetLocation, ACharacter* Instigator, float Damage, float Radius);
+
+	void GrantLightning(bool Case);
+	
+	UPROPERTY(EditDefaultsOnly)
+	UNiagaraSystem* LightningSystem;
+	
+	FVector LastLightningLoc;
+	
+	FTimerHandle PrepareLightningTimerHandle;
+	
+	void PrepareLightningTimerHandleCallback();
+	
 	// Hammer CD
 	float CalculateHammerCoolDown();
 
 	TArray<FTimerHandle> ActiveTimerArr;
 
-	float HammerRadius = 300.0f;
-
+	
+	
 
 };
+
+
+

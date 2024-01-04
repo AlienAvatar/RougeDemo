@@ -6,6 +6,7 @@
 
 #define ECC_PlayerBackStabbed ECollisionChannel::ECC_GameTraceChannel1
 #define ECC_Attack ECollisionChannel::ECC_GameTraceChannel2
+#define ECC_TRACE_ENEMY ECC_GameTraceChannel3
 
 //#define ECC_AIPawn ECollisionChannel::ECC_GameCollisionChannel1
 

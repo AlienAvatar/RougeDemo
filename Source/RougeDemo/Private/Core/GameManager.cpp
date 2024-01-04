@@ -111,3 +111,18 @@ void AGameManager::UpdateTimerCallBack()
 	}
 }
 
+void AGameManager::SpawnUp()
+{
+	
+}
+
+void AGameManager::PrepareWaveElites()
+{
+	
+}
+
+void AGameManager::PrepareWaveEnemies()
+{
+	
+}
+

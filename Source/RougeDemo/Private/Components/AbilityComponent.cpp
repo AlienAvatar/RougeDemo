@@ -6,6 +6,13 @@
 #include "Lib/RougeDemoFunctionLibary.h"
 #include "SaveGame/PlayerSaveGame.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Actor/BaseExplosion.h"
+#include "Character/RougeDemoCharacter.h"
+#include "Interface/CharacterInterface.h"
+#include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "RougeDemo/RougeDemo.h"
 
 // Sets default values for this component's properties
 UAbilityComponent::UAbilityComponent()
@@ -48,6 +55,9 @@ void UAbilityComponent::SetStartingAbility()
 		{
 		case EActiveAbilities::EAA_Hammer:
 			LevelUpHammer();
+			break;
+		case EActiveAbilities::EAA_Lightning:
+			LevelUpLightning();
 			break;
 		}
 	}
@@ -99,7 +109,7 @@ void UAbilityComponent::GrantHammer(bool Cast)
 
 void UAbilityComponent::PrepareHammer()
 {
-	TArray<FHitResult> OutArray;
+	TArray<FHitResult> OutHits;
 	TArray<AActor*> IgnoreActor;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypeQueryArr;
 	UKismetSystemLibrary::SphereTraceMultiForObjects(
@@ -111,10 +121,19 @@ void UAbilityComponent::PrepareHammer()
 		false,
 		IgnoreActor,
 		EDrawDebugTrace::None,
-		OutArray,
+		OutHits,
 		true
 	);
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	ExecuteHammer(OutHits, HammerDamage, HammerRadius, PlayerController);
+
+	//Apply Damage
 	
+}
+
+void UAbilityComponent::ExecuteHammer(TArray<FHitResult> Hits, float Damage, float Radius,
+	APlayerController* Controller)
+{
 	if(HammerFX)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAttached(
@@ -123,7 +142,7 @@ void UAbilityComponent::PrepareHammer()
 			FName("None"),
 			FVector::ZeroVector,
 			FRotator::ZeroRotator,
-		    EAttachLocation::KeepRelativeOffset,
+			EAttachLocation::KeepRelativeOffset,
 			true,
 			true,
 			ENCPoolMethod::None,
@@ -132,9 +151,52 @@ void UAbilityComponent::PrepareHammer()
 	}
 }
 
+void UAbilityComponent::PrepareLightning()
+{
+	ICharacterInterface* CharacterInterface = Cast<ICharacterInterface>(GetOwner());
+	if(CharacterInterface)
+	{
+		TArray<TEnumAsByte<EObjectTypeQuery> > ObjectTypeQueryArr;
+		const EObjectTypeQuery EnemyObjectTypeQuery = UEngineTypes::ConvertToObjectType(ECC_TRACE_ENEMY);
+		ObjectTypeQueryArr.Add(EnemyObjectTypeQuery);
+		TArray<AActor*> IgnoreActorArr;
+		TArray<AActor*> EnemyActorArr;
+		//检查是否有Actor与AbilityComponent发送碰撞
+		UKismetSystemLibrary::ComponentOverlapActors(
+			CharacterInterface->GetAbilitySphere(),
+			GetOwner()->GetTransform(),
+			ObjectTypeQueryArr,
+			nullptr,
+			IgnoreActorArr,
+			EnemyActorArr
+		);
+
+		if(EnemyActorArr.Num() > 0 && EnemyActorArr[0])
+		{
+			ARougeDemoCharacter* Instigator = Cast<ARougeDemoCharacter>(GetOwner());
+			int32 RandomIndex = UKismetMathLibrary::RandomIntegerInRange(0, EnemyActorArr.Num() - 1);
+			FVector TargetLocation = EnemyActorArr[RandomIndex]->GetActorLocation();
+			LastLightningLoc = TargetLocation;
+			
+			ExecuteLightning(
+				LastLightningLoc,
+				Instigator,
+				LightningDamage,
+				LightningRadius
+			);
+		}
+	}
+	
+}
+
 void UAbilityComponent::PrepareHammerTimerHandleCallback()
 {
 	PrepareHammer();
+}
+
+void UAbilityComponent::PrepareLightningTimerHandleCallback()
+{
+	PrepareLightning();
 }
 
 float UAbilityComponent::CalculateHammerCoolDown()
@@ -155,12 +217,12 @@ void UAbilityComponent::RefreshAbilities()
 			GrantHammer(false);
 			break;
 		case EActiveAbilities::EAA_Lightning:
-			
+			GrantLightning(false);
 			break;
 		case EActiveAbilities::EAA_FrostBolt:
 			
 			break;
-		case EActiveAbilities::EAA_Fireball:
+		case EActiveAbilities::EAA_FireBall:
 			
 			break;
 		}
@@ -169,3 +231,65 @@ void UAbilityComponent::RefreshAbilities()
 	
 }
 
+void UAbilityComponent::LevelUpLightning()
+{
+	int32 Local_Level = 1;
+	if(ActiveAbilitiesMap.Contains(EActiveAbilities::EAA_Lightning))
+	{
+		Local_Level = *ActiveAbilitiesMap.Find(EActiveAbilities::EAA_Lightning);
+		++Local_Level;
+		ActiveAbilitiesMap.Add(EActiveAbilities::EAA_Lightning, Local_Level);
+	}else
+	{
+		ActiveAbilitiesMap.Add(EActiveAbilities::EAA_Lightning, Local_Level);
+	}
+	
+	switch (Local_Level)
+	{
+	case 1:
+		GrantLightning(true);
+		break;
+	case 2:
+		LightningDamage += 5;
+		break;
+	case 3:
+		LightningDamage += 5;
+		break;
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("LevelUpLightning Error"));
+	}
+}
+
+void UAbilityComponent::ExecuteLightning(FVector TargetLocation, ACharacter* Instigator, float Damage,
+                                         float Radius)
+{
+	if(LightningClass)
+	{
+		ABaseExplosion* BaseExplosion = GetWorld()->SpawnActor<ABaseExplosion>(
+			LightningClass,
+			TargetLocation - FVector(0.f, 0.f, 100.f),
+			FRotator::ZeroRotator
+		);
+		
+		BaseExplosion->SetUp(
+			Damage,
+			Radius,
+			LightningSystem
+		);
+
+		BaseExplosion->DoWork();
+	}
+}
+
+void UAbilityComponent::GrantLightning(bool Case)
+{
+	GetWorld()->GetTimerManager().SetTimer(
+		PrepareLightningTimerHandle,
+		this,
+		&UAbilityComponent::PrepareLightningTimerHandleCallback,
+		2.0f,
+		true
+	);
+	
+	ActiveTimerArr.AddUnique(PrepareLightningTimerHandle);
+}
