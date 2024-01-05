@@ -3,6 +3,7 @@
 
 #include "Weapon/ProjectileBase.h"
 
+#include "NiagaraFunctionLibrary.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -27,6 +28,9 @@ AProjectileBase::AProjectileBase()
 
 	ParticleSystemComp = CreateDefaultSubobject<UParticleSystemComponent>("ParticleSystemComp");
 	ParticleSystemComp->SetupAttachment(SphereComp);
+
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
+	MeshComp->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -67,6 +71,16 @@ void AProjectileBase::PostInitializeComponents()
 void AProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
+	if(HitFX)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			HitFX,
+			Hit.Location
+		);
+	}
+	
+	
 }
 
 void AProjectileBase::OnProjectileStop(const FHitResult& ImpactResult)
@@ -91,6 +105,12 @@ void AProjectileBase::DestroyProjectile()
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),HitParticle,GetActorLocation(),GetActorRotation());
 		Destroy();
 	}
+}
+
+void AProjectileBase::Setup(UNiagaraSystem* pHitFX, float pDamage)
+{
+	HitFX = pHitFX;
+	BaseDamage = pDamage;
 }
 
 

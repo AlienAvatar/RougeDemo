@@ -8,6 +8,8 @@
 #include "Enum/EPassiveAbilities.h"
 #include "AbilityComponent.generated.h"
 
+class AProjectileBase;
+class ABaseProjectile;
 class ABaseExplosion;
 class UNiagaraSystem;
 
@@ -40,6 +42,8 @@ public:
 	void RefreshAbilities();
 
 	void LevelUpLightning();
+
+	void LevelUpFrostBolt();
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -49,6 +53,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ABaseExplosion> LightningClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	UNiagaraSystem* HitFX;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AProjectileBase> FrostBoltClass;
 private:
 	//Hammer
 	float HammerDamage = 0.5f;
@@ -90,9 +100,20 @@ private:
 
 	TArray<FTimerHandle> ActiveTimerArr;
 
-	
-	
+	//FrostBolt
+	int FrostBoltIndex = 0;
 
+	float FrostBoltDamage = 5.0f;
+	
+	void PrepareFrostBolt();
+
+	void ExecuteFrostBolt(AActor* TargetActor, ACharacter* Instigator, float Damage);
+
+	FTimerHandle PrepareFrostBoltTimerHandle;
+
+	void PrepareFrostBoltTimerHandleCallback();
+
+	void GrantFrostBolt(bool Cast);
 };
 
 

@@ -11,8 +11,10 @@
 #include "Enum/EMovementDirection.h"
 #include "Enum/EAIStage.h"
 #include "Interface/EnemyAIInterface.h"
+#include "Struct/EnemySpawnType.h"
 #include "BaseAI.generated.h"
 
+struct FEnemySpawn;
 class AAIEnemyController;
 class USphereComponent;
 class UAISense_Sight;
@@ -53,6 +55,9 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=State)
 	FAttributeInfo AttributeInfo;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=State)
+	FEnemySpawnType EnemySpawn;
 	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

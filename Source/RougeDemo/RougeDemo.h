@@ -21,3 +21,7 @@ UE_LOG(LogRougeWidget, Verbosity, Format, ##__VA_ARGS__)
 DECLARE_LOG_CATEGORY_EXTERN(LogRougeController, Log, All);
 #define CONTROLLER_LOG(Verbosity, Format, ...) \
 UE_LOG(LogRougeController, Verbosity, Format, ##__VA_ARGS__)
+
+DECLARE_LOG_CATEGORY_EXTERN(LogGameManager, Log, All);
+#define GAME_LOG(Verbosity, Format, ...) \
+UE_LOG(LogGameManager, Verbosity, Format, ##__VA_ARGS__)

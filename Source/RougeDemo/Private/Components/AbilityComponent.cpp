@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "RougeDemo/RougeDemo.h"
+#include "Weapon/ProjectileBase.h"
 
 // Sets default values for this component's properties
 UAbilityComponent::UAbilityComponent()
@@ -58,6 +59,9 @@ void UAbilityComponent::SetStartingAbility()
 			break;
 		case EActiveAbilities::EAA_Lightning:
 			LevelUpLightning();
+			break;
+		case EActiveAbilities::EAA_FrostBolt:
+			LevelUpFrostBolt();
 			break;
 		}
 	}
@@ -204,6 +208,88 @@ float UAbilityComponent::CalculateHammerCoolDown()
 	return 1.0f;
 }
 
+void UAbilityComponent::PrepareFrostBolt()
+{
+	FrostBoltIndex = 0;
+	ICharacterInterface* CharacterImpl = Cast<ICharacterInterface>(GetOwner());
+	if(CharacterImpl)
+	{
+		TArray<TEnumAsByte<EObjectTypeQuery> > ObjectTypeQueryArr;
+		const EObjectTypeQuery EnemyObjectTypeQuery = UEngineTypes::ConvertToObjectType(ECC_TRACE_ENEMY);
+		ObjectTypeQueryArr.Add(EnemyObjectTypeQuery);
+		
+		TArray<AActor*> IgnoreActorArr;
+		TArray<AActor*> EnemyActorArr;
+		//检查是否有Actor与AbilityComponent发送碰撞
+		UKismetSystemLibrary::ComponentOverlapActors(
+			CharacterImpl->GetAbilitySphere(),
+			GetOwner()->GetTransform(),
+			ObjectTypeQueryArr,
+			nullptr,
+			IgnoreActorArr,
+			EnemyActorArr
+		);
+
+		if(EnemyActorArr.Num() > 0 && EnemyActorArr[0])
+		{
+			ARougeDemoCharacter* Character = Cast<ARougeDemoCharacter>(GetOwner());
+			FVector Origin = GetOwner()->GetActorLocation();
+			float Distance = 0.f;
+			AActor* Target = UGameplayStatics::FindNearestActor(
+				Origin,
+				EnemyActorArr,
+				Distance
+			);
+
+			ExecuteFrostBolt(Target, Character, FrostBoltDamage);
+		}
+	}
+}
+
+void UAbilityComponent::ExecuteFrostBolt(AActor* TargetActor, ACharacter* Instigator, float Damage)
+{
+	FRotator LookDirection = UKismetMathLibrary::FindLookAtRotation(
+		Instigator->GetActorLocation(),
+		TargetActor->GetActorLocation()
+	);
+	
+	FActorSpawnParameters ActorSpawnParameters;
+	ActorSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+	AProjectileBase* ProjectileBase = GetWorld()->SpawnActor<AProjectileBase>(
+		FrostBoltClass,
+		Instigator->GetActorLocation(),
+		FRotator(0.f,LookDirection.Yaw,LookDirection.Roll),
+		ActorSpawnParameters
+	);
+	if(ProjectileBase && HitFX)
+	{
+		ProjectileBase->Setup(
+			HitFX,
+			Damage
+		);
+	}
+}
+
+void UAbilityComponent::PrepareFrostBoltTimerHandleCallback()
+{
+	PrepareFrostBolt();
+}
+
+void UAbilityComponent::GrantFrostBolt(bool Cast)
+{
+	GetWorld()->GetTimerManager().SetTimer(
+		PrepareFrostBoltTimerHandle,
+		this,
+		&UAbilityComponent::PrepareFrostBoltTimerHandleCallback,
+		2.0f,
+		true,
+		-1
+	);
+	
+	ActiveTimerArr.AddUnique(PrepareFrostBoltTimerHandle);
+}
+
 void UAbilityComponent::RefreshAbilities()
 {
 	ActiveTimerArr.Empty();
@@ -220,7 +306,7 @@ void UAbilityComponent::RefreshAbilities()
 			GrantLightning(false);
 			break;
 		case EActiveAbilities::EAA_FrostBolt:
-			
+			GrantFrostBolt(false);
 			break;
 		case EActiveAbilities::EAA_FireBall:
 			
@@ -257,6 +343,35 @@ void UAbilityComponent::LevelUpLightning()
 		break;
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("LevelUpLightning Error"));
+	}
+}
+
+void UAbilityComponent::LevelUpFrostBolt()
+{
+	int32 Local_Level = 1;
+	if(ActiveAbilitiesMap.Contains(EActiveAbilities::EAA_FrostBolt))
+	{
+		Local_Level = *ActiveAbilitiesMap.Find(EActiveAbilities::EAA_FrostBolt);
+		++Local_Level;
+		ActiveAbilitiesMap.Add(EActiveAbilities::EAA_FrostBolt, Local_Level);
+	}else
+	{
+		ActiveAbilitiesMap.Add(EActiveAbilities::EAA_FrostBolt, Local_Level);
+	}
+	
+	switch (Local_Level)
+	{
+	case 1:
+		GrantFrostBolt(true);
+		break;
+	case 2:
+		FrostBoltDamage += 5;
+		break;
+	case 3:
+		FrostBoltDamage += 5;
+		break;
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("LevelUpFrostBolt Error"));
 	}
 }
 

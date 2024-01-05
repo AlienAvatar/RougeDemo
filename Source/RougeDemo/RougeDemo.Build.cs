@@ -27,6 +27,7 @@ public class RougeDemo : ModuleRules
 			"GameplayTags",
 			"GameplayTasks", 
 			"MoviePlayer",
+			"AIModule"
 		});
 
 		// Uncomment if you are using Slate UI

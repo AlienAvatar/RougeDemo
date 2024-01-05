@@ -3,12 +3,17 @@
 
 #include "Core/GameManager.h"
 
+#include "AI/BaseAI.h"
 #include "Core/RougeDemoPlayerController.h"
+#include "EnvironmentQuery/EnvQueryManager.h"
+#include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
 #include "Interface/ControllerManagerInterface.h"
+#include "Kismet/DataTableFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "RougeDemo/RougeDemo.h"
 
-
+DEFINE_LOG_CATEGORY(LogGameManager);
 // Sets default values
 AGameManager::AGameManager()
 {
@@ -21,6 +26,7 @@ void AGameManager::BeginPlay()
 {
 	Super::BeginPlay();
 	GameSetUp();
+	//SpawnUp();
 }
 
 
@@ -113,7 +119,16 @@ void AGameManager::UpdateTimerCallBack()
 
 void AGameManager::SpawnUp()
 {
-	
+	PrepareWaveEnemies();
+
+	GetWorld()->GetTimerManager().SetTimer(
+		PrepareWaveEnemiesTimer,
+		this,
+		&AGameManager::SpawnWave,
+		SpawnWaveCoolDown,
+		true,
+		-1
+	);
 }
 
 void AGameManager::PrepareWaveElites()
@@ -123,6 +138,125 @@ void AGameManager::PrepareWaveElites()
 
 void AGameManager::PrepareWaveEnemies()
 {
+	//首先-为游戏的每一分钟创建足够的物品
+	for(int i = 0; i < MaxGameTime; ++i)
+	{
+		FEnemySpawnWave EnemySpawnWave;
+		EnemySpawnWaveArr.Add(EnemySpawnWave);
+	}
 	
+	const FString Path = "/Script/Engine.DataTable'/Game/RougeDemo/SRC/Data/DataTables/DT_EnemySpawnType.DT_EnemySpawnType'";
+	UDataTable* Table =  Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *Path));
+	
+	if(Table)
+	{
+		TArray<FName> OutRowNames;
+		UDataTableFunctionLibrary::GetDataTableRowNames(Table,OutRowNames);
+
+		for(int j = 0; j < OutRowNames.Num(); ++j)
+		{
+			FEnemySpawnType* OutRow = Table->FindRow<FEnemySpawnType>(OutRowNames[j],"");
+			if(OutRow)
+			{
+				EnemySpawnWaveArr[OutRow->AllowedWave].SpawnArr.Add(*OutRow);
+			}
+		}
+	}
+}
+
+void AGameManager::SpawnWave()
+{
+	//Calculate how many enemies we want to spawn in interval
+	UpdateEnemyWave();
+
+	CurrentEnemySpawnIndex = 0;
+
+	NumberOfEnemiesToSpawn = UKismetMathLibrary::RandomIntegerInRange(MinEnemiesPerWave, MaxEnemiesPerWave);
+
+	if(CurrentEnemyCount < MaxEnemiesCount && CurrentEnemySpawnIndex < NumberOfEnemiesToSpawn)
+	{
+		FindSpawnLocation();
+	}
+}
+
+void AGameManager::UpdateEnemyWave()
+{
+	TArray<FEnemySpawnType> SpawnsArr = EnemySpawnWaveArr[WaveIndex].SpawnArr;
+	if(SpawnsArr.IsEmpty())
+	{
+		return;
+	}else
+	{
+		PreparedEnemiesArr = SpawnsArr;
+	}
+}
+
+void AGameManager::FindSpawnLocation()
+{
+	APawn* Pawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	if(Pawn && EQSFindSpawnLocation)
+	{
+		UEnvQueryInstanceBlueprintWrapper* EQSInstance = UEnvQueryManager::RunEQSQuery(
+			GetWorld(),
+			EQSFindSpawnLocation,
+			Pawn,
+			EEnvQueryRunMode::AllMatching,
+			nullptr
+		);
+
+		//wait to found location
+		EQSInstance->GetOnQueryFinishedEvent().AddDynamic(this, &AGameManager::SpawnEnemy);
+	}
+}
+
+void AGameManager::SpawnEnemy(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
+{
+	if(!PreparedEnemiesArr.IsEmpty())
+	{
+		TArray<FVector> ResultLocations;
+		if(QueryInstance->GetQueryResultsAsLocations(ResultLocations))
+		{
+			int32 RandomIndex = UKismetMathLibrary::RandomIntegerInRange(0, ResultLocations.Num()-1);
+			FVector SpawnLocation = ResultLocations[RandomIndex];
+			SpawnLocation += FVector(0.f, 0.f, 25.f);
+			
+			FActorSpawnParameters ActorSpawnParameters;
+			ActorSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+			TSubclassOf<ABaseAI> EnemyClass = PreparedEnemiesArr[0].Enemy;
+			if(!EnemyClass)
+			{
+				return;
+			}
+			ABaseAI* Enemy = GetWorld()->SpawnActor<ABaseAI>(
+				EnemyClass,
+				SpawnLocation,
+				FRotator::ZeroRotator,
+				ActorSpawnParameters
+			);
+			
+			if(Enemy)
+			{
+				//Enemy计数
+				++CurrentEnemySpawnIndex;
+				//继续生成
+				ContinueSpawn();
+			}
+		}else
+		{
+			FindSpawnLocation();
+			GAME_LOG(Error, TEXT("ERROR: Did Not Find Spawn Location"));
+		}
+	}else
+	{
+		GAME_LOG(Error, TEXT("ERROR: Enemy data table not setup correctly!"));
+	}
+}
+
+void AGameManager::ContinueSpawn()
+{
+	if(CurrentEnemyCount < MaxEnemiesCount && CurrentEnemySpawnIndex < NumberOfEnemiesToSpawn)
+	{
+		FindSpawnLocation();
+	}
 }
 

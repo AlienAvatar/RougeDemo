@@ -10,6 +10,8 @@ class USphereComponent;
 class UProjectileMovementComponent;
 class UParticleSystem;
 class UParticleSystemComponent;
+class UNiagaraSystem;
+class UStaticMeshComponent;
 
 UCLASS()
 class ROUGEDEMO_API AProjectileBase : public AActor
@@ -48,6 +50,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UParticleSystem* HitParticle;
 
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* HitFX;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* MeshComp;
+	
 	UFUNCTION()
 	void OnProjectileStop(const FHitResult& ImpactResult);
 
@@ -61,4 +69,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void Setup(UNiagaraSystem* pHitFX, float pDamage);
 };
