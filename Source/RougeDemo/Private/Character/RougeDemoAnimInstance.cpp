@@ -41,8 +41,10 @@ void URougeDemoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Lean = FMath::Clamp(Interp,-90.f,90.f);*/
 
 	//每帧进行更新
-	UpdateLayerValues(DeltaSeconds);
 	UpdateCharacterInfo(DeltaSeconds);
+	
+	
+	/*UpdateLayerValues(DeltaSeconds);
 	UpdateAimingValues(DeltaSeconds);
 	
 	switch (MovementState)
@@ -64,7 +66,7 @@ void URougeDemoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	case EMovementState::EMS_RagDoll:
 		UpdateRagdollValues();
 		break;
-	}
+	}*/
 	
 }
 
@@ -103,6 +105,7 @@ void URougeDemoAnimInstance::UpdateCharacterInfo(float DeltaTime)
 	Speed = RougeDemoCharacter->GetSpeed();
 	Acceleration = RougeDemoCharacter->GetAcceleration();
 	bIsMoving = RougeDemoCharacter->GetIsMoving();
+
 	bHasMovementInput = RougeDemoCharacter->GetHasMovementInput();
 	AimingRotation = RougeDemoCharacter->GetControlRotation();
 	MovementInput = RougeDemoCharacter->GetCharacterMovement()->GetCurrentAcceleration();
