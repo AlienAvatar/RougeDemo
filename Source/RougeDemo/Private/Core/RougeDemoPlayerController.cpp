@@ -9,11 +9,9 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Core/GameManager.h"
-#include "Core/RougeDemoGameMode.h"
 #include "HUD/PlayerOverlayWidget.h"
 #include "HUD/RougeDemoHUD.h"
 #include "HUD/Game/LevelMasterWidget.h"
-#include "Interface/GameModeInterface.h"
 #include "Kismet/DataTableFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -634,6 +632,7 @@ void ARougeDemoPlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilit
 	
 	SetShowMouseCursor(false);
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
+	//Level up ability
 	AssignAbility(Type, ActiveAbilities, PassiveAbilities);
 
 	//更新UI
@@ -655,10 +654,13 @@ void ARougeDemoPlayerController::AssignAbility(EAbilityType Type, EActiveAbiliti
 					AbilityComponent->LevelUpHammer();
 					break;
 				case EActiveAbilities::EAA_FireBall:
+					
 					break;
 				case EActiveAbilities::EAA_Lightning:
+					AbilityComponent->LevelUpLightning();
 					break;
 				case EActiveAbilities::EAA_FrostBolt:
+					AbilityComponent->LevelUpFrostBolt();
 					break;
 			}
 			break;
@@ -666,21 +668,30 @@ void ARougeDemoPlayerController::AssignAbility(EAbilityType Type, EActiveAbiliti
 			switch (PassiveAbilities)
 			{
 				case EPassiveAbilities::EPA_Health:
-					
+					AbilityComponent->LevelUpMaxHealth(false);
 					break;
 				case EPassiveAbilities::EPA_Speed:
-					AbilityComponent->LevelUpHammer();
+					AbilityComponent->LevelUpWalkSpeed(false);
 					break;
 				case EPassiveAbilities::EPA_AbilityDamage:
+					AbilityComponent->LevelUpAbilityDamage(false);
 					break;
 				case EPassiveAbilities::EPA_CooldownReduction:
+					AbilityComponent->LevelUpTimerReduction(false);
 					break;
 			}
 			break;
 		case EAbilityType::EAT_Evolution:
 			break;
 		case EAbilityType::EAT_Health:
-			break;
+			{
+				ICharacterInterface* CharacterImpl = Cast<ICharacterInterface>(GetPawn());
+				if(CharacterImpl)
+				{
+					CharacterImpl->RestoreHealth(10.f);
+				}
+				break;
+			}
 		case EAbilityType::EAT_Gold:
 			break;
 	}

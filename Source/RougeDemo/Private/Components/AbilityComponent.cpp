@@ -26,6 +26,7 @@ UAbilityComponent::UAbilityComponent()
 }
 
 
+
 // Called when the game starts
 void UAbilityComponent::BeginPlay()
 {
@@ -205,7 +206,7 @@ void UAbilityComponent::PrepareLightningTimerHandleCallback()
 
 float UAbilityComponent::CalculateHammerCoolDown()
 {
-	return 1.0f;
+	return 1.0f * AbilityCoolDownTimeMultiplier;
 }
 
 void UAbilityComponent::PrepareFrostBolt()
@@ -375,6 +376,7 @@ void UAbilityComponent::LevelUpFrostBolt()
 	}
 }
 
+
 void UAbilityComponent::ExecuteLightning(FVector TargetLocation, ACharacter* Instigator, float Damage,
                                          float Radius)
 {
@@ -408,3 +410,159 @@ void UAbilityComponent::GrantLightning(bool Case)
 	
 	ActiveTimerArr.AddUnique(PrepareLightningTimerHandle);
 }
+
+void UAbilityComponent::LevelUpMaxHealth(bool PowerUp)
+{
+	int32 Local_Level = 1;
+	ICharacterInterface* CharacterImpl = Cast<ICharacterInterface>(GetOwner());
+	if(PowerUp)
+	{
+		if(CharacterImpl)
+		{
+			CharacterImpl->AdjustPassive(EPassiveAbilities::EPA_Health, 1.1f);
+		}
+	}else
+	{
+		if(PassiveAbilitiesMap.Contains(EPassiveAbilities::EPA_Health))
+		{
+			Local_Level = *PassiveAbilitiesMap.Find(EPassiveAbilities::EPA_Health);
+			++Local_Level;
+			PassiveAbilitiesMap.Add(EPassiveAbilities::EPA_Health, Local_Level);
+		}else
+		{
+			PassiveAbilitiesMap.Add(EPassiveAbilities::EPA_Health, Local_Level);
+		}
+		
+		switch (Local_Level)
+		{
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+			if(CharacterImpl)
+			{
+				CharacterImpl->AdjustPassive(EPassiveAbilities::EPA_Health, 1.1f);
+			}
+			break;
+		case 5:
+			if(CharacterImpl)
+			{
+				CharacterImpl->AdjustPassive(EPassiveAbilities::EPA_Health, 1.1f);
+			}
+			EvolutionPassiveArr.AddUnique(EPassiveAbilities::EPA_Health);
+			break;
+		}
+	}
+}
+
+void UAbilityComponent::LevelUpTimerReduction(bool PowerUp)
+{
+	int32 Local_Level = 1;
+	if(PowerUp)
+	{
+		AbilityCoolDownTimeMultiplier = AbilityCoolDownTimeMultiplier * 1.1;
+	}else
+	{
+		if(PassiveAbilitiesMap.Contains(EPassiveAbilities::EPA_CooldownReduction))
+		{
+			Local_Level = *PassiveAbilitiesMap.Find(EPassiveAbilities::EPA_CooldownReduction);
+			++Local_Level;
+			PassiveAbilitiesMap.Add(EPassiveAbilities::EPA_CooldownReduction, Local_Level);
+		}else
+		{
+			PassiveAbilitiesMap.Add(EPassiveAbilities::EPA_CooldownReduction, Local_Level);
+		}
+
+		switch (Local_Level)
+		{
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+			AbilityCoolDownTimeMultiplier = AbilityCoolDownTimeMultiplier * 1.1;
+			break;
+		case 5:
+			AbilityCoolDownTimeMultiplier = AbilityCoolDownTimeMultiplier * 1.1;
+			EvolutionPassiveArr.AddUnique(EPassiveAbilities::EPA_CooldownReduction);
+		}
+	}
+}
+
+void UAbilityComponent::LevelUpWalkSpeed(bool PowerUp)
+{
+	int32 Local_Level = 1;
+	ICharacterInterface* CharacterImpl = Cast<ICharacterInterface>(GetOwner());
+	if(PowerUp)
+	{
+		if(CharacterImpl)
+		{
+			CharacterImpl->AdjustPassive(EPassiveAbilities::EPA_Speed, 1.1f);
+		}
+	}else
+	{
+		if(PassiveAbilitiesMap.Contains(EPassiveAbilities::EPA_Speed))
+		{
+			Local_Level = *PassiveAbilitiesMap.Find(EPassiveAbilities::EPA_Speed);
+			++Local_Level;
+			PassiveAbilitiesMap.Add(EPassiveAbilities::EPA_Speed, Local_Level);
+		}else
+		{
+			PassiveAbilitiesMap.Add(EPassiveAbilities::EPA_Speed, Local_Level);
+		}
+		
+		switch (Local_Level)
+		{
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+			if(CharacterImpl)
+			{
+				CharacterImpl->AdjustPassive(EPassiveAbilities::EPA_Speed, 1.1f);
+			}
+			break;
+		case 5:
+			if(CharacterImpl)
+			{
+				CharacterImpl->AdjustPassive(EPassiveAbilities::EPA_Speed, 1.1f);
+			}
+			EvolutionPassiveArr.AddUnique(EPassiveAbilities::EPA_Speed);
+			break;
+		}
+	}
+}
+
+void UAbilityComponent::LevelUpAbilityDamage(bool PowerUp)
+{
+	int32 Local_Level = 1;
+	if(PowerUp)
+	{
+		AbilityDamageMultiplier = AbilityDamageMultiplier * 1.1;
+	}else
+	{
+		if(PassiveAbilitiesMap.Contains(EPassiveAbilities::EPA_AbilityDamage))
+		{
+			Local_Level = *PassiveAbilitiesMap.Find(EPassiveAbilities::EPA_AbilityDamage);
+			++Local_Level;
+			PassiveAbilitiesMap.Add(EPassiveAbilities::EPA_AbilityDamage, Local_Level);
+		}else
+		{
+			PassiveAbilitiesMap.Add(EPassiveAbilities::EPA_AbilityDamage, Local_Level);
+		}
+
+		switch (Local_Level)
+		{
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+			AbilityDamageMultiplier = AbilityDamageMultiplier * 1.1;
+			break;
+		case 5:
+			AbilityDamageMultiplier = AbilityDamageMultiplier * 1.1;
+			EvolutionPassiveArr.AddUnique(EPassiveAbilities::EPA_AbilityDamage);
+		}
+	}
+}
+
+

@@ -333,4 +333,8 @@ public:
 	UAbilityComponent* GetAbilityComponent() const { return AbilityComp; }
 
 	virtual USphereComponent* GetAbilitySphere() override;
+
+	virtual void AdjustPassive(EPassiveAbilities Stat, float MultiplicationAmount) override;
+
+	virtual void RestoreHealth(float Health) override;
 };

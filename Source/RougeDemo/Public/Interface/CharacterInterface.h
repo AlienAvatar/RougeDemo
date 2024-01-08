@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enum/EPassiveAbilities.h"
 #include "UObject/Interface.h"
 #include "CharacterInterface.generated.h"
 
@@ -25,4 +26,8 @@ class ROUGEDEMO_API ICharacterInterface
 public:
 	
 	virtual USphereComponent* GetAbilitySphere() = 0;
+	
+	virtual void AdjustPassive(EPassiveAbilities Stat, float MultiplicationAmount) = 0;
+
+	virtual void RestoreHealth(float Health) = 0;
 };

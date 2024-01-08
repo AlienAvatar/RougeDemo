@@ -222,6 +222,32 @@ USphereComponent* ARougeDemoCharacter::GetAbilitySphere()
 	return AbilitySphere;
 }
 
+void ARougeDemoCharacter::AdjustPassive(EPassiveAbilities Stat, float MultiplicationAmount)
+{
+	switch (Stat)
+	{
+		case EPassiveAbilities::EPA_Speed:
+			{
+				float MaxSpeed = GetCharacterMovement()->MaxWalkSpeed;
+				MaxSpeed *= MultiplicationAmount;
+				GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
+			}
+			break;
+		case EPassiveAbilities::EPA_Health:
+			float MaxHealth = AttributeInfo.MaxHealth;
+			MaxHealth *= MultiplicationAmount;
+			AttributeInfo.MaxHealth = MaxHealth;
+			UpdateHealthHUD();
+			break;
+	}
+}
+
+void ARougeDemoCharacter::RestoreHealth(float Health)
+{
+	AttributeInfo.Health += Health;
+	UpdateHealthHUD();
+}
+
 
 void ARougeDemoCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                         AController* InstigatorController, AActor* DamageCauser)

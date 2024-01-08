@@ -44,6 +44,14 @@ public:
 	void LevelUpLightning();
 
 	void LevelUpFrostBolt();
+
+	void LevelUpAbilityDamage(bool PowerUp);
+
+	void LevelUpMaxHealth(bool PowerUp);
+	
+	void LevelUpTimerReduction(bool PowerUp);
+	
+	void LevelUpWalkSpeed(bool PowerUp);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -114,6 +122,10 @@ private:
 	void PrepareFrostBoltTimerHandleCallback();
 
 	void GrantFrostBolt(bool Cast);
+
+	float AbilityDamageMultiplier = 1.0f;
+	
+	float AbilityCoolDownTimeMultiplier = 1.0f;
 };
 
 
