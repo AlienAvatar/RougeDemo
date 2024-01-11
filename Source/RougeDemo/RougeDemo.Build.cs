@@ -10,24 +10,52 @@ public class RougeDemo : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
-			"Core", 
+			"Core",
+			"CoreOnline",
 			"CoreUObject",
-			"Engine", 
-			"InputCore"
+			"ApplicationCore",
+			"Engine",
+			"PhysicsCore",
+			"GameplayTags",
+			"GameplayTasks",
+			"GameplayAbilities",
+			"AIModule",
+			"ModularGameplay",
+			"ModularGameplayActors",
+			"DataRegistry",
+			"ReplicationGraph",
+			"GameFeatures",
+			"SignificanceManager",
+			"Hotfix",
+			"Niagara",
+			"ControlFlows",
+			"PropertyPath"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
-			"UMG", 
+			"InputCore",
+			"Slate",
+			"SlateCore",
+			"RenderCore",
+			"DeveloperSettings",
+			"EnhancedInput",
+			"NetCore",
+			"RHI",
+			"Projects",
+			"Gauntlet",
+			"UMG",
+			"CommonUI",
+			"CommonInput",
+			"CommonUser",
+			"AudioMixer",
+			"NetworkReplayStreaming",
+			"ClientPilot",
+			"AudioModulation",
+			"EngineSettings",
+			"DTLSHandlerComponent", 
+			"MoviePlayer", 
 			"AnimGraphRuntime",
-			"GameplayTasks",
-			"NavigationSystem",
-			"Niagara",
-			"GameplayAbilities",
-			"GameplayTags",
-			"GameplayTasks", 
-			"MoviePlayer",
-			"AIModule"
 		});
 
 		// Uncomment if you are using Slate UI
