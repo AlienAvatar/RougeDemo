@@ -3,7 +3,7 @@
 
 #include "Core/MainMap/MainGameMode.h"
 
-#include "Core/RougeDemoInstance.h"
+#include "..\..\..\Public\Core\RougeInstance.h"
 #include "HUD/Main/MainWidget.h"
 #include "Lib/RougeDemoFunctionLibary.h"
 

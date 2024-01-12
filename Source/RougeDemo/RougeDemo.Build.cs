@@ -29,7 +29,8 @@ public class RougeDemo : ModuleRules
 			"Hotfix",
 			"Niagara",
 			"ControlFlows",
-			"PropertyPath"
+			"PropertyPath", 
+			"CommonGame"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]

@@ -6,7 +6,7 @@
 #include "AI/BaseAI.h"
 #include "Character/PlayerKatanaCharacter.h"
 #include "Character/RougeDemoAnimInstance.h"
-#include "Character/RougeDemoCharacter.h"
+#include "Character/RougeCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -30,7 +30,7 @@ void UCombatComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	RougeDemoCharacter = Cast<ARougeDemoCharacter>(GetOwner());
+	RougeDemoCharacter = Cast<ARougeCharacter>(GetOwner());
 
 	//Test 扇形
 	float AngleDegree = 45.f;

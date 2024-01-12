@@ -6,12 +6,12 @@
 #include "AI/AIEnemyController.h"
 #include "AI/BaseAIAnimInstance.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Character/RougeDemoCharacter.h"
+#include "Character/RougeCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/WidgetComponent.h"
-#include "Core/RougeDemoGameMode.h"
-#include "Core/RougeDemoPlayerController.h"
+#include "..\..\Public\Core\RougeGameMode.h"
+#include "..\..\Public\Core\RougePlayerController.h"
 #include "Enum/EMovementDirection.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/EnemyHealthBarWidget.h"
@@ -142,11 +142,11 @@ void ABaseAI::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageTyp
 	
 	if(AttributeInfo.Health == 0.f)
 	{
-		ARougeDemoGameMode* RougeDemoGameMode = GetWorld()->GetAuthGameMode<ARougeDemoGameMode>();
+		ARougeGameMode* RougeDemoGameMode = GetWorld()->GetAuthGameMode<ARougeGameMode>();
 		if(RougeDemoGameMode)
 		{
 			EnemyController = EnemyController == nullptr ? Cast<AAIEnemyController>(Controller) : EnemyController;
-			ARougeDemoPlayerController* AttackController = Cast<ARougeDemoPlayerController>(InstigatorController);
+			ARougePlayerController* AttackController = Cast<ARougePlayerController>(InstigatorController);
 			
 			RougeDemoGameMode->PlayEliminated(this,EnemyController,AttackController);
 		}
@@ -262,7 +262,7 @@ void ABaseAI::OnLeftAttackBeginOverHandle(UPrimitiveComponent* OverlappedCompone
 void ABaseAI::OnRightAttackBeginOverHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ARougeDemoCharacter* OwnerCharacter = Cast<ARougeDemoCharacter>(OtherActor);
+	ARougeCharacter* OwnerCharacter = Cast<ARougeCharacter>(OtherActor);
 	if(OwnerCharacter)
 	{
 		AController* OwnerController = OwnerCharacter->Controller;
@@ -443,7 +443,7 @@ void ABaseAI::Dead()
 
 bool ABaseAI::DoMeleeAttack(float& Delay)
 {
-	const ARougeDemoCharacter* Player = Cast<ARougeDemoCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
+	const ARougeCharacter* Player = Cast<ARougeCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
 	if(Player && Player->IsAlive())
 	{
 		if(CanUseAnyAbility())

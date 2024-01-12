@@ -1,24 +1,40 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Core/RougeDemoGameMode.h"
+#include "..\..\Public\Core\RougeGameMode.h"
 
 #include "AI/AIEnemyController.h"
 #include "AI/BaseAI.h"
-#include "Core/RougeDemoPlayerController.h"
-#include "Core/RougeDemoPlayerState.h"
+#include "..\..\Public\Core\RougePlayerController.h"
+#include "..\..\Public\Core\RougePlayerState.h"
+#include "Character/RougeCharacter.h"
+#include "Core/RougeGameSession.h"
+#include "Core/RougeGameState.h"
+#include "Core/RougeReplayPlayerController.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerStart.h"
+#include "HUD/RougeHUD.h"
 #include "Kismet/GameplayStatics.h"
 
-void ARougeDemoGameMode::PlayEliminated(ABaseAI* ElimmedCharacter,
-                                        AAIEnemyController* VictimController, ARougeDemoPlayerController* AttackController)
+ARougeGameMode::ARougeGameMode()
+{
+	GameStateClass = ARougeGameState::StaticClass();
+	GameSessionClass = ARougeGameSession::StaticClass();
+	PlayerControllerClass = ARougePlayerController::StaticClass();
+	ReplaySpectatorPlayerControllerClass = ARougeReplayPlayerController::StaticClass();
+	PlayerStateClass = ARougePlayerState::StaticClass();
+	DefaultPawnClass = ARougeCharacter::StaticClass();
+	HUDClass = ARougeHUD::StaticClass();
+}
+
+void ARougeGameMode::PlayEliminated(ABaseAI* ElimmedCharacter,
+                                    AAIEnemyController* VictimController, ARougePlayerController* AttackController)
 {
 	//计算Kills
-	ARougeDemoPlayerController* RougeDemoPlayerController = Cast<ARougeDemoPlayerController>(AttackController);
+	ARougePlayerController* RougeDemoPlayerController = Cast<ARougePlayerController>(AttackController);
 	if(RougeDemoPlayerController)
 	{
-		ARougeDemoPlayerState* AttackerPlayerState = RougeDemoPlayerController ? Cast<ARougeDemoPlayerState>(RougeDemoPlayerController->PlayerState) : nullptr;
+		ARougePlayerState* AttackerPlayerState = RougeDemoPlayerController ? Cast<ARougePlayerState>(RougeDemoPlayerController->PlayerState) : nullptr;
 		if(AttackerPlayerState)
 		{
 			AttackerPlayerState->AddToScore(1.f);
@@ -26,7 +42,7 @@ void ARougeDemoGameMode::PlayEliminated(ABaseAI* ElimmedCharacter,
 	}
 }
 
-void ARougeDemoGameMode::RequetRespwan(ACharacter* ElimmedCharacter, AController* ElimmedController)
+void ARougeGameMode::RequetRespwan(ACharacter* ElimmedCharacter, AController* ElimmedController)
 {
 	if(ElimmedCharacter)
 	{
@@ -46,7 +62,7 @@ void ARougeDemoGameMode::RequetRespwan(ACharacter* ElimmedCharacter, AController
 	}
 }
 
-void ARougeDemoGameMode::Pause(bool bPause, bool bOverride)
+void ARougeGameMode::Pause(bool bPause, bool bOverride)
 {
 	if(bPause)
 	{

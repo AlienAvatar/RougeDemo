@@ -3,14 +3,14 @@
 
 #include "Lib/RougeDemoFunctionLibary.h"
 
-#include "Core/RougeDemoInstance.h"
+#include "..\..\Public\Core\RougeInstance.h"
 #include "Kismet/DataTableFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "SaveGame/PlayerSaveGame.h"
 
-URougeDemoInstance* URougeDemoFunctionLibary::GetRougeDemoGameInstance(UObject* WorldContextObject)
+URougeInstance* URougeDemoFunctionLibary::GetRougeDemoGameInstance(UObject* WorldContextObject)
 {
-	return Cast<URougeDemoInstance>(UGameplayStatics::GetGameInstance(WorldContextObject));
+	return Cast<URougeInstance>(UGameplayStatics::GetGameInstance(WorldContextObject));
 }
 
 void URougeDemoFunctionLibary::PlayLoadingScreen(bool bPlayUntilStopped, float PlayTime)

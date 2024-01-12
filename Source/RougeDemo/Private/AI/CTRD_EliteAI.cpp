@@ -5,7 +5,7 @@
 
 #include "AI/AIEnemyController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Character/RougeDemoCharacter.h"
+#include "Character/RougeCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "NiagaraFunctionLibrary.h"
@@ -218,7 +218,7 @@ void ACTRD_EliteAI::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 {
 	if(OtherActor)
 	{
-		ARougeDemoCharacter* RougeDemoCharacter = Cast<ARougeDemoCharacter>(OtherActor);
+		ARougeCharacter* RougeDemoCharacter = Cast<ARougeCharacter>(OtherActor);
 		if(RougeDemoCharacter && RougeDemoCharacter->ActorHasTag(FName("Player")))
 		{
 			UGameplayStatics::ApplyDamage(RougeDemoCharacter,RayAttackDamageCount,GetInstigatorController(),this,UDamageType::StaticClass());
@@ -308,7 +308,7 @@ void ACTRD_EliteAI::CheckRayTrack(FHitResult HitResult)
 {
 	if(HitResult.bBlockingHit)
 	{
-		ARougeDemoCharacter* RougeDemoCharacter = Cast<ARougeDemoCharacter>(HitResult.GetActor());
+		ARougeCharacter* RougeDemoCharacter = Cast<ARougeCharacter>(HitResult.GetActor());
 		if(RougeDemoCharacter && RougeDemoCharacter->ActorHasTag(FName("Player")))
 		{
 			UGameplayStatics::ApplyDamage(RougeDemoCharacter,RayAttackDamageCount,GetInstigatorController(),this,UDamageType::StaticClass());

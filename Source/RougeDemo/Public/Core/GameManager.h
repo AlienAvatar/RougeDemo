@@ -9,7 +9,7 @@
 #include "Struct/EnemySpawnWave.h"
 #include "GameManager.generated.h"
 
-class ARougeDemoPlayerController;
+class ARougePlayerController;
 class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
 
@@ -26,7 +26,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	TArray<ARougeDemoPlayerController*> PlayerControllerArr;
+	TArray<ARougePlayerController*> PlayerControllerArr;
 
 	void GameSetUp();
 

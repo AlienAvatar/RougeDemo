@@ -4,7 +4,7 @@
 #include "Character/RougeDemoAnimInstance.h"
 
 #include "KismetAnimationLibrary.h"
-#include "Character/RougeDemoCharacter.h"
+#include "Character/RougeCharacter.h"
 #include "Components/LockOnComponent.h"
 #include "Curves/CurveVector.h"
 #include "Enum/EGait.h"
@@ -16,7 +16,7 @@ void URougeDemoAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	RougeDemoCharacter = Cast<ARougeDemoCharacter>(TryGetPawnOwner());
+	RougeDemoCharacter = Cast<ARougeCharacter>(TryGetPawnOwner());
 }
 
 void URougeDemoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -25,7 +25,7 @@ void URougeDemoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if(RougeDemoCharacter == nullptr)
 	{
-		RougeDemoCharacter = Cast<ARougeDemoCharacter>(TryGetPawnOwner());
+		RougeDemoCharacter = Cast<ARougeCharacter>(TryGetPawnOwner());
 	}
 
 	if(RougeDemoCharacter == nullptr)

@@ -1,19 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Core/RougeDemoPlayerState.h"
+#include "..\..\Public\Core\RougePlayerState.h"
 
-#include "Character/RougeDemoCharacter.h"
-#include "Core/RougeDemoPlayerController.h"
+#include "Character/RougeCharacter.h"
+#include "..\..\Public\Core\RougePlayerController.h"
 
-void ARougeDemoPlayerState::OnRep_Score()
+void ARougePlayerState::OnRep_Score()
 {
 	Super::OnRep_Score();
 
-	RougeDemoCharacter = RougeDemoCharacter == nullptr? Cast<ARougeDemoCharacter>(GetPawn()) : RougeDemoCharacter;
+	RougeDemoCharacter = RougeDemoCharacter == nullptr? Cast<ARougeCharacter>(GetPawn()) : RougeDemoCharacter;
 	if(RougeDemoCharacter)
 	{
-		RougeDemoPlayerController = RougeDemoPlayerController == nullptr ? Cast<ARougeDemoPlayerController>(RougeDemoCharacter->Controller) : RougeDemoPlayerController;
+		RougeDemoPlayerController = RougeDemoPlayerController == nullptr ? Cast<ARougePlayerController>(RougeDemoCharacter->Controller) : RougeDemoPlayerController;
 		if(RougeDemoPlayerController)
 		{
 			RougeDemoPlayerController->SetHUDScore(GetScore());
@@ -21,16 +21,16 @@ void ARougeDemoPlayerState::OnRep_Score()
 	}
 }
 
-void ARougeDemoPlayerState::AddToScore(float ScoreAmount)
+void ARougePlayerState::AddToScore(float ScoreAmount)
 {
 	float LocalScore = GetScore();
 	LocalScore += ScoreAmount;
 	SetScore(LocalScore);
 	
-	RougeDemoCharacter = RougeDemoCharacter == nullptr? Cast<ARougeDemoCharacter>(GetPawn()) : RougeDemoCharacter;
+	RougeDemoCharacter = RougeDemoCharacter == nullptr? Cast<ARougeCharacter>(GetPawn()) : RougeDemoCharacter;
 	if(RougeDemoCharacter)
 	{
-		RougeDemoPlayerController = RougeDemoPlayerController == nullptr ? Cast<ARougeDemoPlayerController>(RougeDemoCharacter->Controller) : RougeDemoPlayerController;
+		RougeDemoPlayerController = RougeDemoPlayerController == nullptr ? Cast<ARougePlayerController>(RougeDemoCharacter->Controller) : RougeDemoPlayerController;
 		if(RougeDemoPlayerController)
 		{
 			RougeDemoPlayerController->SetHUDScore(GetScore());

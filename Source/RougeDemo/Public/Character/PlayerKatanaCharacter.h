@@ -3,15 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/RougeDemoCharacter.h"
+#include "Character/RougeCharacter.h"
 #include "PlayerKatanaCharacter.generated.h"
 
-class ARougeDemoPlayerController;
+class ARougePlayerController;
 /**
  * 
  */
 UCLASS()
-class ROUGEDEMO_API APlayerKatanaCharacter : public ARougeDemoCharacter
+class ROUGEDEMO_API APlayerKatanaCharacter : public ARougeCharacter
 {
 	GENERATED_BODY()
 

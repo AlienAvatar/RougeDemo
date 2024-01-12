@@ -7,7 +7,7 @@
 #include "SaveGame/PlayerSaveGame.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Actor/BaseExplosion.h"
-#include "Character/RougeDemoCharacter.h"
+#include "Character/RougeCharacter.h"
 #include "Interface/CharacterInterface.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -178,7 +178,7 @@ void UAbilityComponent::PrepareLightning()
 
 		if(EnemyActorArr.Num() > 0 && EnemyActorArr[0])
 		{
-			ARougeDemoCharacter* Instigator = Cast<ARougeDemoCharacter>(GetOwner());
+			ARougeCharacter* Instigator = Cast<ARougeCharacter>(GetOwner());
 			int32 RandomIndex = UKismetMathLibrary::RandomIntegerInRange(0, EnemyActorArr.Num() - 1);
 			FVector TargetLocation = EnemyActorArr[RandomIndex]->GetActorLocation();
 			LastLightningLoc = TargetLocation;
@@ -233,7 +233,7 @@ void UAbilityComponent::PrepareFrostBolt()
 
 		if(EnemyActorArr.Num() > 0 && EnemyActorArr[0])
 		{
-			ARougeDemoCharacter* Character = Cast<ARougeDemoCharacter>(GetOwner());
+			ARougeCharacter* Character = Cast<ARougeCharacter>(GetOwner());
 			FVector Origin = GetOwner()->GetActorLocation();
 			float Distance = 0.f;
 			AActor* Target = UGameplayStatics::FindNearestActor(

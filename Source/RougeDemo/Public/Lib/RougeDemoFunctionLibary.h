@@ -19,7 +19,7 @@ class ROUGEDEMO_API URougeDemoFunctionLibary : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION()
-	static URougeDemoInstance* GetRougeDemoGameInstance(UObject* WorldContextObject);
+	static URougeInstance* GetRougeDemoGameInstance(UObject* WorldContextObject);
 
 	//开始加载画面
 	UFUNCTION(Category = Loading)

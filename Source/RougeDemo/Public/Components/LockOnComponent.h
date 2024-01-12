@@ -7,7 +7,7 @@
 #include "LockOnComponent.generated.h"
 
 class ULockOnWidget;
-class ARougeDemoCharacter;
+class ARougeCharacter;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ROUGEDEMO_API ULockOnComponent : public UActorComponent
@@ -47,7 +47,7 @@ private:
 	AActor* LockOnTarget;
 
 	UPROPERTY()
-	ARougeDemoCharacter* PlayerRougeDemoCharacter;
+	ARougeCharacter* PlayerRougeDemoCharacter;
 
 	//查找范围，目标能够锁定的最远距离
 	UPROPERTY(EditDefaultsOnly)

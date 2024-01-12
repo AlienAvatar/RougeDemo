@@ -12,7 +12,7 @@
 DECLARE_DYNAMIC_DELEGATE_OneParam(FTest, EUIState, UIState);
 
 class UButton;
-class URougeDemoInstance;
+class URougeInstance;
 /**
  * 
  */

@@ -4,7 +4,7 @@
 #include "Components/LockOnComponent.h"
 
 #include "AI/BaseAI.h"
-#include "Character/RougeDemoCharacter.h"
+#include "Character/RougeCharacter.h"
 #include "Engine/Canvas.h"
 #include "HUD/LockOnWidget.h"
 #include "Kismet/GameplayStatics.h"
@@ -41,7 +41,7 @@ void ULockOnComponent::BeginPlay()
 void ULockOnComponent::Initialize()
 {
 	//只有玩家才能锁定
-	PlayerRougeDemoCharacter = Cast<ARougeDemoCharacter>(GetOwner());
+	PlayerRougeDemoCharacter = Cast<ARougeCharacter>(GetOwner());
 
 	//自动锁敌的一个方法，无法把Widget移动到Enemy上
 	/*if(PlayerRougeDemoCharacter && MarketWidgetClass)

@@ -13,7 +13,7 @@
 #include "Struct/VelocityBlend.h"
 #include "RougeDemoAnimInstance.generated.h"
 
-class ARougeDemoCharacter;
+class ARougeCharacter;
 class UCurveVector;
 /**
  * 
@@ -36,7 +36,7 @@ private:
 	float Speed;
 
 	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
-	ARougeDemoCharacter* RougeDemoCharacter;
+	ARougeCharacter* RougeDemoCharacter;
 
 	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
 	float PitchOffset;

@@ -4,7 +4,7 @@
 #include "Core/GameManager.h"
 
 #include "AI/BaseAI.h"
-#include "Core/RougeDemoPlayerController.h"
+#include "..\..\Public\Core\RougePlayerController.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
 #include "Interface/ControllerManagerInterface.h"
@@ -44,7 +44,7 @@ void AGameManager::GameSetUp()
 
 void AGameManager::UpdateCharactersXP(float Percent, int32 Level)
 {
-	ARougeDemoPlayerController* RougeDemoPlayerController = Cast<ARougeDemoPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	ARougePlayerController* RougeDemoPlayerController = Cast<ARougePlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if(RougeDemoPlayerController == nullptr) { return; }
 	if (IControllerManagerInterface* ControllerImpl = Cast<IControllerManagerInterface>(RougeDemoPlayerController))
 	{
@@ -54,7 +54,7 @@ void AGameManager::UpdateCharactersXP(float Percent, int32 Level)
 
 void AGameManager::PrepareLevelUp()
 {
-	ARougeDemoPlayerController* RougeDemoPlayerController = Cast<ARougeDemoPlayerController>((UGameplayStatics::GetPlayerController(GetWorld(), 0)));
+	ARougePlayerController* RougeDemoPlayerController = Cast<ARougePlayerController>((UGameplayStatics::GetPlayerController(GetWorld(), 0)));
 	if(RougeDemoPlayerController == nullptr) { return; }
 	RougeDemoPlayerController->OnLevelUp();
 
@@ -109,7 +109,7 @@ void AGameManager::UpdateTimerCallBack()
 {
 	UpdateTimer();
 
-	ARougeDemoPlayerController* RougeDemoPlayerController = Cast<ARougeDemoPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	ARougePlayerController* RougeDemoPlayerController = Cast<ARougePlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if(RougeDemoPlayerController == nullptr) { return; }
 	if (IControllerManagerInterface* ControllerImpl = Cast<IControllerManagerInterface>(RougeDemoPlayerController))
 	{

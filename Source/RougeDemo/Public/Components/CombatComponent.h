@@ -11,7 +11,7 @@
 
 class ABaseAI;
 class AWeapon;
-class ARougeDemoCharacter;
+class ARougeCharacter;
 class UAnimMontage;
 class APlayerKatanaCharacter;
 
@@ -23,7 +23,7 @@ class ROUGEDEMO_API UCombatComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UCombatComponent();
-	friend class ARougeDemoCharacter;
+	friend class ARougeCharacter;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -48,7 +48,7 @@ private:
 	bool CheckAttackState();
 
 	UPROPERTY()
-	ARougeDemoCharacter* RougeDemoCharacter;
+	ARougeCharacter* RougeDemoCharacter;
 
 	ECombatType CombatType;
 

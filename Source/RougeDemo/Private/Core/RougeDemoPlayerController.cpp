@@ -1,16 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Core/RougeDemoPlayerController.h"
+#include "..\..\Public\Core\RougePlayerController.h"
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
-#include "Character/RougeDemoCharacter.h"
+#include "Character/RougeCharacter.h"
 #include "Components/AbilityComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Core/GameManager.h"
 #include "HUD/PlayerOverlayWidget.h"
-#include "HUD/RougeDemoHUD.h"
+#include "HUD/RougeHUD.h"
 #include "HUD/Game/LevelMasterWidget.h"
 #include "Kismet/DataTableFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -24,26 +24,26 @@
 
 DEFINE_LOG_CATEGORY(LogRougeController);
 
-void ARougeDemoPlayerController::BeginPlay()
+void ARougePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	RougeDemoHUD = Cast<ARougeDemoHUD>(GetHUD());
+	RougeDemoHUD = Cast<ARougeHUD>(GetHUD());
 	SetupPlayer();
 }
 
 
 
-void ARougeDemoPlayerController::SetupInputComponent()
+void ARougePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("Test", IE_Pressed, this, &ARougeDemoPlayerController::TestAction);
+	InputComponent->BindAction("Test", IE_Pressed, this, &ARougePlayerController::TestAction);
 }
 
-void ARougeDemoPlayerController::SetHUDHealth(float Health, float MaxHealth)
+void ARougePlayerController::SetHUDHealth(float Health, float MaxHealth)
 {
-	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeDemoHUD>(GetHUD()) : RougeDemoHUD;
+	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeHUD>(GetHUD()) : RougeDemoHUD;
 
 	bool bHUDValid = RougeDemoHUD &&
 		RougeDemoHUD->PlayerOverlayWidget &&
@@ -59,9 +59,9 @@ void ARougeDemoPlayerController::SetHUDHealth(float Health, float MaxHealth)
 	}
 }
 
-void ARougeDemoPlayerController::SetHUDScore(float Score)
+void ARougePlayerController::SetHUDScore(float Score)
 {
-	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeDemoHUD>(GetHUD()) : RougeDemoHUD;
+	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeHUD>(GetHUD()) : RougeDemoHUD;
 
 	bool bHUDValid = RougeDemoHUD &&
 		RougeDemoHUD->PlayerOverlayWidget &&
@@ -73,9 +73,9 @@ void ARougeDemoPlayerController::SetHUDScore(float Score)
 	}
 }
 
-void ARougeDemoPlayerController::SetHUDSkillValue(float SkillValue,float MaxSkillValue)
+void ARougePlayerController::SetHUDSkillValue(float SkillValue,float MaxSkillValue)
 {
-	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeDemoHUD>(GetHUD()) : RougeDemoHUD;
+	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeHUD>(GetHUD()) : RougeDemoHUD;
 
 	bool bHUDValid = RougeDemoHUD &&
 		RougeDemoHUD->PlayerOverlayWidget &&
@@ -88,39 +88,39 @@ void ARougeDemoPlayerController::SetHUDSkillValue(float SkillValue,float MaxSkil
 	}
 }
 
-void ARougeDemoPlayerController::OnLevelUp()
+void ARougePlayerController::OnLevelUp()
 {
 	CreateLevelUpUI();
 }
 
-void ARougeDemoPlayerController::UpdateLevelBar(float Percent, int32 Level)
+void ARougePlayerController::UpdateLevelBar(float Percent, int32 Level)
 {
 	UpdateCharacterUI(Percent, Level);
 }
 
-void ARougeDemoPlayerController::LevelUpMaxHealth(bool PowerUp)
+void ARougePlayerController::LevelUpMaxHealth(bool PowerUp)
 {
 	
 }
 
-void ARougeDemoPlayerController::LevelUpMaxSpeed(bool PowerUp)
+void ARougePlayerController::LevelUpMaxSpeed(bool PowerUp)
 {
 }
 
-void ARougeDemoPlayerController::LevelUpTimerReduction(bool PowerUp)
+void ARougePlayerController::LevelUpTimerReduction(bool PowerUp)
 {
 }
 
-void ARougeDemoPlayerController::LevelUpAbilityDamage(bool PowerUp)
+void ARougePlayerController::LevelUpAbilityDamage(bool PowerUp)
 {
 }
 
-void ARougeDemoPlayerController::SetupPlayer()
+void ARougePlayerController::SetupPlayer()
 {
 	//检查是否是本地
 	if(IsLocalPlayerController())
 	{
-		ARougeDemoCharacter* RougeDemoCharacter = Cast<ARougeDemoCharacter>(GetPawn());
+		ARougeCharacter* RougeDemoCharacter = Cast<ARougeCharacter>(GetPawn());
 		if(RougeDemoCharacter)
 		{
 			AbilityComponent = RougeDemoCharacter->GetAbilityComponent();
@@ -133,12 +133,12 @@ void ARougeDemoPlayerController::SetupPlayer()
 	}
 }
 
-void ARougeDemoPlayerController::SetReference()
+void ARougePlayerController::SetReference()
 {
 	
 }
 
-void ARougeDemoPlayerController::CreateLevelUpUI()
+void ARougePlayerController::CreateLevelUpUI()
 {
 	if(HasAuthority())
 	{
@@ -149,7 +149,7 @@ void ARougeDemoPlayerController::CreateLevelUpUI()
 	}
 }
 
-void ARougeDemoPlayerController::PrepareLevelUp()
+void ARougePlayerController::PrepareLevelUp()
 {
 	if(LevelMasterWidgetClass == nullptr) { return; } 
 	//创建LevelUpUI
@@ -162,9 +162,9 @@ void ARougeDemoPlayerController::PrepareLevelUp()
 		//添加卡片
 		ExecuteLevelUp();
 		//Bind Event to On Ready
-		LevelMasterWidget->OnReadyDelegate.BindUObject(this, &ARougeDemoPlayerController::ExecuteLevelUp);
+		LevelMasterWidget->OnReadyDelegate.BindUObject(this, &ARougePlayerController::ExecuteLevelUp);
 		//ProcessLevelup Bind to OnClose 处理点击选择后
-		LevelMasterWidget->OnCloseDelegate.BindUObject(this, &ARougeDemoPlayerController::ProcessLevelUp);
+		LevelMasterWidget->OnCloseDelegate.BindUObject(this, &ARougePlayerController::ProcessLevelUp);
 	}else
 	{
 		LevelMasterWidget->ResetUI();
@@ -174,7 +174,7 @@ void ARougeDemoPlayerController::PrepareLevelUp()
 	UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(this, LevelMasterWidget);
 }
 
-void ARougeDemoPlayerController::ExecuteLevelUp()
+void ARougePlayerController::ExecuteLevelUp()
 {
 	if(AbilityComponent == nullptr) { return; }
 
@@ -307,7 +307,7 @@ void ARougeDemoPlayerController::ExecuteLevelUp()
 	
 }
 
-bool ARougeDemoPlayerController::CheckIfEVOReady(EActiveAbilities& Ability)
+bool ARougePlayerController::CheckIfEVOReady(EActiveAbilities& Ability)
 {
 	TArray<EPassiveAbilities> Local_PassiveArr = AbilityComponent->EvolutionPassiveArr;
 	TMap<EActiveAbilities, EPassiveAbilities> Local_EvoMap = AbilityComponent->EvolutionMap;
@@ -335,7 +335,7 @@ bool ARougeDemoPlayerController::CheckIfEVOReady(EActiveAbilities& Ability)
 	return false;
 }
 
-TArray<EActiveAbilities> ARougeDemoPlayerController::CheckActiveAbilities(
+TArray<EActiveAbilities> ARougePlayerController::CheckActiveAbilities(
 	TMap<EActiveAbilities, int32> ActiveMap, int32 MaxLevel)
 {
 	int32 Local_MaxAbilityLevel = MaxLevel;
@@ -393,7 +393,7 @@ TArray<EActiveAbilities> ARougeDemoPlayerController::CheckActiveAbilities(
 	return LocalActiveAbilitiesArr;
 }
 
-TArray<EPassiveAbilities> ARougeDemoPlayerController::CheckPassiveAbilities(TMap<EPassiveAbilities, int32> PassiveMap,
+TArray<EPassiveAbilities> ARougePlayerController::CheckPassiveAbilities(TMap<EPassiveAbilities, int32> PassiveMap,
 	int32 MaxLevel)
 {
 	int32 Local_MaxAbilityLevel = MaxLevel;
@@ -446,9 +446,9 @@ TArray<EPassiveAbilities> ARougeDemoPlayerController::CheckPassiveAbilities(TMap
 	return LocalPassiveAbilitiesArr;
 }
 
-void ARougeDemoPlayerController::UpdateCharacterUI(float Percent, int32 Level)
+void ARougePlayerController::UpdateCharacterUI(float Percent, int32 Level)
 {
-	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeDemoHUD>(GetHUD()) : RougeDemoHUD;
+	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeHUD>(GetHUD()) : RougeDemoHUD;
 
 	if(RougeDemoHUD->PlayerOverlayWidget)
 	{
@@ -459,9 +459,9 @@ void ARougeDemoPlayerController::UpdateCharacterUI(float Percent, int32 Level)
 	}
 }
 
-void ARougeDemoPlayerController::TestAction()
+void ARougePlayerController::TestAction()
 {
-	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeDemoHUD>(GetHUD()) : RougeDemoHUD;
+	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeHUD>(GetHUD()) : RougeDemoHUD;
 
 	if(RougeDemoHUD->PlayerOverlayWidget)
 	{
@@ -483,16 +483,16 @@ void ARougeDemoPlayerController::TestAction()
 	}
 }
 
-void ARougeDemoPlayerController::UpdateTime(FText Time)
+void ARougePlayerController::UpdateTime(FText Time)
 {
-	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeDemoHUD>(GetHUD()) : RougeDemoHUD;
+	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeHUD>(GetHUD()) : RougeDemoHUD;
 	if(RougeDemoHUD->PlayerOverlayWidget)
 	{
 		RougeDemoHUD->PlayerOverlayWidget->UpdateTime(Time);
 	}
 }
 
-void ARougeDemoPlayerController::CreateActiveCard(int32 Local_MaxCount, TArray<EActiveAbilities>& Local_AvailableActiveAbilities,
+void ARougePlayerController::CreateActiveCard(int32 Local_MaxCount, TArray<EActiveAbilities>& Local_AvailableActiveAbilities,
 	TMap<EActiveAbilities, int32>& Local_ActiveAbilitiesMap)
 {
 	EActiveAbilities Local_ActiveAbility;
@@ -550,7 +550,7 @@ void ARougeDemoPlayerController::CreateActiveCard(int32 Local_MaxCount, TArray<E
 	}
 }
 
-void ARougeDemoPlayerController::CreatePassiveCard(int32 Local_MaxCount,
+void ARougePlayerController::CreatePassiveCard(int32 Local_MaxCount,
 	TArray<EPassiveAbilities>& Local_AvailablePassiveAbilities,TMap<EPassiveAbilities, int32>& Local_PassiveAbilitiesMap)
 {
 	//从本地数组中删除，这样我们就没有重复项了
@@ -609,7 +609,7 @@ void ARougeDemoPlayerController::CreatePassiveCard(int32 Local_MaxCount,
 	}
 }
 
-void ARougeDemoPlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilities ActiveAbilities, EPassiveAbilities PassiveAbilities)
+void ARougePlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilities ActiveAbilities, EPassiveAbilities PassiveAbilities)
 {
 	FString EnumName = UEnum::GetValueAsString(Type);
 	UE_LOG(LogTemp, Warning, TEXT("EAbilityType[%s]"), *EnumName);
@@ -642,7 +642,7 @@ void ARougeDemoPlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilit
 	AbilityComponent->RefreshAbilities();
 }
 
-void ARougeDemoPlayerController::AssignAbility(EAbilityType Type, EActiveAbilities ActiveAbilities,
+void ARougePlayerController::AssignAbility(EAbilityType Type, EActiveAbilities ActiveAbilities,
 	EPassiveAbilities PassiveAbilities)
 {
 	switch (Type)
@@ -697,17 +697,17 @@ void ARougeDemoPlayerController::AssignAbility(EAbilityType Type, EActiveAbiliti
 	}
 }
 
-void ARougeDemoPlayerController::UpdateHudHotbar(TMap<EActiveAbilities, int32> ActiveMap,
+void ARougePlayerController::UpdateHudHotbar(TMap<EActiveAbilities, int32> ActiveMap,
 	TMap<EPassiveAbilities, int32> PassiveMap)
 {
-	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeDemoHUD>(GetHUD()) : RougeDemoHUD;
+	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeHUD>(GetHUD()) : RougeDemoHUD;
 	if(RougeDemoHUD->PlayerOverlayWidget)
 	{
 		RougeDemoHUD->PlayerOverlayWidget->BuildHotbar(ActiveMap, PassiveMap);
 	}
 }
 
-void ARougeDemoPlayerController::UpdateHotbar()
+void ARougePlayerController::UpdateHotbar()
 {
 	if(AbilityComponent == nullptr) { return; }
 	UpdateHudHotbar(

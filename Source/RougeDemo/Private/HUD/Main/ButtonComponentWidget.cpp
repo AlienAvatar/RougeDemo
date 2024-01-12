@@ -3,7 +3,7 @@
 
 #include "HUD/Main/ButtonComponentWidget.h"
 #include "Components/Button.h"
-#include "Core/RougeDemoInstance.h"
+#include "..\..\..\Public\Core\RougeInstance.h"
 #include "HUD/Main/MainHUD.h"
 #include "HUD/Main/MainWidget.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -48,7 +48,7 @@ void UButtonComponentWidget::StartWidgetHandle()
 	MainHUD->GetMainWidget()->RemoveFromParent();
 	
 	//RemoveFromParent();
-	URougeDemoInstance* RougeDemoInstance = URougeDemoFunctionLibary::GetRougeDemoGameInstance(GetWorld());
+	URougeInstance* RougeDemoInstance = URougeDemoFunctionLibary::GetRougeDemoGameInstance(GetWorld());
 	if(RougeDemoInstance)
 	{
 		RougeDemoInstance->LoadGameLevel();

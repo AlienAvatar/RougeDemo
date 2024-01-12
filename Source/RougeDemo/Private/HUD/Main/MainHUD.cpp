@@ -3,7 +3,7 @@
 
 #include "HUD/Main/MainHUD.h"
 
-#include "Core/RougeDemoInstance.h"
+#include "..\..\..\Public\Core\RougeInstance.h"
 #include "HUD/Main/ChooseWidget.h"
 #include "HUD/Main/MainWidget.h"
 #include "Lib/RougeDemoFunctionLibary.h"
@@ -47,7 +47,7 @@ void AMainHUD::OnBegin()
 		MainWidget->AddToViewport();
 	}
 	
-	URougeDemoInstance* RougeGameInstance = URougeDemoFunctionLibary::GetRougeDemoGameInstance(GetWorld());
+	URougeInstance* RougeGameInstance = URougeDemoFunctionLibary::GetRougeDemoGameInstance(GetWorld());
 	if(RougeGameInstance)
 	{
 		const FGlobalOptionsStruct GlobalOptions = RougeGameInstance->GetGlobalOptions();

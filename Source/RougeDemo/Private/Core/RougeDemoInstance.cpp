@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Core/RougeDemoInstance.h"
+#include "..\..\Public\Core\RougeInstance.h"
 
 #include "Blueprint/WidgetLayoutLibrary.h"
-#include "Core/RougeDemoSaveGame.h"
+#include "Core/RougeSaveGame.h"
 #include "Engine/StreamableManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Lib/RougeDemoFunctionLibary.h"
@@ -16,14 +16,14 @@
 
 DEFINE_LOG_CATEGORY(LogGameInstance);
 
-URougeDemoInstance::URougeDemoInstance()
+URougeInstance::URougeInstance()
 	: SaveSlot(TEXT("SaveGameSlot"))
 	, SaveUserIndex(0)
 {
 	
 }
 
-void URougeDemoInstance::Init()
+void URougeInstance::Init()
 {
 	Super::Init();
 	
@@ -43,22 +43,22 @@ void URougeDemoInstance::Init()
 	}
 }
 
-URougeDemoSaveGame* URougeDemoInstance::GetCurrentSaveGame()
+URougeSaveGame* URougeInstance::GetCurrentSaveGame()
 {
 	return CurrentSaveGame;
 }
 
-void URougeDemoInstance::FadeInAndShowLoadingScreen()
+void URougeInstance::FadeInAndShowLoadingScreen()
 {
 	FString MapName = "TestMap";
 }
 
-void URougeDemoInstance::FadeOutAndHideLoadingScreen()
+void URougeInstance::FadeOutAndHideLoadingScreen()
 {
 	
 }
 
-FGlobalOptionsStruct URougeDemoInstance::GetGlobalOptions()
+FGlobalOptionsStruct URougeInstance::GetGlobalOptions()
 {
 	if(UGameplayStatics::DoesSaveGameExist(GlobalOptionsName, 0))
 	{
@@ -80,7 +80,7 @@ FGlobalOptionsStruct URougeDemoInstance::GetGlobalOptions()
 	return FGlobalOptionsStruct();
 }
 
-void URougeDemoInstance::SetGlobalOptions(FGlobalOptionsStruct NewGlobalOptions)
+void URougeInstance::SetGlobalOptions(FGlobalOptionsStruct NewGlobalOptions)
 {
 	//更改文件中的属性
 	UGlobalOptionsSaveGame* SaveGame = Cast<UGlobalOptionsSaveGame>(UGameplayStatics::CreateSaveGameObject(UGlobalOptionsSaveGame::StaticClass()));
@@ -91,24 +91,24 @@ void URougeDemoInstance::SetGlobalOptions(FGlobalOptionsStruct NewGlobalOptions)
 	}
 }
 
-void URougeDemoInstance::LoadGameLevel()
+void URougeInstance::LoadGameLevel()
 {
 	UWidgetLayoutLibrary::RemoveAllWidgets(GetWorld());
 	UGameplayStatics::OpenLevel(GetWorld(),FName("TestMap"));
 }
 
-void URougeDemoInstance::SetSavingEnabled(bool bEnabled)
+void URougeInstance::SetSavingEnabled(bool bEnabled)
 {
 	bSavingEnabled = bEnabled;
 }
 
-void URougeDemoInstance::GetSaveSlotInfo(FString& SlotName, int32& UserIndex) const
+void URougeInstance::GetSaveSlotInfo(FString& SlotName, int32& UserIndex) const
 {
 	SlotName = SaveSlot;
 	UserIndex = SaveUserIndex;
 }
 
-bool URougeDemoInstance::WriteSaveGame()
+bool URougeInstance::WriteSaveGame()
 {
 	//可以存取
 	if (bSavingEnabled)
@@ -124,13 +124,13 @@ bool URougeDemoInstance::WriteSaveGame()
 		bCurrentlySaving = true;
 
 		// 异步调用
-		UGameplayStatics::AsyncSaveGameToSlot(GetCurrentSaveGame(), SaveSlot, SaveUserIndex, FAsyncSaveGameToSlotDelegate::CreateUObject(this, &URougeDemoInstance::HandleAsyncSave));
+		UGameplayStatics::AsyncSaveGameToSlot(GetCurrentSaveGame(), SaveSlot, SaveUserIndex, FAsyncSaveGameToSlotDelegate::CreateUObject(this, &URougeInstance::HandleAsyncSave));
 		return true;
 	}
 	return false;
 }
 
-void URougeDemoInstance::HandleAsyncSave(const FString& SlotName, const int32 UserIndex, bool bSuccess)
+void URougeInstance::HandleAsyncSave(const FString& SlotName, const int32 UserIndex, bool bSuccess)
 {
 	bCurrentlySaving = false;
 
