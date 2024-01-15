@@ -4,11 +4,13 @@
 #include "Character/RougeHeroComponent.h"
 
 #include "EnhancedInputSubsystems.h"
+#include "Character/RougePawnData.h"
 #include "Character/RougePawnExtensionComponent.h"
 #include "Core/RougeLocalPlayer.h"
 #include "Core/RougePlayerState.h"
 #include "RougeDemo/RougeGameplayTags.h"
 #include "Core/RougePlayerController.h"
+
 
 
 URougeHeroComponent::URougeHeroComponent(const FObjectInitializer& ObjectInitializer)
@@ -20,7 +22,8 @@ URougeHeroComponent::URougeHeroComponent(const FObjectInitializer& ObjectInitial
 void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState,
 	FGameplayTag DesiredState)
 {
-	if (CurrentState == RougeGameplayTags::InitState_DataAvailable && DesiredState == RougeGameplayTags::InitState_DataInitialized)
+	FRougeGameplayTags RougeGameplayTags = FRougeGameplayTags::Get();
+	if (CurrentState == RougeGameplayTags.InitState_DataAvailable && DesiredState == RougeGameplayTags.InitState_DataInitialized)
 	{
 		APawn* Pawn = GetPawn<APawn>();
 		ARougePlayerState* RougePS = GetPlayerState<ARougePlayerState>();
@@ -29,6 +32,7 @@ void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* 
 			return;
 		}
 
+		const URougePawnData* PawnData = nullptr;
 		if (URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(Pawn))
 		{
 			//PawnData = PawnExtComp->GetPawnData<URougePawnData>();
@@ -80,10 +84,25 @@ void URougeHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputComp
 
 	if (const URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(Pawn))
 	{
-		
+		if (const URougePawnData* PawnData = PawnExtComp->GetPawnData<URougePawnData>())
+		{
+			if (const URougeInputConfig* InputConfig = PawnData->InputConfig)
+			{
+				const FRougeGameplayTags& GameplayTags = FRougeGameplayTags::Get();
+				for (const FMappableConfigPair& Pair : DefaultInputConfigs)
+				{
+					if (Pair.bShouldActivateAutomatically && Pair.CanBeActivated())
+					{
+						FModifyContextOptions Options = {};
+						Options.bIgnoreAllPressedKeysUntilRelease = false;
+						// Actually add the config to the local player			
+						Subsystem->AddPlayerMappableConfig(Pair.Config.LoadSynchronous(), Options);	
+					}
+				}
+			}
+		}
 	}
 }
-
 
 // Called every frame
 void URougeHeroComponent::TickComponent(float DeltaTime, ELevelTick TickType,

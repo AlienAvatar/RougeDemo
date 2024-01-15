@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/GameFrameworkInitStateInterface.h"
 #include "Components/PawnComponent.h"
+#include "Input/RougeMappableConfigPair.h"
 #include "RougeHeroComponent.generated.h"
 
 
@@ -23,6 +24,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void InitializePlayerInput(UInputComponent* PlayerInputComponent);
+
+	UPROPERTY(EditAnywhere)
+	TArray<FMappableConfigPair> DefaultInputConfigs;
+	
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,

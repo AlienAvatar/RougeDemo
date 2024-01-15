@@ -20,4 +20,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Lyra|Input")
 	TObjectPtr<URougeInputConfig> InputConfig;
+
+
+protected:
+
+
 };

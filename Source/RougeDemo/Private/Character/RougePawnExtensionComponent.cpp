@@ -45,6 +45,10 @@ void URougePawnExtensionComponent::OnAbilitySystemUninitialized_Register(FSimple
 }
 
 
+// void URougePawnExtensionComponent::OnRep_PawnData()
+// {
+// }
+
 // Called every frame
 void URougePawnExtensionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                                  FActorComponentTickFunction* ThisTickFunction)
@@ -62,15 +66,17 @@ void URougePawnExtensionComponent::SetupPlayerInputComponent()
 void URougePawnExtensionComponent::CheckDefaultInitialization()
 {
 	// 检查其它进度是否初始化完成，因为在检查我们的进度之前，我们可能依赖的任何其他功能的进度
+	// UGameFrameworkInitStateInterface的方法
 	CheckDefaultInitializationForImplementers();
 
+	const FRougeGameplayTags& InitTags = FRougeGameplayTags::Get();
 	static const TArray<FGameplayTag> StateChain = {
-		RougeGameplayTags::InitState_Spawned,
-		// RougeGameplayTags::InitState_DataAvailable,
-		// RougeGameplayTags::InitState_DataInitialized,
-		// RougeGameplayTags::InitState_GameplayReady
+		InitTags.InitState_Spawned,
+		InitTags.InitState_DataAvailable,
+		InitTags.InitState_DataInitialized,
+		InitTags.InitState_GameplayReady
 	};
-
+	
 	//这将尝试从生成(只在BeginPlay中设置)到数据初始化阶段
 	ContinueInitStateChain(StateChain);
 }

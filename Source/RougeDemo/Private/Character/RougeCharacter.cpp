@@ -158,9 +158,12 @@ void ARougeCharacter::OnAbilitySystemUninitialized()
 
 void ARougeCharacter::InitializeGameplayTags()
 {
+
 	if (URougeAbilitySystemComponent* LyraASC = GetRougeAbilitySystemComponent())
 	{
-		for (const TPair<uint8, FGameplayTag>& TagMapping : RougeGameplayTags::MovementModeTagMap)
+		const FRougeGameplayTags& GameplayTags = FRougeGameplayTags::Get();
+		
+		for (const TPair<uint8, FGameplayTag>& TagMapping : GameplayTags.MovementModeTagMap)
 		{
 			if (TagMapping.Value.IsValid())
 			{
@@ -175,7 +178,16 @@ void ARougeCharacter::SetMovementModeTag(EMovementMode MovementMode, uint8 Custo
 	if (URougeAbilitySystemComponent* LyraASC = GetRougeAbilitySystemComponent())
 	{
 		const FGameplayTag* MovementModeTag = nullptr;
-		MovementModeTag = RougeGameplayTags::MovementModeTagMap.Find(MovementMode);
+		const FRougeGameplayTags& GameplayTags = FRougeGameplayTags::Get();
+
+		if (MovementMode == MOVE_Custom)
+		{
+			MovementModeTag = GameplayTags.CustomMovementModeTagMap.Find(CustomMovementMode);
+		}
+		else
+		{
+			MovementModeTag = GameplayTags.MovementModeTagMap.Find(MovementMode);
+		}
 
 		if (MovementModeTag && MovementModeTag->IsValid())
 		{

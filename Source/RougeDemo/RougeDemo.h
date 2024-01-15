@@ -25,3 +25,5 @@ UE_LOG(LogRougeController, Verbosity, Format, ##__VA_ARGS__)
 DECLARE_LOG_CATEGORY_EXTERN(LogGameManager, Log, All);
 #define GAME_LOG(Verbosity, Format, ...) \
 UE_LOG(LogGameManager, Verbosity, Format, ##__VA_ARGS__)
+
+ROUGEDEMO_API DECLARE_LOG_CATEGORY_EXTERN(LogRouge, Log, All);
