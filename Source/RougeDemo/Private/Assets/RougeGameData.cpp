@@ -2,3 +2,14 @@
 
 
 #include "Assets/RougeGameData.h"
+
+#include "Assets/RougeAssetManager.h"
+
+URougeGameData::URougeGameData()
+{
+}
+
+const URougeGameData& URougeGameData::Get()
+{
+	return URougeAssetManager::Get().GetGameData();
+}

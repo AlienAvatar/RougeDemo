@@ -20,4 +20,6 @@ public:
 	//返回GameData
 	static const URougeGameData& Get();
 
+protected:
+
 };

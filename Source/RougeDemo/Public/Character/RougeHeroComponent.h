@@ -8,7 +8,9 @@
 #include "Input/RougeMappableConfigPair.h"
 #include "RougeHeroComponent.generated.h"
 
-
+/**
+ * IGameFrameworkInitStateInterface 比如一个obj在初始化前必须要求另一个obj达到某个状态
+ */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ROUGEDEMO_API URougeHeroComponent : public UPawnComponent, public IGameFrameworkInitStateInterface
 {
@@ -18,6 +20,7 @@ public:
 	// Sets default values for this component's properties
 	URougeHeroComponent(const FObjectInitializer& ObjectInitializer);
 
+	//~ Begin IGameFrameworkInitStateInterface interface
 	virtual void HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) override;
 protected:
 	// Called when the game starts

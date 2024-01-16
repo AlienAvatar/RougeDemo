@@ -22,7 +22,7 @@ URougeHeroComponent::URougeHeroComponent(const FObjectInitializer& ObjectInitial
 void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState,
 	FGameplayTag DesiredState)
 {
-	FRougeGameplayTags RougeGameplayTags = FRougeGameplayTags::Get();
+	const FRougeGameplayTags& RougeGameplayTags = FRougeGameplayTags::Get();
 	if (CurrentState == RougeGameplayTags.InitState_DataAvailable && DesiredState == RougeGameplayTags.InitState_DataInitialized)
 	{
 		APawn* Pawn = GetPawn<APawn>();

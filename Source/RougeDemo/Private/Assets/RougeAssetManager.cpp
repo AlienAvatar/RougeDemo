@@ -5,6 +5,7 @@
 #include "AbilitySystemGlobals.h"
 #include "RougeDemo/RougeDemo.h"
 #include "../RougeDemo.h"
+
 #include "RougeDemo/RougeGameplayTags.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -39,6 +40,63 @@ void URougeAssetManager::StartInitialLoading()
 void URougeAssetManager::UpdateInitialGameContentLoadPercent(float GameContentPercent)
 {
 	
+}
+
+const URougeGameData& URougeAssetManager::GetGameData()
+{
+	return GetOrLoadTypedGameData<URougeGameData>(LyraGameDataPath);
+}
+
+URougeAssetManager& URougeAssetManager::Get()
+{
+	check(GEngine)
+
+	if (URougeAssetManager* Singleton = Cast<URougeAssetManager>(GEngine->AssetManager))
+	{
+		return *Singleton;
+	}
+
+	UE_LOG(LogTemp, Fatal, TEXT("Invalid AssetManagerClassName in DefaultEngine.ini.  It must be set to LyraAssetManager!"));
+
+	// Fatal error above prevents this from being called.
+	return *NewObject<URougeAssetManager>();
+}
+
+UPrimaryDataAsset* URougeAssetManager::LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass,
+	const TSoftObjectPtr<UPrimaryDataAsset>& DataClassPath, FPrimaryAssetType PrimaryAssetType)
+{
+	UPrimaryDataAsset* Asset = nullptr;
+	if (!DataClassPath.IsNull())
+	{
+		//这可以在编辑器中递归调用，因为它是按需从PostLoad调用的，所以可以在编辑器中递归调用，因为它是按需从PostLoad调用的，所以强制同步加载主资产，并在这种情况下异步加载其余的主资产，在这种情况下异步加载其余的
+		if (GIsEditor)
+		{
+			Asset = DataClassPath.LoadSynchronous();
+			LoadPrimaryAssetsWithType(PrimaryAssetType);
+		}else
+		{
+			TSharedPtr<FStreamableHandle> Handle = LoadPrimaryAssetsWithType(PrimaryAssetType);
+			if (Handle.IsValid())
+			{
+				Handle->WaitUntilComplete(0.0f, false);
+
+				// This should always work
+				Asset = Cast<UPrimaryDataAsset>(Handle->GetLoadedAsset());
+			}
+		}
+	}
+	
+	if (Asset)
+	{
+		GameDataMap.Add(DataClass, Asset);
+	}
+	else
+	{
+		// It is not acceptable to fail to load any GameData asset. It will result in soft failures that are hard to diagnose.
+		UE_LOG(LogTemp, Fatal, TEXT("Failed to load GameData asset at %s. Type %s. This is not recoverable and likely means you do not have the correct data to run %s."), *DataClassPath.ToString(), *PrimaryAssetType.ToString(), FApp::GetProjectName());
+	}
+
+	return Asset;
 }
 
 void URougeAssetManager::DoAllStartupJobs()
