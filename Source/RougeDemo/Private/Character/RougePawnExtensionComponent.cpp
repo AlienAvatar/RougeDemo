@@ -4,6 +4,8 @@
 #include "Character/RougePawnExtensionComponent.h"
 #include "../RougeGameplayTags.h"
 
+const FName URougePawnExtensionComponent::NAME_ActorFeatureName("PawnExtension");
+
 URougePawnExtensionComponent::URougePawnExtensionComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {

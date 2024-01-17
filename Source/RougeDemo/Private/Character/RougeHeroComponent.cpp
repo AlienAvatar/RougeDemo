@@ -11,7 +11,8 @@
 #include "RougeDemo/RougeGameplayTags.h"
 #include "Core/RougePlayerController.h"
 
-
+const FName URougeHeroComponent::NAME_BindInputsNow("BindInputsNow");
+const FName URougeHeroComponent::NAME_ActorFeatureName("Hero");
 
 URougeHeroComponent::URougeHeroComponent(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
@@ -53,13 +54,28 @@ void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* 
 	
 }
 
+void URougeHeroComponent::CheckDefaultInitialization()
+{
+	const FRougeGameplayTags& InitTags = FRougeGameplayTags::Get();
+	static const TArray<FGameplayTag> StateChain = { InitTags.InitState_Spawned, InitTags.InitState_DataAvailable, InitTags.InitState_DataInitialized, InitTags.InitState_GameplayReady };
+	
+	ContinueInitStateChain(StateChain);
+}
+
 // Called when the game starts
 void URougeHeroComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
 	// ...
-	
+	BindOnActorInitStateChanged(URougePawnExtensionComponent::NAME_ActorFeatureName, FGameplayTag(), false);
+
+	CheckDefaultInitialization();
+}
+
+void URougeHeroComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
 }
 
 void URougeHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputComponent)
@@ -99,17 +115,14 @@ void URougeHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputComp
 						Subsystem->AddPlayerMappableConfig(Pair.Config.LoadSynchronous(), Options);	
 					}
 				}
+
+				// To do Input Component
 			}
 		}
 	}
 }
 
-// Called every frame
-void URougeHeroComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                        FActorComponentTickFunction* ThisTickFunction)
+void URougeHeroComponent::OnRegister()
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	Super::OnRegister();
 }
-

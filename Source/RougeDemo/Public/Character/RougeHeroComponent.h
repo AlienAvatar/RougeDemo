@@ -22,17 +22,25 @@ public:
 
 	//~ Begin IGameFrameworkInitStateInterface interface
 	virtual void HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) override;
+	virtual void CheckDefaultInitialization() override;
+
+	/**  当输入绑定好时，扩展事件的名称发送给UGameFrameworkComponentManager */
+	static const FName NAME_BindInputsNow;
+
+	/** component-implemented 特性名字 */
+	static const FName NAME_ActorFeatureName;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void InitializePlayerInput(UInputComponent* PlayerInputComponent);
 
 	UPROPERTY(EditAnywhere)
 	TArray<FMappableConfigPair> DefaultInputConfigs;
+
+	// 当Input已经被绑定应用，则为true
+	bool bReadyToBindInputs = false;
+
+	virtual void OnRegister() override;
 	
-public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
 };

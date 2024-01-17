@@ -8,6 +8,11 @@
 #include "Assets/RougeGameData.h"
 #include "RougeAssetManager.generated.h"
 
+struct FRougeBundles
+{
+	static const FName Equipped;
+};
+
 UCLASS(Config = Game)
 class URougeAssetManager : public UAssetManager
 {

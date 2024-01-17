@@ -11,6 +11,7 @@ class ARougePlayerController;
 class ARougeCharacter;
 class AAIEnemyController;
 class ABaseAI;
+class URougeExperienceDefinition;
 /**
  * 
  */
@@ -29,5 +30,13 @@ public:
 	virtual void RequetRespwan(ACharacter* ElimmedCharacter,AController* ElimmedController);
 
 	virtual void Pause(bool bPause, bool bOverride) override;
+
+	//~AGameModeBase interface
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+	virtual void InitGameState() override;
+	//~End of AGameModeBase interface
+protected:
+	void HandleMatchAssignmentIfNotExpectingOne();
 	
+	void OnExperienceLoaded(const URougeExperienceDefinition* CurrentExperience);
 };

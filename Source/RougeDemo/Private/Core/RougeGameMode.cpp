@@ -11,6 +11,8 @@
 #include "Core/RougeGameSession.h"
 #include "Core/RougeGameState.h"
 #include "Core/RougeReplayPlayerController.h"
+#include "Core/GameModes/RougeExperienceDefinition.h"
+#include "Core/GameModes/RougeExperienceManagerComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerStart.h"
 #include "HUD/RougeHUD.h"
@@ -26,6 +28,17 @@ ARougeGameMode::ARougeGameMode()
 	DefaultPawnClass = ARougeCharacter::StaticClass();
 	HUDClass = ARougeHUD::StaticClass();
 }
+
+void ARougeGameMode::InitGameState()
+{
+	Super::InitGameState();
+
+	//等待扩展组件加载完成
+	URougeExperienceManagerComponent* ExperienceComponent = GameState->FindComponentByClass<URougeExperienceManagerComponent>();
+	check(ExperienceComponent);
+	ExperienceComponent->CallOrRegister_OnExperienceLoaded(FOnRougeExperienceLoaded::FDelegate::CreateUObject(this, &ThisClass::OnExperienceLoaded));
+}
+
 
 void ARougeGameMode::PlayEliminated(ABaseAI* ElimmedCharacter,
                                     AAIEnemyController* VictimController, ARougePlayerController* AttackController)
@@ -75,4 +88,54 @@ void ARougeGameMode::Pause(bool bPause, bool bOverride)
 		bGameIsPaused = false;
 	}
 	
+}
+
+void ARougeGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::HandleMatchAssignmentIfNotExpectingOne);
+}
+
+
+void ARougeGameMode::HandleMatchAssignmentIfNotExpectingOne()
+{
+	FPrimaryAssetId ExperienceId;
+	FString ExperienceIdSource;
+	UWorld* World = GetWorld();
+
+	if (!ExperienceId.IsValid() && UGameplayStatics::HasOption(OptionsString, TEXT("Experience")))
+	{
+		const FString ExperienceFromOptions = UGameplayStatics::ParseOption(OptionsString, TEXT("Experience"));
+		ExperienceId = FPrimaryAssetId(FPrimaryAssetType(URougeExperienceDefinition::StaticClass()->GetFName()), FName(*ExperienceFromOptions));
+		ExperienceIdSource = TEXT("OptionsString");
+	}
+
+	if (!ExperienceId.IsValid())
+	{
+		FString ExperienceFromCommandLine;
+		if (FParse::Value(FCommandLine::Get(), TEXT("Experience="), ExperienceFromCommandLine))
+		{
+			ExperienceId = FPrimaryAssetId::ParseTypeAndName(ExperienceFromCommandLine);
+			ExperienceIdSource = TEXT("CommandLine");
+		}
+	}
+
+	
+}
+
+void ARougeGameMode::OnExperienceLoaded(const URougeExperienceDefinition* CurrentExperience)
+{
+	//遍历所有Controller
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* PC = Cast<APlayerController>(*Iterator);
+		if ((PC != nullptr) && (PC->GetPawn() == nullptr))
+		{
+			if (PlayerCanRestart(PC))
+			{
+				RestartPlayer(PC);
+			}
+		}
+	}
 }

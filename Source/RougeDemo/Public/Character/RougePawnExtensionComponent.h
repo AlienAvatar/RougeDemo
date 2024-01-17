@@ -20,6 +20,7 @@ class ROUGEDEMO_API URougePawnExtensionComponent : public UPawnComponent, public
 	GENERATED_BODY()
 
 public:
+	static const FName NAME_ActorFeatureName;
 	// Sets default values for this component's properties
 	URougePawnExtensionComponent(const FObjectInitializer& ObjectInitializer);
 
