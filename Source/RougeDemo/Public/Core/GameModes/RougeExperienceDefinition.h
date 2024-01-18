@@ -7,6 +7,8 @@
 #include "RougeExperienceDefinition.generated.h"
 
 class URougeExperienceActionSet;
+class URougePawnData;
+class UGameFeatureAction;
 /**
  * 
  */
@@ -17,6 +19,16 @@ class ROUGEDEMO_API URougeExperienceDefinition : public UPrimaryDataAsset
 public:
 	URougeExperienceDefinition();
 
+	UPROPERTY(EditDefaultsOnly, Category = Gameplay)
+	TArray<FString> GameFeaturesToEnable;
+	
 	UPROPERTY(EditDefaultsOnly, Category=Gameplay)
 	TArray<TObjectPtr<URougeExperienceActionSet>> ActionSets;
+
+	UPROPERTY(EditDefaultsOnly, Category=Gameplay)
+	TObjectPtr<const URougePawnData> DefaultPawnData;
+
+	UPROPERTY(EditDefaultsOnly, Instanced, Category="Actions")
+	TArray<TObjectPtr<UGameFeatureAction>> Actions;
+
 };

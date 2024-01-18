@@ -48,14 +48,14 @@ protected:
 
 	//Transit 属性是临时的，无法被保存或加载
 	//全局的数据加载
+	//在初始化的时候需要加载
 	UPROPERTY(Transient)
 	TMap<TObjectPtr<UClass>, TObjectPtr<UPrimaryDataAsset>> GameDataMap;
 
 	//当前值被存入相关的.ini文件中，创建后被加载
 	UPROPERTY(Config)
-	TSoftObjectPtr<URougeGameData> LyraGameDataPath;
+	TSoftObjectPtr<URougeGameData> RougeGameDataPath;
 
-	
 	UPrimaryDataAsset* LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass, const TSoftObjectPtr<UPrimaryDataAsset>& DataClassPath, FPrimaryAssetType PrimaryAssetType);
 private:
 	TArray<FRougeAssetManagerStartupJob> StartupJobs;

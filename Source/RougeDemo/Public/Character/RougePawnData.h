@@ -18,10 +18,11 @@ class ROUGEDEMO_API URougePawnData : public UPrimaryDataAsset
 public:
 	URougePawnData(const FObjectInitializer& ObjectInitializer);
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Lyra|Input")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rouge|Input")
 	TObjectPtr<URougeInputConfig> InputConfig;
 
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rouge|Pawn")
+	TSubclassOf<APawn> PawnClass;
 protected:
 
 

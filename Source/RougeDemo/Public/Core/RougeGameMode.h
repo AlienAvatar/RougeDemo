@@ -39,4 +39,6 @@ protected:
 	void HandleMatchAssignmentIfNotExpectingOne();
 	
 	void OnExperienceLoaded(const URougeExperienceDefinition* CurrentExperience);
+
+	void OnMatchAssignmentGiven(FPrimaryAssetId ExperienceId, const FString& ExperienceIdSource);
 };

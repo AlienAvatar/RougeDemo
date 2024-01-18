@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "RougeGameData.generated.h"
 
+class UGameplayEffect;
 /**
  * 
  */
@@ -20,6 +21,8 @@ public:
 	//返回GameData
 	static const URougeGameData& Get();
 
-protected:
+	// Gameplay effect used to add and remove dynamic tags.
+	UPROPERTY(EditDefaultsOnly, Category = "Default Gameplay Effects")
+	TSoftClassPtr<UGameplayEffect> DynamicTagGameplayEffect;
 
 };

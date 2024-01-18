@@ -36,6 +36,12 @@ public:
 	void CallOrRegister_OnExperienceLoaded(FOnRougeExperienceLoaded::FDelegate&& Delegate);
 
 	bool IsExperienceLoaded() const;
+
+#if WITH_SERVER_CODE
+	void ServerSetCurrentExperience(FPrimaryAssetId ExperienceId);
+#endif
+
+	void SetCurrentExperience(FPrimaryAssetId ExperienceId);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

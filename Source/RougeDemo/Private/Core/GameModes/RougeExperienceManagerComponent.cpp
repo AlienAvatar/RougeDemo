@@ -78,6 +78,30 @@ bool URougeExperienceManagerComponent::IsExperienceLoaded() const
 	return (LoadState == ERougeExperienceLoadState::Loaded) && (CurrentExperience != nullptr);
 }
 
+void URougeExperienceManagerComponent::ServerSetCurrentExperience(FPrimaryAssetId ExperienceId)
+{
+	//获取AssetManger实例化
+	URougeAssetManager& AssetManager = URougeAssetManager::Get();
+	//根据ID，获取Experience资源路径和class
+	FSoftObjectPath AssetPath = AssetManager.GetPrimaryAssetPath(ExperienceId);
+	FSoftObjectPath TestAssetPath2("/Game/RougeDemo/SRC/Blueprints/System/BP_Default_RougeExperienceDefinition.BP_Default_RougeExperienceDefinition");
+	TSubclassOf<URougeExperienceDefinition> AssetClass = Cast<UClass>(TestAssetPath2.TryLoad());
+	check(AssetClass);
+	//获取对应的Experience定义配置
+	const URougeExperienceDefinition* Experience = GetDefault<URougeExperienceDefinition>(AssetClass);
+
+	check(Experience != nullptr);
+	check(CurrentExperience == nullptr);
+	//设置为当前的Experience
+	CurrentExperience = Experience;
+	//开始读取Experience
+	StartExperienceLoad();
+}
+
+void URougeExperienceManagerComponent::SetCurrentExperience(FPrimaryAssetId ExperienceId)
+{
+}
+
 
 // Called when the game starts
 void URougeExperienceManagerComponent::BeginPlay()
@@ -95,13 +119,14 @@ void URougeExperienceManagerComponent::OnRep_CurrentExperience()
 void URougeExperienceManagerComponent::StartExperienceLoad()
 {
 	check(CurrentExperience != nullptr);
+	//检查当前Experience的读取状态
 	check(LoadState == ERougeExperienceLoadState::Unloaded);
 
 	// UE_LOG(LogTemp, Log, TEXT("EXPERIENCE: StartExperienceLoad(CurrentExperience = %s, %s)"),
 	// *CurrentExperience->GetPrimaryAssetId().ToString(),
 	// *GetClientServerContextString(this));
 	
-	//设置状态
+	//设置当前Experience的读取状态为loading
 	LoadState = ERougeExperienceLoadState::Loading;
 
 	//获取URougeAssetManager
@@ -121,8 +146,6 @@ void URougeExperienceManagerComponent::StartExperienceLoad()
 	}
 
 	//读取扩展相关的资源
-
-	
 	TArray<FName> BundlesToLoad;
 	//BundlesToLoad.Add(FRougeBundles::Equipped);
 
@@ -137,13 +160,51 @@ void URougeExperienceManagerComponent::StartExperienceLoad()
 	}
 	if (bLoadServer)
 	{
+		//服务端加载
 		BundlesToLoad.Add(UGameFeaturesSubsystemSettings::LoadStateServer);
 	}
 
+	//
 	const TSharedPtr<FStreamableHandle> BundleLoadHandle = AssetManager.ChangeBundleStateForPrimaryAssets(BundleAssetList.Array(), BundlesToLoad, {}, false, FStreamableDelegate(), FStreamableManager::AsyncLoadHighPriority);
+	//按顺序加载资源
 	const TSharedPtr<FStreamableHandle> RawLoadHandle = AssetManager.LoadAssetList(RawAssetList.Array(), FStreamableDelegate(), FStreamableManager::AsyncLoadHighPriority, TEXT("StartExperienceLoad()"));
 
+	//FStreamableManager提供异步加载功能
+	TSharedPtr<FStreamableHandle> Handle = nullptr;
+	if (BundleLoadHandle.IsValid() && RawLoadHandle.IsValid())
+	{
+		Handle = AssetManager.GetStreamableManager().CreateCombinedHandle({ BundleLoadHandle, RawLoadHandle });
+	}
+	else
+	{
+		Handle = BundleLoadHandle.IsValid() ? BundleLoadHandle : RawLoadHandle;
+	}
+	
+	//加载完成
 	FStreamableDelegate OnAssetsLoadedDelegate = FStreamableDelegate::CreateUObject(this, &ThisClass::OnExperienceLoadComplete);
+	if (!Handle.IsValid() || Handle->HasLoadCompleted())
+	{
+		// Assets were already loaded, call the delegate now
+		//调用资源加载完成委托
+		FStreamableHandle::ExecuteDelegate(OnAssetsLoadedDelegate);
+	}
+	else
+	{
+		Handle->BindCompleteDelegate(OnAssetsLoadedDelegate);
+
+		Handle->BindCancelDelegate(FStreamableDelegate::CreateLambda([OnAssetsLoadedDelegate]()
+			{
+				OnAssetsLoadedDelegate.ExecuteIfBound();
+			}));
+	}
+
+	// 这组资产被预加载，但我们不会基于它来阻止体验的开始
+	TSet<FPrimaryAssetId> PreloadAssetList;
+	//@TODO: Determine assets to preload (but not blocking-ly)
+	if (PreloadAssetList.Num() > 0)
+	{
+		AssetManager.ChangeBundleStateForPrimaryAssets(PreloadAssetList.Array(), BundlesToLoad, {});
+	}
 }
 
 void URougeExperienceManagerComponent::OnExperienceLoadComplete()
@@ -155,7 +216,19 @@ void URougeExperienceManagerComponent::OnExperienceLoadComplete()
 
 	auto CollectGameFeaturePluginURLs = [This=this](const UPrimaryDataAsset* Context, const TArray<FString>& FeaturePluginList)
 	{
-		
+		for (const FString& PluginName : FeaturePluginList)
+		{
+			FString PluginURL;
+			//GameFeatureSubSystem中查找PluginURL
+			if (UGameFeaturesSubsystem::Get().GetPluginURLByName(PluginName, /*out*/ PluginURL))
+			{
+				This->GameFeaturePluginURLs.AddUnique(PluginURL);
+			}
+			else
+			{
+				ensureMsgf(false, TEXT("OnExperienceLoadComplete failed to find plugin URL from PluginName %s for experience %s - fix data, ignoring for this run"), *PluginName, *Context->GetPrimaryAssetId().ToString());
+			}
+		}
 	};
 }
 

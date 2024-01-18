@@ -7,12 +7,14 @@
 #include "AI/BaseAI.h"
 #include "..\..\Public\Core\RougePlayerController.h"
 #include "..\..\Public\Core\RougePlayerState.h"
+#include "Assets/RougeAssetManager.h"
 #include "Character/RougeCharacter.h"
 #include "Core/RougeGameSession.h"
 #include "Core/RougeGameState.h"
 #include "Core/RougeReplayPlayerController.h"
 #include "Core/GameModes/RougeExperienceDefinition.h"
 #include "Core/GameModes/RougeExperienceManagerComponent.h"
+#include "Core/GameModes/RougeWorldSettings.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerStart.h"
 #include "HUD/RougeHUD.h"
@@ -33,7 +35,7 @@ void ARougeGameMode::InitGameState()
 {
 	Super::InitGameState();
 
-	//等待扩展组件加载完成
+	//等待Experience管理组件加载完成
 	URougeExperienceManagerComponent* ExperienceComponent = GameState->FindComponentByClass<URougeExperienceManagerComponent>();
 	check(ExperienceComponent);
 	ExperienceComponent->CallOrRegister_OnExperienceLoaded(FOnRougeExperienceLoaded::FDelegate::CreateUObject(this, &ThisClass::OnExperienceLoaded));
@@ -111,6 +113,12 @@ void ARougeGameMode::HandleMatchAssignmentIfNotExpectingOne()
 		ExperienceIdSource = TEXT("OptionsString");
 	}
 
+	// if (!ExperienceId.IsValid() && World->IsPlayInEditor())
+	// {
+	// 	ExperienceId = GetDefault<URougeDeveloperSettings>()->ExperienceOverride;
+	// 	ExperienceIdSource = TEXT("DeveloperSettings");
+	// }
+	
 	if (!ExperienceId.IsValid())
 	{
 		FString ExperienceFromCommandLine;
@@ -121,7 +129,35 @@ void ARougeGameMode::HandleMatchAssignmentIfNotExpectingOne()
 		}
 	}
 
-	
+	if (!ExperienceId.IsValid())
+	{
+		if (ARougeWorldSettings* TypedWorldSettings = Cast<ARougeWorldSettings>(GetWorldSettings()))
+		{
+			ExperienceId = TypedWorldSettings->GetDefaultGameplayExperience();
+			ExperienceIdSource = TEXT("WorldSettings");
+		}
+	}
+
+	URougeAssetManager& AssetManager = URougeAssetManager::Get();
+	FAssetData Dummy;
+	if (ExperienceId.IsValid() && !AssetManager.GetPrimaryAssetData(ExperienceId, /*out*/ Dummy))
+	{
+		UE_LOG(LogTemp, Error, TEXT("EXPERIENCE: Wanted to use %s but couldn't find it, falling back to the default)"), *ExperienceId.ToString());
+		ExperienceId = FPrimaryAssetId();
+	}
+
+	// Final fallback to the default experience
+	// 默认设置
+	if (!ExperienceId.IsValid())
+	{
+		//@TODO: Pull this from a config setting or something
+		//这里对应AssetManager中Primary Asset Type, FName为蓝图的Name
+		ExperienceId = FPrimaryAssetId(FPrimaryAssetType("RougeExperienceDefinition"), FName("BP_Default_RougeExperienceDefinition"));
+		ExperienceIdSource = TEXT("Default");
+	}
+
+	//匹配对应的资源
+	OnMatchAssignmentGiven(ExperienceId, ExperienceIdSource);
 }
 
 void ARougeGameMode::OnExperienceLoaded(const URougeExperienceDefinition* CurrentExperience)
@@ -138,4 +174,22 @@ void ARougeGameMode::OnExperienceLoaded(const URougeExperienceDefinition* Curren
 			}
 		}
 	}
+}
+
+void ARougeGameMode::OnMatchAssignmentGiven(FPrimaryAssetId ExperienceId, const FString& ExperienceIdSource)
+{
+#if WITH_SERVER_CODE
+	if (ExperienceId.IsValid())
+	{
+		UE_LOG(LogTemp, Log, TEXT("Identified experience %s (Source: %s)"), *ExperienceId.ToString(), *ExperienceIdSource);
+
+		URougeExperienceManagerComponent* ExperienceComponent = GameState->FindComponentByClass<URougeExperienceManagerComponent>();
+		check(ExperienceComponent);
+		ExperienceComponent->ServerSetCurrentExperience(ExperienceId);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to identify experience, loading screen will stay up forever"));
+	}
+#endif
 }
