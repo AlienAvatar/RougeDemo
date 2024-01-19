@@ -37,6 +37,8 @@ public:
 
 	bool IsExperienceLoaded() const;
 
+	// 如果加载完成，返回当前的CurrentExperience
+	const URougeExperienceDefinition* GetCurrentExperienceChecked() const;
 #if WITH_SERVER_CODE
 	void ServerSetCurrentExperience(FPrimaryAssetId ExperienceId);
 #endif

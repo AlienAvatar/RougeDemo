@@ -24,13 +24,15 @@ public:
 	// Sets default values for this component's properties
 	URougePawnExtensionComponent(const FObjectInitializer& ObjectInitializer);
 
+	void SetPawnData(const URougePawnData* InPawnData);
+	
 	// 注册并调用委托，如果我们的Pawn已经注册了AbilitySystemComponent，那么就注册OnAbilitySystemInitialized委托
 	void OnAbilitySystemInitialized_RegisterAndCall(FSimpleMulticastDelegate::FDelegate Delegate);
 
 	//注销委托
 	void OnAbilitySystemUninitialized_Register(FSimpleMulticastDelegate::FDelegate Delegate);
 
-	UFUNCTION(BlueprintPure, Category = "Lyra|Pawn")
+	UFUNCTION(BlueprintPure, Category = "Rouge|Pawn")
 	static URougePawnExtensionComponent* FindPawnExtensionComponent(const AActor* Actor) { return (Actor ? Actor->FindComponentByClass<URougePawnExtensionComponent>() : nullptr); }
 
 	template <class T>
@@ -51,7 +53,7 @@ protected:
 	TObjectPtr<URougeAbilitySystemComponent> AbilitySystemComponent;
 
 	/** Pawn data 用来创建 pawn. 从Spwan函数或者实例中指定 */
-	UPROPERTY(EditInstanceOnly, Category = "Lyra|Pawn")
+	UPROPERTY(EditInstanceOnly, Category = "Rouge|Pawn")
 	TObjectPtr<const URougePawnData> PawnData;
 	
 	// UFUNCTION()

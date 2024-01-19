@@ -27,3 +27,6 @@ DECLARE_LOG_CATEGORY_EXTERN(LogGameManager, Log, All);
 UE_LOG(LogGameManager, Verbosity, Format, ##__VA_ARGS__)
 
 ROUGEDEMO_API DECLARE_LOG_CATEGORY_EXTERN(LogRouge, Log, All);
+
+ROUGEDEMO_API FString GetClientServerContextString(UObject* ContextObject = nullptr);
+

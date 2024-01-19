@@ -3,6 +3,7 @@
 
 #include "Character/RougePawnExtensionComponent.h"
 #include "../RougeGameplayTags.h"
+#include "UObject/UObjectBaseUtility.h"
 
 const FName URougePawnExtensionComponent::NAME_ActorFeatureName("PawnExtension");
 
@@ -12,6 +13,8 @@ URougePawnExtensionComponent::URougePawnExtensionComponent(const FObjectInitiali
 	AbilitySystemComponent = nullptr;
 }
 
+
+
 // Called when the game starts
 void URougePawnExtensionComponent::BeginPlay()
 {
@@ -19,6 +22,30 @@ void URougePawnExtensionComponent::BeginPlay()
 
 	// ...
 	
+}
+
+void URougePawnExtensionComponent::SetPawnData(const URougePawnData* InPawnData)
+{
+	check(InPawnData);
+
+	APawn* Pawn = GetPawnChecked<APawn>();
+
+	if (Pawn->GetLocalRole() != ROLE_Authority)
+	{
+		return;
+	}
+
+	if (PawnData)
+	{
+		//UE_LOG(LogTemp, Error, TEXT("Trying to set PawnData [%s] on pawn [%s] that already has valid PawnData [%s]."), *GetNameSafe(InPawnData), *GetNameSafe(Pawn), *GetNameSafe(PawnData));
+		return;
+	}
+	
+	PawnData = InPawnData;
+
+	Pawn->ForceNetUpdate();
+
+	CheckDefaultInitialization();
 }
 
 void URougePawnExtensionComponent::OnAbilitySystemInitialized_RegisterAndCall(

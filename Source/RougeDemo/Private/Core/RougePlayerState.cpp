@@ -5,7 +5,17 @@
 
 #include "Character/RougeCharacter.h"
 #include "..\..\Public\Core\RougePlayerController.h"
+#include "Net/UnrealNetwork.h"
 
+void ARougePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	FDoRepLifetimeParams SharedParams;
+	SharedParams.bIsPushBased = true;
+
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, PawnData, SharedParams);
+}
 void ARougePlayerState::OnRep_Score()
 {
 	Super::OnRep_Score();
@@ -36,4 +46,8 @@ void ARougePlayerState::AddToScore(float ScoreAmount)
 			RougeDemoPlayerController->SetHUDScore(GetScore());
 		}
 	}
+}
+
+void ARougePlayerState::OnRep_PawnData()
+{
 }

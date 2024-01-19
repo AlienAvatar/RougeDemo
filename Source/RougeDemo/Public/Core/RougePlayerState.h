@@ -4,15 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "ModularPlayerState.h"
+#include "Templates/Casts.h"
 #include "RougePlayerState.generated.h"
 
+class URougePawnData;
 class ARougePlayerController;
 class ARougeCharacter;
 /**
  * 
  */
 UCLASS()
-class ROUGEDEMO_API ARougePlayerState : public APlayerState
+class ROUGEDEMO_API ARougePlayerState : public AModularPlayerState
 {
 	GENERATED_BODY()
 
@@ -26,4 +29,15 @@ public:
 	
 	virtual void OnRep_Score() override;
 	void AddToScore(float ScoreAmount);
+
+	template <class T>
+	const T* GetPawnData() const { return Cast<T>(PawnData); }
+
+protected:
+	UPROPERTY(ReplicatedUsing = OnRep_PawnData)
+	TObjectPtr<const URougePawnData> PawnData;
+
+	UFUNCTION()
+	void OnRep_PawnData();
+
 };

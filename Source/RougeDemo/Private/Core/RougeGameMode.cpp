@@ -9,6 +9,7 @@
 #include "..\..\Public\Core\RougePlayerState.h"
 #include "Assets/RougeAssetManager.h"
 #include "Character/RougeCharacter.h"
+#include "Character/RougePawnExtensionComponent.h"
 #include "Core/RougeGameSession.h"
 #include "Core/RougeGameState.h"
 #include "Core/RougeReplayPlayerController.h"
@@ -19,6 +20,8 @@
 #include "GameFramework/PlayerStart.h"
 #include "HUD/RougeHUD.h"
 #include "Kismet/GameplayStatics.h"
+#include "Assets/RougeGameData.h"
+#include "Core/RougePlayerState.h"
 
 ARougeGameMode::ARougeGameMode()
 {
@@ -39,6 +42,34 @@ void ARougeGameMode::InitGameState()
 	URougeExperienceManagerComponent* ExperienceComponent = GameState->FindComponentByClass<URougeExperienceManagerComponent>();
 	check(ExperienceComponent);
 	ExperienceComponent->CallOrRegister_OnExperienceLoaded(FOnRougeExperienceLoaded::FDelegate::CreateUObject(this, &ThisClass::OnExperienceLoaded));
+}
+
+APawn* ARougeGameMode::SpawnDefaultPawnAtTransform_Implementation(AController* NewPlayer,
+	const FTransform& SpawnTransform)
+{
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Instigator = GetInstigator();
+	SpawnInfo.ObjectFlags |= RF_Transient;	// Never save the default player pawns into a map.
+	SpawnInfo.bDeferConstruction = true;
+
+	if (UClass* PawnClass = GetDefaultPawnClassForController(NewPlayer))
+	{
+		if (APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(PawnClass, SpawnTransform, SpawnInfo))
+		{
+			if (URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(SpawnedPawn))
+			{
+				if (const URougePawnData* PawnData = GetPawnDataForController(NewPlayer))
+				{
+					//PawnExtComp->SetPawnData(PawnData);
+				}
+				else
+				{
+					UE_LOG(LogTemp, Error, TEXT("Game mode was unable to set PawnData on the spawned pawn [%s]."), *GetNameSafe(SpawnedPawn));
+				}
+			}
+		}
+	}
+	return Super::SpawnDefaultPawnAtTransform_Implementation(NewPlayer, SpawnTransform);
 }
 
 
@@ -90,6 +121,38 @@ void ARougeGameMode::Pause(bool bPause, bool bOverride)
 		bGameIsPaused = false;
 	}
 	
+}
+
+const URougePawnData* ARougeGameMode::GetPawnDataForController(const AController* InController) const
+{
+	// 查看Pawn Data是否已经在PlayerState中设置
+	// 问题
+	// if (InController != nullptr)
+	// {
+	// 	if (const ARougePlayerState* RougePS = InController->GetPlayerState<ARougePlayerState>())
+	// 	{
+	// 		if (const URougePawnData* PawnData = RougePS->GetPawnData<URougePawnData>())
+	// 		{
+	// 			return PawnData;
+	// 		}
+	// 	}
+	// }
+
+	// 如果没设置，回到当前默认的current experience
+	check(GameState);
+	URougeExperienceManagerComponent* ExperienceComponent = GameState->FindComponentByClass<URougeExperienceManagerComponent>();
+	check(ExperienceComponent);
+	if (ExperienceComponent->IsExperienceLoaded())
+	{
+		const URougeExperienceDefinition* Experience = ExperienceComponent->GetCurrentExperienceChecked();
+		if (Experience->DefaultPawnData != nullptr)
+		{
+			return Experience->DefaultPawnData;
+		}
+	}
+
+	//如果没有PawnData，则返回空
+	return nullptr;
 }
 
 void ARougeGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)

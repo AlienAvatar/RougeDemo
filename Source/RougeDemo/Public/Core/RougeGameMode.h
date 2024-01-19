@@ -12,6 +12,7 @@ class ARougeCharacter;
 class AAIEnemyController;
 class ABaseAI;
 class URougeExperienceDefinition;
+class URougePawnData;
 /**
  * 
  */
@@ -31,9 +32,13 @@ public:
 
 	virtual void Pause(bool bPause, bool bOverride) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Rouge|Pawn")
+	const URougePawnData* GetPawnDataForController(const AController* InController) const;
+	
 	//~AGameModeBase interface
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	virtual void InitGameState() override;
+	virtual APawn* SpawnDefaultPawnAtTransform_Implementation(AController* NewPlayer, const FTransform& SpawnTransform) override;
 	//~End of AGameModeBase interface
 protected:
 	void HandleMatchAssignmentIfNotExpectingOne();

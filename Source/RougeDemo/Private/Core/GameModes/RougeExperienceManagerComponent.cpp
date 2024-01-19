@@ -11,6 +11,7 @@
 #include "Core/GameModes/RougeExperienceDefinition.h"
 #include "Core/GameModes/RougeExperienceManager.h"
 #include "Net/UnrealNetwork.h"
+#include "RougeDemo/RougeDemo.h"
 
 // Sets default values for this component's properties
 URougeExperienceManagerComponent::URougeExperienceManagerComponent(const FObjectInitializer& ObjectInitializer)
@@ -78,14 +79,21 @@ bool URougeExperienceManagerComponent::IsExperienceLoaded() const
 	return (LoadState == ERougeExperienceLoadState::Loaded) && (CurrentExperience != nullptr);
 }
 
+const URougeExperienceDefinition* URougeExperienceManagerComponent::GetCurrentExperienceChecked() const
+{
+	check(LoadState == ERougeExperienceLoadState::Loaded);
+	check(CurrentExperience != nullptr);
+	return CurrentExperience;
+}
+
 void URougeExperienceManagerComponent::ServerSetCurrentExperience(FPrimaryAssetId ExperienceId)
 {
 	//获取AssetManger实例化
 	URougeAssetManager& AssetManager = URougeAssetManager::Get();
-	//根据ID，获取Experience资源路径和class
+	//根据ID，获取Experience资源路径
 	FSoftObjectPath AssetPath = AssetManager.GetPrimaryAssetPath(ExperienceId);
-	FSoftObjectPath TestAssetPath2("/Game/RougeDemo/SRC/Blueprints/System/BP_Default_RougeExperienceDefinition.BP_Default_RougeExperienceDefinition");
-	TSubclassOf<URougeExperienceDefinition> AssetClass = Cast<UClass>(TestAssetPath2.TryLoad());
+	//根据AssetPath,反射得到Class
+	TSubclassOf<URougeExperienceDefinition> AssetClass = Cast<UClass>(AssetPath.TryLoad());
 	check(AssetClass);
 	//获取对应的Experience定义配置
 	const URougeExperienceDefinition* Experience = GetDefault<URougeExperienceDefinition>(AssetClass);
@@ -122,9 +130,10 @@ void URougeExperienceManagerComponent::StartExperienceLoad()
 	//检查当前Experience的读取状态
 	check(LoadState == ERougeExperienceLoadState::Unloaded);
 
-	// UE_LOG(LogTemp, Log, TEXT("EXPERIENCE: StartExperienceLoad(CurrentExperience = %s, %s)"),
-	// *CurrentExperience->GetPrimaryAssetId().ToString(),
-	// *GetClientServerContextString(this));
+	//Log Output: LogTemp: EXPERIENCE: StartExperienceLoad(CurrentExperience = RougeExperienceDefinition:BP_Default_RougeExperienceDefinition, Server)
+	UE_LOG(LogTemp, Log, TEXT("EXPERIENCE: StartExperienceLoad(CurrentExperience = %s, %s)"),
+	*CurrentExperience->GetPrimaryAssetId().ToString(),
+	*GetClientServerContextString(this));
 	
 	//设置当前Experience的读取状态为loading
 	LoadState = ERougeExperienceLoadState::Loading;
@@ -133,9 +142,11 @@ void URougeExperienceManagerComponent::StartExperienceLoad()
 	URougeAssetManager& AssetManager = URougeAssetManager::Get();
 
 	//Id List
+	// FPrimaryAssetId 包括 Primary Asset Type 和 Asset Name
 	TSet<FPrimaryAssetId> BundleAssetList;
 	TSet<FSoftObjectPath> RawAssetList;
 
+	//对URougeExperienceDefinition中的配置数据进行加载
 	BundleAssetList.Add(CurrentExperience->GetPrimaryAssetId());
 	for (const TObjectPtr<URougeExperienceActionSet>& ActionSet : CurrentExperience->ActionSets)
 	{
@@ -164,7 +175,7 @@ void URougeExperienceManagerComponent::StartExperienceLoad()
 		BundlesToLoad.Add(UGameFeaturesSubsystemSettings::LoadStateServer);
 	}
 
-	//
+	//AssetManager.ChangeBundleStateForPrimaryAssets方法，其内部会搜索属于AssetBundles的所有资源，然后执行异步加载操作。加载完成后进入LoadingGameFeatures状态
 	const TSharedPtr<FStreamableHandle> BundleLoadHandle = AssetManager.ChangeBundleStateForPrimaryAssets(BundleAssetList.Array(), BundlesToLoad, {}, false, FStreamableDelegate(), FStreamableManager::AsyncLoadHighPriority);
 	//按顺序加载资源
 	const TSharedPtr<FStreamableHandle> RawLoadHandle = AssetManager.LoadAssetList(RawAssetList.Array(), FStreamableDelegate(), FStreamableManager::AsyncLoadHighPriority, TEXT("StartExperienceLoad()"));
@@ -193,9 +204,10 @@ void URougeExperienceManagerComponent::StartExperienceLoad()
 		Handle->BindCompleteDelegate(OnAssetsLoadedDelegate);
 
 		Handle->BindCancelDelegate(FStreamableDelegate::CreateLambda([OnAssetsLoadedDelegate]()
-			{
-				OnAssetsLoadedDelegate.ExecuteIfBound();
-			}));
+		{
+			//执行委托
+			OnAssetsLoadedDelegate.ExecuteIfBound();
+		}));
 	}
 
 	// 这组资产被预加载，但我们不会基于它来阻止体验的开始
