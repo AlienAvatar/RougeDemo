@@ -47,6 +47,7 @@ void ARougeGameMode::InitGameState()
 APawn* ARougeGameMode::SpawnDefaultPawnAtTransform_Implementation(AController* NewPlayer,
 	const FTransform& SpawnTransform)
 {
+	//配置参数
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.Instigator = GetInstigator();
 	SpawnInfo.ObjectFlags |= RF_Transient;	// Never save the default player pawns into a map.
@@ -54,13 +55,14 @@ APawn* ARougeGameMode::SpawnDefaultPawnAtTransform_Implementation(AController* N
 
 	if (UClass* PawnClass = GetDefaultPawnClassForController(NewPlayer))
 	{
+		//生成Pawn
 		if (APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(PawnClass, SpawnTransform, SpawnInfo))
 		{
 			if (URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(SpawnedPawn))
 			{
 				if (const URougePawnData* PawnData = GetPawnDataForController(NewPlayer))
 				{
-					//PawnExtComp->SetPawnData(PawnData);
+					PawnExtComp->SetPawnData(PawnData);
 				}
 				else
 				{
@@ -126,17 +128,17 @@ void ARougeGameMode::Pause(bool bPause, bool bOverride)
 const URougePawnData* ARougeGameMode::GetPawnDataForController(const AController* InController) const
 {
 	// 查看Pawn Data是否已经在PlayerState中设置
-	// 问题
-	// if (InController != nullptr)
-	// {
-	// 	if (const ARougePlayerState* RougePS = InController->GetPlayerState<ARougePlayerState>())
-	// 	{
-	// 		if (const URougePawnData* PawnData = RougePS->GetPawnData<URougePawnData>())
-	// 		{
-	// 			return PawnData;
-	// 		}
-	// 	}
-	// }
+	// 问题无法通过模板参数获取URougePawnData
+	if (InController != nullptr)
+	{
+		if (const ARougePlayerState* RougePS = InController->GetPlayerState<ARougePlayerState>())
+		{
+			if (const URougePawnData* PawnData = RougePS->GetPawnData())
+			{
+				return PawnData;
+			}
+		}
+	}
 
 	// 如果没设置，回到当前默认的current experience
 	check(GameState);

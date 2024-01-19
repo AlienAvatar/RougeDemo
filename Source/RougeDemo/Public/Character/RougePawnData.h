@@ -7,6 +7,7 @@
 #include "RougePawnData.generated.h"
 
 class URougeInputConfig;
+class URougeAbilitySet;
 /**
  * 
  */
@@ -23,6 +24,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rouge|Pawn")
 	TSubclassOf<APawn> PawnClass;
+
+	//赋予Pawn Ability
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rouge|Abilities")
+	TArray<TObjectPtr<URougeAbilitySet>> AbilitySets;
 protected:
 
 

@@ -5,12 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
 #include "ModularPlayerState.h"
+#include "Character/RougePawnData.h"
 #include "Templates/Casts.h"
 #include "RougePlayerState.generated.h"
 
 class URougePawnData;
 class ARougePlayerController;
 class ARougeCharacter;
+class URougeExperienceDefinition;
 /**
  * 
  */
@@ -28,16 +30,20 @@ private:
 public:
 	
 	virtual void OnRep_Score() override;
+	
 	void AddToScore(float ScoreAmount);
 
-	template <class T>
-	const T* GetPawnData() const { return Cast<T>(PawnData); }
+	const URougePawnData* GetPawnData() const { return Cast<URougePawnData>(PawnData); }
 
+	void SetPawnData(const URougePawnData* InPawnData);
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_PawnData)
 	TObjectPtr<const URougePawnData> PawnData;
 
 	UFUNCTION()
 	void OnRep_PawnData();
+
+private:
+	void OnExperienceLoaded(const URougeExperienceDefinition* CurrentExperience);
 
 };
