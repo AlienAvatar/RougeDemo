@@ -3,14 +3,82 @@
 
 #include "..\..\Public\Core\RougePlayerState.h"
 
+#include "AbilitySystemComponent.h"
 #include "Character/RougeCharacter.h"
 #include "..\..\Public\Core\RougePlayerController.h"
 #include "AbilitySystem/RougeAbilitySet.h"
+#include "AbilitySystem/RougeAbilitySystemComponent.h"
+#include "Character/RougePawnExtensionComponent.h"
+#include "Components/GameFrameworkComponentManager.h"
 #include "Core/RougeGameMode.h"
+#include "Core/GameModes/RougeExperienceManagerComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "RougeDemo/RougeDemo.h"
 
 DEFINE_LOG_CATEGORY(LogPlayerState);
+const FName ARougePlayerState::NAME_RougeAbilityReady("RougeAbilitiesReady");
+
+ARougePlayerState::ARougePlayerState(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
+	AbilitySystemComponent = ObjectInitializer.CreateDefaultSubobject<URougeAbilitySystemComponent>(this, TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+}
+
+void ARougePlayerState::Reset()
+{
+	Super::Reset();
+}
+
+void ARougePlayerState::ClientInitialize(AController* C)
+{
+	Super::ClientInitialize(C);
+
+	if (URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(GetPawn()))
+	{
+		PawnExtComp->CheckDefaultInitialization();
+	}
+}
+
+void ARougePlayerState::CopyProperties(APlayerState* PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+}
+
+void ARougePlayerState::OnDeactivated()
+{
+	Super::OnDeactivated();
+
+	
+}
+
+void ARougePlayerState::OnReactivated()
+{
+	Super::OnReactivated();
+}
+
+void ARougePlayerState::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
+}
+
+void ARougePlayerState::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	check(AbilitySystemComponent);
+	AbilitySystemComponent->InitAbilityActorInfo(this, GetPawn());
+
+	if (GetNetMode() != NM_Client)
+	{
+		AGameStateBase* GameState = GetWorld()->GetGameState();
+		check(GameState);
+		URougeExperienceManagerComponent* ExperienceComponent = GameState->FindComponentByClass<URougeExperienceManagerComponent>();
+		check(ExperienceComponent);
+		ExperienceComponent->CallOrRegister_OnExperienceLoaded(FOnRougeExperienceLoaded::FDelegate::CreateUObject(this, &ThisClass::OnExperienceLoaded));
+	}
+}
 
 void ARougePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -21,6 +89,7 @@ void ARougePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, PawnData, SharedParams);
 }
+
 void ARougePlayerState::OnRep_Score()
 {
 	Super::OnRep_Score();
@@ -76,10 +145,13 @@ void ARougePlayerState::SetPawnData(const URougePawnData* InPawnData)
 	{
 		if (AbilitySet)
 		{
-			//AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, nullptr);
+			AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, nullptr);
 		}
 	}
 	
+	UGameFrameworkComponentManager::SendGameFrameworkComponentExtensionEvent(this, NAME_RougeAbilityReady);
+	
+	ForceNetUpdate();
 }
 
 void ARougePlayerState::OnRep_PawnData()

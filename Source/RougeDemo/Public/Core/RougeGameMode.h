@@ -39,6 +39,7 @@ public:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	virtual void InitGameState() override;
 	virtual APawn* SpawnDefaultPawnAtTransform_Implementation(AController* NewPlayer, const FTransform& SpawnTransform) override;
+	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 	//~End of AGameModeBase interface
 protected:
 	void HandleMatchAssignmentIfNotExpectingOne();

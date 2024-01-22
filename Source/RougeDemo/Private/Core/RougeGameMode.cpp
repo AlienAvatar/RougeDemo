@@ -69,9 +69,33 @@ APawn* ARougeGameMode::SpawnDefaultPawnAtTransform_Implementation(AController* N
 					UE_LOG(LogTemp, Error, TEXT("Game mode was unable to set PawnData on the spawned pawn [%s]."), *GetNameSafe(SpawnedPawn));
 				}
 			}
+
+			SpawnedPawn->FinishSpawning(SpawnTransform);
+
+			return SpawnedPawn;
+		}else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Game mode was unable to spawn Pawn of class [%s] at [%s]."), *GetNameSafe(PawnClass), *SpawnTransform.ToHumanReadableString());
 		}
 	}
-	return Super::SpawnDefaultPawnAtTransform_Implementation(NewPlayer, SpawnTransform);
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Game mode was unable to spawn Pawn due to NULL pawn class."));
+	}
+	return nullptr;
+}
+
+UClass* ARougeGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
+{
+	if (const URougePawnData* PawnData = GetPawnDataForController(InController))
+	{
+		if (PawnData->PawnClass)
+		{
+			return PawnData->PawnClass;
+		}
+	}
+	
+	return Super::GetDefaultPawnClassForController_Implementation(InController);
 }
 
 
@@ -144,7 +168,8 @@ const URougePawnData* ARougeGameMode::GetPawnDataForController(const AController
 	check(GameState);
 	URougeExperienceManagerComponent* ExperienceComponent = GameState->FindComponentByClass<URougeExperienceManagerComponent>();
 	check(ExperienceComponent);
-	if (ExperienceComponent->IsExperienceLoaded())
+	//检查Experience是否加载完成
+ 	if (ExperienceComponent->IsExperienceLoaded())
 	{
 		const URougeExperienceDefinition* Experience = ExperienceComponent->GetCurrentExperienceChecked();
 		if (Experience->DefaultPawnData != nullptr)

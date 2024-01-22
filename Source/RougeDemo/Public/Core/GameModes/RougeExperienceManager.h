@@ -16,4 +16,9 @@ class ROUGEDEMO_API URougeExperienceManager : public UEngineSubsystem
 
 public:
 	static bool RequestToDeactivatePlugin(const FString PluginURL);
+
+	static void NotifyOfPluginActivation(const FString PluginURL);
+
+private:
+	TMap<FString, int32> GameFeaturePluginRequestCountMap;
 };

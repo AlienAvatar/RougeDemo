@@ -6,6 +6,11 @@
 #include "Components/GameStateComponent.h"
 #include "RougeExperienceManagerComponent.generated.h"
 
+namespace UE::GameFeatures
+{
+	struct FResult;
+}
+
 class URougeExperienceDefinition;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnRougeExperienceLoaded, const URougeExperienceDefinition* /*Experience*/);
 
@@ -19,6 +24,25 @@ enum class ERougeExperienceLoadState
 	Loaded,
 	Deactivating
 };
+
+namespace RougeConsoleVariables
+{
+	static float ExperienceLoadRandomDelayMin = 0.0f;
+	static FAutoConsoleVariableRef CVarExperienceLoadRandomDelayMin(
+		TEXT("Rouge.chaos.ExperienceDelayLoad.MinSecs"),
+		ExperienceLoadRandomDelayMin,
+		TEXT("This value (in seconds) will be added as a delay of load completion of the experience (along with the random value Rouge.chaos.ExperienceDelayLoad.RandomSecs)"),
+		ECVF_Default);
+
+	static float ExperienceLoadRandomDelayRange = 0.0f;
+	static FAutoConsoleVariableRef CVarExperienceLoadRandomDelayRange(
+		TEXT("Rouge.chaos.ExperienceDelayLoad.RandomSecs"),
+		ExperienceLoadRandomDelayRange,
+		TEXT("A random amount of time between 0 and this value (in seconds) will be added as a delay of load completion of the experience (along with the fixed value Rouge.chaos.ExperienceDelayLoad.MinSecs)"),
+		ECVF_Default);
+
+	
+}
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ROUGEDEMO_API URougeExperienceManagerComponent : public UGameStateComponent
@@ -57,17 +81,33 @@ private:
 	void OnRep_CurrentExperience();
 	void StartExperienceLoad();
 	void OnExperienceLoadComplete();
+	void OnGameFeaturePluginLoadComplete(const UE::GameFeatures::FResult& Result);
 	
 	void OnActionDeactivationCompleted();
 	void OnAllActionsDeactivated();
-	
+
+	int32 NumGameFeaturePluginsLoading = 0;
 	int32 NumObservedPausers = 0;
 	int32 NumExpectedPausers = 0;
 
-	//委托代理当扩展组件加载完毕
-	FOnRougeExperienceLoaded OnExperienceLoaded;
+
 
 	UPROPERTY(ReplicatedUsing=OnRep_CurrentExperience)
 	TObjectPtr<const URougeExperienceDefinition> CurrentExperience;
 
+	//Experience加载完成
+	void OnExperienceFullLoadCompleted();
+
+	/**
+	* Delegate called when the experience has finished loading just before others
+	* 委托调用，在其它未加载时当Experience完成加载，高优先级
+	* (e.g., subsystems that set up for regular gameplay)
+	*/
+	FOnRougeExperienceLoaded OnExperienceLoaded_HighPriority;
+
+	//委托代理当扩展组件加载完毕
+	FOnRougeExperienceLoaded OnExperienceLoaded;
+	
+	//委托代理当扩展组件加载完毕 低优先级
+	FOnRougeExperienceLoaded OnExperienceLoaded_LowPriority;
 };

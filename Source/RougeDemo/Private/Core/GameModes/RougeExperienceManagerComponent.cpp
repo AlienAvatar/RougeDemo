@@ -12,6 +12,7 @@
 #include "Core/GameModes/RougeExperienceManager.h"
 #include "Net/UnrealNetwork.h"
 #include "RougeDemo/RougeDemo.h"
+#include "Settings/RougeSettingsLocal.h"
 
 // Sets default values for this component's properties
 URougeExperienceManagerComponent::URougeExperienceManagerComponent(const FObjectInitializer& ObjectInitializer)
@@ -226,6 +227,7 @@ void URougeExperienceManagerComponent::OnExperienceLoadComplete()
 
 	GameFeaturePluginURLs.Reset();
 
+	//加载插件
 	auto CollectGameFeaturePluginURLs = [This=this](const UPrimaryDataAsset* Context, const TArray<FString>& FeaturePluginList)
 	{
 		for (const FString& PluginName : FeaturePluginList)
@@ -242,6 +244,41 @@ void URougeExperienceManagerComponent::OnExperienceLoadComplete()
 			}
 		}
 	};
+
+	CollectGameFeaturePluginURLs(CurrentExperience, CurrentExperience->GameFeaturesToEnable);
+	for (const TObjectPtr<URougeExperienceActionSet>& ActionSet : CurrentExperience->ActionSets)
+	{
+		if (ActionSet != nullptr)
+		{
+			CollectGameFeaturePluginURLs(ActionSet, ActionSet->GameFeaturesToEnable);
+		}
+	}
+
+	// Load and activate the features	
+	NumGameFeaturePluginsLoading = GameFeaturePluginURLs.Num();
+	if (NumGameFeaturePluginsLoading > 0)
+	{
+		LoadState = ERougeExperienceLoadState::LoadingGameFeatures;
+		for (const FString& PluginURL : GameFeaturePluginURLs)
+		{
+			URougeExperienceManager::NotifyOfPluginActivation(PluginURL);
+			UGameFeaturesSubsystem::Get().LoadAndActivateGameFeaturePlugin(PluginURL, FGameFeaturePluginLoadComplete::CreateUObject(this, &ThisClass::OnGameFeaturePluginLoadComplete));
+		}
+	}
+	else
+	{
+		OnExperienceFullLoadCompleted();
+	}
+}
+
+void URougeExperienceManagerComponent::OnGameFeaturePluginLoadComplete(const UE::GameFeatures::FResult& Result)
+{
+	NumGameFeaturePluginsLoading--;
+
+	if (NumGameFeaturePluginsLoading == 0)
+	{
+		OnExperienceFullLoadCompleted();
+	}
 }
 
 void URougeExperienceManagerComponent::OnActionDeactivationCompleted()
@@ -259,5 +296,82 @@ void URougeExperienceManagerComponent::OnAllActionsDeactivated()
 {
 	//To Do
 	LoadState = ERougeExperienceLoadState::Unloaded;
+}
+
+void URougeExperienceManagerComponent::OnExperienceFullLoadCompleted()
+{
+	check(LoadState != ERougeExperienceLoadState::Loaded);
+
+	// Insert a random delay for testing (if configured)
+	// 用一个随机等待时间进行测试
+	if (LoadState != ERougeExperienceLoadState::LoadingChaosTestingDelay)
+	{
+		//const float DelaySecs = 2.0f;
+		float RandomTime = FMath::Max(0.0f, 0.0f + FMath::FRand() * 0.0f);
+		const float DelaySecs = RandomTime;
+		if (DelaySecs > 0.0f)
+		{
+			FTimerHandle DummyHandle;
+
+			LoadState = ERougeExperienceLoadState::LoadingChaosTestingDelay;
+			//延迟
+			GetWorld()->GetTimerManager().SetTimer(DummyHandle, this, &ThisClass::OnExperienceFullLoadCompleted, DelaySecs, /*bLooping=*/ false);
+
+			return;
+		}
+	}
+
+	LoadState = ERougeExperienceLoadState::ExecutingActions;
+
+	// Execute the actions
+	FGameFeatureActivatingContext Context;
+
+	// Only apply to our specific world context if set
+	const FWorldContext* ExistingWorldContext = GEngine->GetWorldContextFromWorld(GetWorld());
+	if (ExistingWorldContext)
+	{
+		Context.SetRequiredWorldContextHandle(ExistingWorldContext->ContextHandle);
+	}
+
+	auto ActivateListOfActions = [&Context](const TArray<UGameFeatureAction*>& ActionList)
+	{
+		for (UGameFeatureAction* Action : ActionList)
+		{
+			if (Action != nullptr)
+			{
+				//@TODO: The fact that these don't take a world are potentially problematic in client-server PIE
+				// The current behavior matches systems like gameplay tags where loading and registering apply to the entire process,
+				// but actually applying the results to actors is restricted to a specific world
+				Action->OnGameFeatureRegistering();
+				Action->OnGameFeatureLoading();
+				Action->OnGameFeatureActivating(Context);
+			}
+		}
+	};
+
+	ActivateListOfActions(CurrentExperience->Actions);
+	for (const TObjectPtr<URougeExperienceActionSet>& ActionSet : CurrentExperience->ActionSets)
+	{
+		if (ActionSet != nullptr)
+		{
+			ActivateListOfActions(ActionSet->Actions);
+		}
+	}
+
+	LoadState = ERougeExperienceLoadState::Loaded;
+
+	OnExperienceLoaded_HighPriority.Broadcast(CurrentExperience);
+	OnExperienceLoaded_HighPriority.Clear();
+	
+	OnExperienceLoaded.Broadcast(CurrentExperience);
+	OnExperienceLoaded.Clear();
+	
+	OnExperienceLoaded_LowPriority.Broadcast(CurrentExperience);
+	OnExperienceLoaded_LowPriority.Clear();
+
+	// Apply any necessary scalability settings
+	#if !UE_SERVER
+	URougeSettingsLocal::Get()->OnExperienceLoaded();
+#endif
 }
 
