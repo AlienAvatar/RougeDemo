@@ -24,21 +24,68 @@
 
 DEFINE_LOG_CATEGORY(LogRougeController);
 
+ARougePlayerController::ARougePlayerController(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+}
+
+void ARougePlayerController::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
+}
+
 void ARougePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetActorHiddenInGame(false);
+	
 	RougeDemoHUD = Cast<ARougeHUD>(GetHUD());
 	SetupPlayer();
 }
 
+void ARougePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+}
+
+void ARougePlayerController::OnUnPossess()
+{
+	Super::OnUnPossess();
+}
+
+void ARougePlayerController::InitPlayerState()
+{
+	Super::InitPlayerState();
+	//BroadcastOnPlayerStateChanged();
+}
+
+void ARougePlayerController::CleanupPlayerState()
+{
+	Super::CleanupPlayerState();
+}
+
+void ARougePlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+}
+
+void ARougePlayerController::ReceivedPlayer()
+{
+	Super::ReceivedPlayer();
+}
+
+void ARougePlayerController::PlayerTick(float DeltaTime)
+{
+	Super::PlayerTick(DeltaTime);
+}
 
 
 void ARougePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("Test", IE_Pressed, this, &ARougePlayerController::TestAction);
+	//InputComponent->BindAction("Test", IE_Pressed, this, &ARougePlayerController::TestAction);
 }
 
 void ARougePlayerController::SetHUDHealth(float Health, float MaxHealth)

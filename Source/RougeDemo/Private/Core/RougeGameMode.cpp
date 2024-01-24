@@ -56,7 +56,7 @@ APawn* ARougeGameMode::SpawnDefaultPawnAtTransform_Implementation(AController* N
 	if (UClass* PawnClass = GetDefaultPawnClassForController(NewPlayer))
 	{
 		//生成Pawn
-		if (APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(PawnClass, SpawnTransform, SpawnInfo))
+ 		if (APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(PawnClass, SpawnTransform, SpawnInfo))
 		{
 			if (URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(SpawnedPawn))
 			{

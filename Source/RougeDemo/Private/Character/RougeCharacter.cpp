@@ -7,7 +7,7 @@
 #include "AI/BaseAI.h"
 #include "AI/BaseAIAnimInstance.h"
 #include "Camera/CameraComponent.h"
-#include "Character/RougeDemoAnimInstance.h"
+#include "Character/RougeAnimInstance.h"
 #include "Components/AbilityComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -96,7 +96,7 @@ void ARougeCharacter::OnBeginPlay()
 	GetMesh()->AddTickPrerequisiteActor(this);
 
 	//设置动画实例
-	RougeDemoAnimInstance = Cast<URougeDemoAnimInstance>(GetMesh()->GetAnimInstance());
+	RougeDemoAnimInstance = Cast<URougeAnimInstance>(GetMesh()->GetAnimInstance());
 	//设置Controller
 	RougeDemoPlayerController = Cast<ARougePlayerController>(Controller);
 	//绑定受击函数
@@ -368,7 +368,7 @@ void ARougeCharacter::UpdateHealthHUD()
 
 void ARougeCharacter::PlayHitReactMontage(EMovementDirection HitDirection)
 {
-	URougeDemoAnimInstance* AnimInstance = Cast<URougeDemoAnimInstance>(GetMesh()->GetAnimInstance());
+	URougeAnimInstance* AnimInstance = Cast<URougeAnimInstance>(GetMesh()->GetAnimInstance());
 	if(AnimInstance)
 	{
 		UAnimMontage* HitMontage = nullptr;

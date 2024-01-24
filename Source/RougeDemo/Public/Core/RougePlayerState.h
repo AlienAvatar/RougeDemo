@@ -15,7 +15,8 @@ class ARougePlayerController;
 class ARougeCharacter;
 class URougeExperienceDefinition;
 /**
- * 
+ * Rouge玩家状态（ARougePlayerState）拥有用于所有玩家特定技能和行为的技能系统组件
+ * 将技能系统组件添加到玩家状态（Player State）类的主要优势是，它有助于将GAS状态逻辑与底层 Pawn 数据分开
  */
 UCLASS()
 class ROUGEDEMO_API ARougePlayerState : public AModularPlayerState

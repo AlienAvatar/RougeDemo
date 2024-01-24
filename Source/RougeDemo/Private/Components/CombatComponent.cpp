@@ -5,7 +5,7 @@
 
 #include "AI/BaseAI.h"
 #include "Character/PlayerKatanaCharacter.h"
-#include "Character/RougeDemoAnimInstance.h"
+#include "Character/RougeAnimInstance.h"
 #include "Character/RougeCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -215,7 +215,7 @@ void UCombatComponent::OnFinisherStart()
 		//关闭目标的锁定UI
 		ExecutionEnemyRef->ToggleMarket(false);
 
-		URougeDemoAnimInstance* AnimInstance = Cast<URougeDemoAnimInstance>(RougeDemoCharacter->GetMesh()->GetAnimInstance());
+		URougeAnimInstance* AnimInstance = Cast<URougeAnimInstance>(RougeDemoCharacter->GetMesh()->GetAnimInstance());
 		if(AnimInstance)
 		{
 			//播放处决动画

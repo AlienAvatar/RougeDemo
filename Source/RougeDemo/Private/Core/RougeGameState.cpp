@@ -17,6 +17,17 @@ ARougeGameState::ARougeGameState(const FObjectInitializer& ObjectInitializer)
 	ExperienceManagerComponent = CreateDefaultSubobject<URougeExperienceManagerComponent>(TEXT("ExperienceManagerComponent"));
 }
 
+void ARougeGameState::AddPlayerState(APlayerState* PlayerState)
+{
+	Super::AddPlayerState(PlayerState);
+}
+
+void ARougeGameState::RemovePlayerState(APlayerState* PlayerState)
+{
+	Super::RemovePlayerState(PlayerState);
+}
+
+
 void ARougeGameState::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
@@ -26,6 +37,7 @@ void ARougeGameState::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	//初始化Actor的技能信息
 	AbilitySystemComponent->InitAbilityActorInfo(/*Owner=*/ this, /*Avatar=*/ this);
 }
 

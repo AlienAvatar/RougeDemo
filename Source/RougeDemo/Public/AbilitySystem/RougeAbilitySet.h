@@ -32,6 +32,7 @@ public:
 	FGameplayTag InputTag;
 };
 
+
 USTRUCT(BlueprintType)
 struct FRougeAbilitySet_GrantedHandles
 {
@@ -60,9 +61,8 @@ protected:
 	TArray<TObjectPtr<UAttributeSet>> GrantedAttributeSets;
 };
 
-
 /**
- * 
+ *  Rouge技能集 （ URougeAbilitySet ）是一种可以从内容浏览器创建的 数据资产（Data Asset） 类型
  */
 UCLASS()
 class ROUGEDEMO_API URougeAbilitySet : public UPrimaryDataAsset

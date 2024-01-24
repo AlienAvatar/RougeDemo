@@ -49,8 +49,6 @@ void ARougePlayerState::CopyProperties(APlayerState* PlayerState)
 void ARougePlayerState::OnDeactivated()
 {
 	Super::OnDeactivated();
-
-	
 }
 
 void ARougePlayerState::OnReactivated()

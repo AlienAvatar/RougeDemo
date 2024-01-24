@@ -3,7 +3,7 @@
 
 #include "Character/PlayerKatanaCharacter.h"
 
-#include "Character/RougeDemoAnimInstance.h"
+#include "Character/RougeAnimInstance.h"
 #include "Components/CombatComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"

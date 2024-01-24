@@ -20,7 +20,7 @@
 
 class URougePawnExtensionComponent;
 class UAbilityComponent;
-class URougeDemoAnimInstance;
+class URougeAnimInstance;
 class UCombatComponent;
 class ULockOnComponent;
 class UCameraComponent;
@@ -220,7 +220,7 @@ protected:
 	float Speed;
 
 	UPROPERTY()
-	URougeDemoAnimInstance* RougeDemoAnimInstance;
+	URougeAnimInstance* RougeDemoAnimInstance;
 
 	void StartSprint();
 
@@ -307,7 +307,7 @@ public:
 	ULockOnComponent* GetLockOnComp() const { return LockOnComp; }
 	void SetDisableInput(bool bNewDisableInput);
 	UCombatComponent* GetCombatComponent() const { return CombatComp; }
-	URougeDemoAnimInstance* GetRougeDemoAnimationInstance() const { return RougeDemoAnimInstance; }
+	URougeAnimInstance* GetRougeDemoAnimationInstance() const { return RougeDemoAnimInstance; }
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	URougeAbilitySystemComponent* GetRougeAbilitySystemComponent() const;

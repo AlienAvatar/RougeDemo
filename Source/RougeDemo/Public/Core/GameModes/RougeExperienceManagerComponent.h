@@ -77,6 +77,7 @@ private:
 
 	ERougeExperienceLoadState LoadState = ERougeExperienceLoadState::Unloaded;
 
+	//开始加载
 	UFUNCTION()
 	void OnRep_CurrentExperience();
 	void StartExperienceLoad();

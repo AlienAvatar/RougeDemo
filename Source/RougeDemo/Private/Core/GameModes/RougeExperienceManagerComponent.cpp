@@ -123,6 +123,7 @@ void URougeExperienceManagerComponent::BeginPlay()
 
 void URougeExperienceManagerComponent::OnRep_CurrentExperience()
 {
+	StartExperienceLoad();
 }
 
 void URougeExperienceManagerComponent::StartExperienceLoad()

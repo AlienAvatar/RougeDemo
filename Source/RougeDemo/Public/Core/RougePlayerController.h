@@ -22,27 +22,27 @@ class ROUGEDEMO_API ARougePlayerController : public APlayerController, public IC
 {
 	GENERATED_BODY()
 
-protected:
-	virtual void BeginPlay() override;
-	
-	UPROPERTY()
-	ARougeHUD* RougeDemoHUD;
-
-	// GAS will instead it
-	UPROPERTY()
-	UAbilityComponent* AbilityComponent; 
-
-	UPROPERTY(EditDefaultsOnly, Category="DataTable")
-	UDataTable* DT_ActiveAbilities;
-
-	UPROPERTY(EditDefaultsOnly, Category="DataTable")
-	UDataTable* DT_PassiveAbilities;
-
-	virtual void SetupInputComponent() override;
-
-	UPROPERTY(EditDefaultsOnly, Category="UI")
-	TSubclassOf<ULevelMasterWidget> LevelMasterWidgetClass;
 public:
+	ARougePlayerController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	
+	//~AActor interface
+	virtual void PreInitializeComponents() override;
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	//~End of AActor interface
+
+	//~AController interface
+	virtual void OnUnPossess() override;
+	virtual void InitPlayerState() override;
+	virtual void CleanupPlayerState() override;
+	virtual void OnRep_PlayerState() override;
+	//~End of AController interface
+
+	//~APlayerController interface
+	virtual void ReceivedPlayer() override;
+	virtual void PlayerTick(float DeltaTime) override;
+	//~End of APlayerController interface
+	
 	void SetHUDHealth(float Health, float MaxHealth);
 	void SetHUDScore(float Score);
 	void SetHUDSkillValue(float SkillValue,float MaxSkillValue);
@@ -61,6 +61,24 @@ public:
 
 	//更新UI
 	void UpdateHotbar();
+protected:
+	UPROPERTY()
+	ARougeHUD* RougeDemoHUD;
+
+	// GAS will instead it
+	UPROPERTY()
+	UAbilityComponent* AbilityComponent; 
+
+	UPROPERTY(EditDefaultsOnly, Category="DataTable")
+	UDataTable* DT_ActiveAbilities;
+
+	UPROPERTY(EditDefaultsOnly, Category="DataTable")
+	UDataTable* DT_PassiveAbilities;
+
+	virtual void SetupInputComponent() override;
+
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<ULevelMasterWidget> LevelMasterWidgetClass;
 private:
 	void SetupPlayer();
 

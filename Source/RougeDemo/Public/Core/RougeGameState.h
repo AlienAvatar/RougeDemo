@@ -10,7 +10,7 @@
 class URougeAbilitySystemComponent;
 class URougeExperienceManagerComponent;
 /**
- * 
+ * 高级游戏逻辑由 Rouge游戏状态（ARougeGameState）类在服务器端进行管理
  */
 UCLASS()
 class ROUGEDEMO_API ARougeGameState : public AModularGameStateBase
@@ -20,6 +20,11 @@ class ROUGEDEMO_API ARougeGameState : public AModularGameStateBase
 public:
 	ARougeGameState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+	//~AGameStateBase interface
+	virtual void AddPlayerState(APlayerState* PlayerState) override;
+	virtual void RemovePlayerState(APlayerState* PlayerState) override;
+	//~End of AGameStateBase interface
+	
 	//~AActor interface
 	virtual void PreInitializeComponents() override;
 	virtual void PostInitializeComponents() override;

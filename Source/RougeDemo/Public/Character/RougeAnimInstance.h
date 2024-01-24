@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "Animation/AnimInstance.h"
 #include "Enum/EMovementDirection.h"
 #include "Enum/ERotationMode.h"
@@ -11,15 +12,16 @@
 #include "Enum/EOverlayState.h"
 #include "Enum/EStance.h"
 #include "Struct/VelocityBlend.h"
-#include "RougeDemoAnimInstance.generated.h"
+#include "RougeAnimInstance.generated.h"
 
+class UAbilitySystemComponent;
 class ARougeCharacter;
 class UCurveVector;
 /**
  * 
  */
 UCLASS()
-class ROUGEDEMO_API URougeDemoAnimInstance : public UAnimInstance
+class ROUGEDEMO_API URougeAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
@@ -27,7 +29,11 @@ public:
 	virtual void NativeInitializeAnimation() override;
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-	
+
+	virtual void InitializeWithAbilitySystem(UAbilitySystemComponent* ASC);
+
+	UPROPERTY(EditDefaultsOnly, Category = "GameplayTags")
+	FGameplayTagBlueprintPropertyMap GameplayTagPropertyMap;
 private:
 	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
 	bool bIsAccelerating;

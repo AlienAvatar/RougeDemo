@@ -5,7 +5,7 @@
 
 #include "AI/BaseAI.h"
 #include "Character/PlayerKatanaCharacter.h"
-#include "Character/RougeDemoAnimInstance.h"
+#include "Character/RougeAnimInstance.h"
 #include "Components/BoxComponent.h"
 #include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
