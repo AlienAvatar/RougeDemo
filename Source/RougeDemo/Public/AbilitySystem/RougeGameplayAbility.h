@@ -38,8 +38,8 @@ public:
 	virtual void OnPawnAvatarSet();
 
 	//当Ability system由Pawn初始化完成
-	UFUNCTION(BlueprintImplementableEvent, Category = Ability, DisplayName = "OnPawnAvatarSet")
-	void K2_OnPawnAvatarSet();
+	/*UFUNCTION(BlueprintImplementableEvent, Category = Ability, DisplayName = "OnPawnAvatarSet")
+	void K2_OnPawnAvatarSet();*/
 
 	void TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;
 

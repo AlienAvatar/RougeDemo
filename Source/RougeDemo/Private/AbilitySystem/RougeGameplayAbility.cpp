@@ -7,7 +7,7 @@
 
 void URougeGameplayAbility::OnPawnAvatarSet()
 {
-	K2_OnPawnAvatarSet();
+	//K2_OnPawnAvatarSet();
 }
 
 void URougeGameplayAbility::TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo,

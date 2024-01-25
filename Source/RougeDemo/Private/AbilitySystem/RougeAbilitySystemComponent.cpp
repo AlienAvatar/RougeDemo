@@ -56,6 +56,7 @@ void URougeAbilitySystemComponent::InitAbilityActorInfo(AActor* InOwnerActor, AA
 		// 当我们确实有一个Pawn时，向RougeGlobalAbilitySytem中注册，我们等待到直到下一次需要avatar时
 		if (URougeGlobalAbilitySystem* GlobalAbilitySystem = UWorld::GetSubsystem<URougeGlobalAbilitySystem>(GetWorld()))
 		{
+		// 	//  UnrealBuildTool failed with exit code 0x00000006
 			GlobalAbilitySystem->RegisterASC(this);
 		}
 
