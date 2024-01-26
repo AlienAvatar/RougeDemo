@@ -11,11 +11,14 @@
 #include "Teams/RougeTeamAgentInterface.h"
 #include "RougePlayerController.generated.h"
 
+class URougeAbilitySystemComponent;
 class UDataTable;
 class UAbilityComponent;
 class ARougeHUD;
 class ULevelMasterWidget;
 class APlayerState;
+class ARougePlayerState;
+
 /**
  * 
  */
@@ -44,6 +47,10 @@ public:
 	virtual void ReceivedPlayer() override;
 	virtual void PlayerTick(float DeltaTime) override;
 	//~End of APlayerController interface
+
+	//~ACommonPlayerController interface
+	virtual void OnPossess(APawn* InPawn) override;
+	//~End of ACommonPlayerController interface
 	
 	void SetHUDHealth(float Health, float MaxHealth);
 	void SetHUDScore(float Score);
@@ -63,6 +70,18 @@ public:
 
 	//更新UI
 	void UpdateHotbar();
+
+	UFUNCTION(BlueprintCallable, Category = "Rouge|PlayerController")
+	URougeAbilitySystemComponent* GetRougeAbilitySystemComponent() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Rouge|PlayerController")
+	ARougePlayerState* GetRougePlayerState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Rouge|Character")
+	void SetIsAutoRunning(const bool bEnabled);
+
+	UFUNCTION(BlueprintCallable, Category = "Rouge|Character")
+	bool GetIsAutoRunning() const;
 protected:
 	UPROPERTY()
 	ARougeHUD* RougeDemoHUD;
@@ -81,6 +100,13 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="UI")
 	TSubclassOf<ULevelMasterWidget> LevelMasterWidgetClass;
+
+	void OnStartAutoRun();
+	void OnEndAutoRun();
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="OnStartAutoRun"))
+	void K2_OnStartAutoRun();
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="OnStartAutoRun"))
+	void K2_OnEndAutoRun();
 private:
 	void SetupPlayer();
 

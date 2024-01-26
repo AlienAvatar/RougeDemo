@@ -21,7 +21,13 @@ void URougePawnExtensionComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+	// 绑定监听所有Feature，是否有改变
+	//调用将OnActorInitStateChanged函数绑定到组件管理器上的适当委托
+	BindOnActorInitStateChanged(NAME_None, FGameplayTag(), false);
+
+	//如果初始状态可能改变为InitState_Spawned状态的话，通知状态Manager，默认初始化其余部分
+	ensure(TryToChangeInitState(FRougeGameplayTags::Get().InitState_Spawned));
+	CheckDefaultInitialization();
 }
 
 void URougePawnExtensionComponent::SetPawnData(const URougePawnData* InPawnData)
@@ -78,6 +84,11 @@ void URougePawnExtensionComponent::OnAbilitySystemUninitialized_Register(FSimple
 // {
 // }
 
+void URougePawnExtensionComponent::HandlePlayerStateReplicated()
+{
+	CheckDefaultInitialization();
+}
+
 // Called every frame
 void URougePawnExtensionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                                  FActorComponentTickFunction* ThisTickFunction)
@@ -99,7 +110,7 @@ void URougePawnExtensionComponent::CheckDefaultInitialization()
 	CheckDefaultInitializationForImplementers();
 
 	const FRougeGameplayTags& InitTags = FRougeGameplayTags::Get();
-	static const TArray<FGameplayTag> StateChain = {
+ 	static const TArray<FGameplayTag> StateChain = {
 		InitTags.InitState_Spawned,
 		InitTags.InitState_DataAvailable,
 		InitTags.InitState_DataInitialized,
@@ -108,5 +119,19 @@ void URougePawnExtensionComponent::CheckDefaultInitialization()
 	
 	//这将尝试从生成(只在BeginPlay中设置)到数据初始化阶段
 	ContinueInitStateChain(StateChain);
+}
+
+void URougePawnExtensionComponent::OnActorInitStateChanged(const FActorInitStateChangedParams& Params)
+{
+	// If another feature is now in DataAvailable, see if we should transition to DataInitialized
+	//NAME_ActorFeatureName为PawnExtension
+	if (Params.FeatureName != NAME_ActorFeatureName)
+	{
+		const FRougeGameplayTags& InitTags = FRougeGameplayTags::Get();
+		if (Params.FeatureState == InitTags.InitState_DataAvailable)
+		{
+			CheckDefaultInitialization();
+		}
+	}
 }
 

@@ -9,8 +9,9 @@
 #include "RougeDemo/RougeGameplayTags.h"
 
 //////////////////////////////////////////////////////////////////////
-
+// STARTUP_JOB_WEIGHTED宏接受两个参数：JobFunc和JobWeight， 它使用这些参数来创建一个FRougeAssetManagerStartupJob对象
 #define STARTUP_JOB_WEIGHTED(JobFunc, JobWeight) StartupJobs.Add(FRougeAssetManagerStartupJob(#JobFunc, [this](const FRougeAssetManagerStartupJob& StartupJob, TSharedPtr<FStreamableHandle>& LoadHandle){JobFunc;}, JobWeight))
+//STARTUP_JOB宏是STARTUP_JOB_WEIGHTED宏的简化版本，只接受一个参数JobFunc。它将任务权重设置为默认值1.0，并调用STARTUP_JOB_WEIGHTED宏来添加任务
 #define STARTUP_JOB(JobFunc) STARTUP_JOB_WEIGHTED(JobFunc, 1.f)
 
 //////////////////////////////////////////////////////////////////////

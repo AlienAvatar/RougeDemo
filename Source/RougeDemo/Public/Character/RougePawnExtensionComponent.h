@@ -59,6 +59,9 @@ protected:
 	// UFUNCTION()
 	// void OnRep_PawnData();
 	//
+
+	// 当PlayerState复制时，应该被调用
+	void HandlePlayerStateReplicated();
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
@@ -73,4 +76,6 @@ public:
 	//GameFreak Interface Start
 	// 重写，尝试读取默认的初始化路径
 	virtual void CheckDefaultInitialization() override;
+	virtual void OnActorInitStateChanged(const FActorInitStateChangedParams& Params) override;
+	//~ End IGameFrameworkInitStateInterface interface
 };

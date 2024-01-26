@@ -4,6 +4,7 @@
 #include "..\..\Public\Core\RougePlayerController.h"
 
 #include "GenericTeamAgentInterface.h"
+#include "AbilitySystem/RougeAbilitySystemComponent.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Character/RougeCharacter.h"
 #include "Components/AbilityComponent.h"
@@ -23,6 +24,7 @@
 #include "RougeDemo/RougeDemo.h"
 #include "Struct/AbilityLevelUp.h"
 #include "Core/RougePlayerState.h"
+#include "RougeDemo/RougeGameplayTags.h"
 #include "Teams/RougeTeamAgentInterface.h"
 
 DEFINE_LOG_CATEGORY(LogRougeController);
@@ -82,6 +84,13 @@ void ARougePlayerController::ReceivedPlayer()
 void ARougePlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
+}
+
+void ARougePlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	SetIsAutoRunning(false);
 }
 
 
@@ -164,6 +173,24 @@ void ARougePlayerController::LevelUpTimerReduction(bool PowerUp)
 
 void ARougePlayerController::LevelUpAbilityDamage(bool PowerUp)
 {
+}
+
+void ARougePlayerController::OnStartAutoRun()
+{
+	if (URougeAbilitySystemComponent* RougeASC = GetRougeAbilitySystemComponent())
+	{
+		RougeASC->SetLooseGameplayTagCount(FRougeGameplayTags::Get().Status_AutoRunning, 1);
+		K2_OnStartAutoRun();
+	}
+}
+
+void ARougePlayerController::OnEndAutoRun()
+{
+	if (URougeAbilitySystemComponent* RougeASC = GetRougeAbilitySystemComponent())
+	{
+		RougeASC->SetLooseGameplayTagCount(FRougeGameplayTags::Get().Status_AutoRunning, 0);
+		K2_OnEndAutoRun();
+	}
 }
 
 void ARougePlayerController::SetupPlayer()
@@ -802,6 +829,44 @@ void ARougePlayerController::UpdateHotbar()
 		AbilityComponent->ActiveAbilitiesMap,
 		AbilityComponent->PassiveAbilitiesMap
 	);
+}
+
+URougeAbilitySystemComponent* ARougePlayerController::GetRougeAbilitySystemComponent() const
+{
+	//从PlayerState中获取
+	const ARougePlayerState* RougePS = GetRougePlayerState();
+	return (RougePS ? RougePS->GetRougeAbilitySystemComponent() : nullptr);
+}
+
+ARougePlayerState* ARougePlayerController::GetRougePlayerState() const
+{
+	return CastChecked<ARougePlayerState>(PlayerState, ECastCheckedType::NullAllowed);
+}
+
+void ARougePlayerController::SetIsAutoRunning(const bool bEnabled)
+{
+	const bool bIsAutoRunning = GetIsAutoRunning();
+	if (bEnabled != bIsAutoRunning)
+	{
+		if (!bEnabled)
+		{
+			OnEndAutoRun();
+		}
+		else
+		{
+			OnStartAutoRun();
+		}
+	}
+}
+
+bool ARougePlayerController::GetIsAutoRunning() const
+{
+	bool bIsAutoRunning = false;
+	if (const URougeAbilitySystemComponent* RougeASC = GetRougeAbilitySystemComponent())
+	{
+		bIsAutoRunning = RougeASC->GetTagCount(FRougeGameplayTags::Get().Status_AutoRunning) > 0;
+	}
+	return bIsAutoRunning;
 }
 
 

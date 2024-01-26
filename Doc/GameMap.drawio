@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2024-01-26T06:51:20.044Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="tqz-Om9pHTHJhD_bZulm" version="22.0.3" type="device">
+<mxfile host="Electron" modified="2024-01-26T09:22:05.354Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="Z6KhBDumVMtbvMzpgjWc" version="22.0.3" type="device">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
-    <mxGraphModel dx="1697" dy="850" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1637" dy="792" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
@@ -1232,6 +1232,12 @@
             <mxPoint x="-730" y="6002" as="sourcePoint" />
             <mxPoint x="-450" y="6002" as="targetPoint" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="GZZsJfVE1OEYmmtLC20g-19" value="URougePawnExtensionComponent" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="-335" y="5960" width="285" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="GZZsJfVE1OEYmmtLC20g-20" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="GZZsJfVE1OEYmmtLC20g-19">
+          <mxGeometry x="137.5" y="102" width="10" height="68" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

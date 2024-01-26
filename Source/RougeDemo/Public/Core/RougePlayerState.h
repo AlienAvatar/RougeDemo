@@ -62,6 +62,8 @@ public:
 	//~IRougeTeamAgentInterface interface
 	virtual FOnRougeTeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
 	//~End of IRougeTeamAgentInterface interface
+
+	URougeAbilitySystemComponent* GetRougeAbilitySystemComponent() const { return AbilitySystemComponent; }
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_PawnData)
 	TObjectPtr<const URougePawnData> PawnData;
