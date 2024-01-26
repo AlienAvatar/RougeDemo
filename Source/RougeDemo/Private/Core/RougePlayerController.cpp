@@ -3,6 +3,7 @@
 
 #include "..\..\Public\Core\RougePlayerController.h"
 
+#include "GenericTeamAgentInterface.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Character/RougeCharacter.h"
 #include "Components/AbilityComponent.h"
@@ -21,6 +22,8 @@
 #include "Lib/RougeDemoFunctionLibary.h"
 #include "RougeDemo/RougeDemo.h"
 #include "Struct/AbilityLevelUp.h"
+#include "Core/RougePlayerState.h"
+#include "Teams/RougeTeamAgentInterface.h"
 
 DEFINE_LOG_CATEGORY(LogRougeController);
 
@@ -57,7 +60,8 @@ void ARougePlayerController::OnUnPossess()
 void ARougePlayerController::InitPlayerState()
 {
 	Super::InitPlayerState();
-	//BroadcastOnPlayerStateChanged();
+	//PlayerState Init 完成
+	BroadcastOnPlayerStateChanged();
 }
 
 void ARougePlayerController::CleanupPlayerState()
@@ -752,6 +756,43 @@ void ARougePlayerController::UpdateHudHotbar(TMap<EActiveAbilities, int32> Activ
 	{
 		RougeDemoHUD->PlayerOverlayWidget->BuildHotbar(ActiveMap, PassiveMap);
 	}
+}
+
+void ARougePlayerController::BroadcastOnPlayerStateChanged()
+{
+	//OnPlayerStateChanged();
+
+	//从旧的Player State中解除绑定(如果有的话)
+	FGenericTeamId OldTeamID = FGenericTeamId::NoTeam;
+
+	if (LastSeenPlayerState != nullptr)
+	{
+		if (IRougeTeamAgentInterface* PlayerStateTeamInterface = Cast<IRougeTeamAgentInterface>(LastSeenPlayerState))
+		{
+			OldTeamID = PlayerStateTeamInterface->GetGenericTeamId();
+			PlayerStateTeamInterface->GetTeamChangedDelegateChecked().RemoveAll(this);
+		}
+	}
+	
+	// 绑定新的Player State(如果有的话)
+	FGenericTeamId NewTeamID = FGenericTeamId::NoTeam;
+	if (PlayerState != nullptr)
+	{
+		if (IRougeTeamAgentInterface* PlayerStateTeamInterface = Cast<IRougeTeamAgentInterface>(PlayerState))
+		{
+			NewTeamID = PlayerStateTeamInterface->GetGenericTeamId();
+			PlayerStateTeamInterface->GetTeamChangedDelegateChecked().AddDynamic(this, &ThisClass::OnPlayerStateChangedTeam);
+		}
+	}
+	
+	ConditionalBroadcastTeamChanged(this, OldTeamID, NewTeamID);
+	
+	LastSeenPlayerState = PlayerState;
+}
+
+void ARougePlayerController::OnPlayerStateChangedTeam(UObject* TeamAgent, int32 OldTeam, int32 NewTeam)
+{
+	ConditionalBroadcastTeamChanged(this, IntegerToGenericTeamId(OldTeam), IntegerToGenericTeamId(NewTeam));
 }
 
 void ARougePlayerController::UpdateHotbar()

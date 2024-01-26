@@ -8,17 +8,19 @@
 #include "Enum/EPassiveAbilities.h"
 #include "GameFramework/PlayerController.h"
 #include "Interface/ControllerManagerInterface.h"
+#include "Teams/RougeTeamAgentInterface.h"
 #include "RougePlayerController.generated.h"
 
 class UDataTable;
 class UAbilityComponent;
 class ARougeHUD;
 class ULevelMasterWidget;
+class APlayerState;
 /**
  * 
  */
 UCLASS()
-class ROUGEDEMO_API ARougePlayerController : public APlayerController, public IControllerManagerInterface
+class ROUGEDEMO_API ARougePlayerController : public APlayerController, public IControllerManagerInterface, public IRougeTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -126,7 +128,12 @@ private:
 
 	virtual void UpdateHudHotbar(TMap<EActiveAbilities, int32> ActiveMap, TMap<EPassiveAbilities, int32> PassiveMap) override;
 
+	void BroadcastOnPlayerStateChanged();
+	
+	UPROPERTY()
+	TObjectPtr<APlayerState> LastSeenPlayerState;
 
-
+	UFUNCTION()
+	void OnPlayerStateChangedTeam(UObject* TeamAgent, int32 OldTeam, int32 NewTeam);
 
 };

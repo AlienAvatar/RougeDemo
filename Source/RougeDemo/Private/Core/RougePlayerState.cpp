@@ -152,6 +152,16 @@ void ARougePlayerState::SetPawnData(const URougePawnData* InPawnData)
 	ForceNetUpdate();
 }
 
+UAbilitySystemComponent* ARougePlayerState::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
+FOnRougeTeamIndexChangedDelegate* ARougePlayerState::GetOnTeamIndexChangedDelegate()
+{
+	return &OnTeamChangedDelegate;
+}
+
 void ARougePlayerState::OnRep_PawnData()
 {
 }

@@ -21,6 +21,7 @@
 #include "HUD/RougeHUD.h"
 #include "Kismet/GameplayStatics.h"
 #include "Assets/RougeGameData.h"
+#include "Components/RougePlayerSpawningManagerComponent.h"
 #include "Core/RougePlayerState.h"
 
 ARougeGameMode::ARougeGameMode()
@@ -44,8 +45,41 @@ void ARougeGameMode::InitGameState()
 	ExperienceComponent->CallOrRegister_OnExperienceLoaded(FOnRougeExperienceLoaded::FDelegate::CreateUObject(this, &ThisClass::OnExperienceLoaded));
 }
 
+UClass* ARougeGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
+{
+	if (const URougePawnData* PawnData = GetPawnDataForController(InController))
+	{
+		if (PawnData->PawnClass)
+		{
+			return PawnData->PawnClass;
+		}
+	}
+	
+	return Super::GetDefaultPawnClassForController_Implementation(InController);
+}
+
+void ARougeGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	//延迟启动新玩家，直到URougeExperienceManagerComponent加载完成
+	if (IsExperienceLoaded())
+	{
+		Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+	}
+}
+
+AActor* ARougeGameMode::ChoosePlayerStart_Implementation(AController* Player)
+{
+	if (URougePlayerSpawningManagerComponent* PlayerSpawningComponent = GameState->FindComponentByClass<URougePlayerSpawningManagerComponent>())
+	{
+		//选择出生点
+		return PlayerSpawningComponent->ChoosePlayerStart(Player);
+	}
+	
+	return Super::ChoosePlayerStart_Implementation(Player);
+}
+
 APawn* ARougeGameMode::SpawnDefaultPawnAtTransform_Implementation(AController* NewPlayer,
-	const FTransform& SpawnTransform)
+                                                                  const FTransform& SpawnTransform)
 {
 	//配置参数
 	FActorSpawnParameters SpawnInfo;
@@ -85,18 +119,6 @@ APawn* ARougeGameMode::SpawnDefaultPawnAtTransform_Implementation(AController* N
 	return nullptr;
 }
 
-UClass* ARougeGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
-{
-	if (const URougePawnData* PawnData = GetPawnDataForController(InController))
-	{
-		if (PawnData->PawnClass)
-		{
-			return PawnData->PawnClass;
-		}
-	}
-	
-	return Super::GetDefaultPawnClassForController_Implementation(InController);
-}
 
 
 void ARougeGameMode::PlayEliminated(ABaseAI* ElimmedCharacter,
@@ -282,4 +304,12 @@ void ARougeGameMode::OnMatchAssignmentGiven(FPrimaryAssetId ExperienceId, const 
 		UE_LOG(LogTemp, Error, TEXT("Failed to identify experience, loading screen will stay up forever"));
 	}
 #endif
+}
+
+bool ARougeGameMode::IsExperienceLoaded() const
+{
+	check(GameState)
+	URougeExperienceManagerComponent* ExperienceComponent = GameState->FindComponentByClass<URougeExperienceManagerComponent>();
+	check(ExperienceComponent);
+	return ExperienceComponent->IsExperienceLoaded();
 }

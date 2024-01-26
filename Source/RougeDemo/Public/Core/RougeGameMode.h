@@ -40,6 +40,8 @@ public:
 	virtual void InitGameState() override;
 	virtual APawn* SpawnDefaultPawnAtTransform_Implementation(AController* NewPlayer, const FTransform& SpawnTransform) override;
 	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	//~End of AGameModeBase interface
 protected:
 	void HandleMatchAssignmentIfNotExpectingOne();
@@ -47,4 +49,7 @@ protected:
 	void OnExperienceLoaded(const URougeExperienceDefinition* CurrentExperience);
 
 	void OnMatchAssignmentGiven(FPrimaryAssetId ExperienceId, const FString& ExperienceIdSource);
+
+	bool IsExperienceLoaded() const;
+
 };

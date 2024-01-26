@@ -32,6 +32,8 @@ public:
 	UPROPERTY(config)
 	bool bUseHDRAudioMode;
 	
+	DECLARE_EVENT_OneParam(URougeSettingsLocal, FAudioDeviceChanged, const FString& /*DeviceId*/);
+	FAudioDeviceChanged OnAudioOutputDeviceChanged;
 protected:
 	void UpdateEffectiveFrameRateLimit();
 	

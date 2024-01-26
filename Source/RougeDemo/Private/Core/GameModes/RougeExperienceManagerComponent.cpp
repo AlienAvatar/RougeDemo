@@ -77,7 +77,7 @@ void URougeExperienceManagerComponent::CallOrRegister_OnExperienceLoaded(FOnRoug
 bool URougeExperienceManagerComponent::IsExperienceLoaded() const
 {
 	//当扩展组件加载完毕
-	return (LoadState == ERougeExperienceLoadState::Loaded) && (CurrentExperience != nullptr);
+	return (LoadState == ERougeExperienceLoadState::Loaded)  && (CurrentExperience != nullptr);
 }
 
 const URougeExperienceDefinition* URougeExperienceManagerComponent::GetCurrentExperienceChecked() const

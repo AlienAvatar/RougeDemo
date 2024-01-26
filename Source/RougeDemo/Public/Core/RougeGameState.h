@@ -30,6 +30,8 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	//~End of AActor interface
+
+	float GetServerFPS() const { return ServerFPS; }
 	
 	//~IAbilitySystemInterface
 	// virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -37,6 +39,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Rouge|GameState")
 	URougeAbilitySystemComponent* GetRougeAbilitySystemComponent() const { return AbilitySystemComponent; }
+
+protected:
+	UPROPERTY(Replicated)
+	float ServerFPS;
+
+	virtual void Tick(float DeltaSeconds) override;
 private:
 	UPROPERTY()
 	TObjectPtr<URougeExperienceManagerComponent> ExperienceManagerComponent;

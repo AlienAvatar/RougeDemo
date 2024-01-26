@@ -315,9 +315,14 @@ void ARougeCharacter::RestoreHealth(float Health)
 	UpdateHealthHUD();
 }
 
+// FOnRougeTeamIndexChangedDelegate* ARougeCharacter::GetOnTeamIndexChangedDelegate()
+// {
+// 	return &OnTeamChangedDelegate;
+// }
+
 
 void ARougeCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
-                                        AController* InstigatorController, AActor* DamageCauser)
+                                    AController* InstigatorController, AActor* DamageCauser)
 {
 	//角色不可受到连续攻击
 	if(!bHitting)

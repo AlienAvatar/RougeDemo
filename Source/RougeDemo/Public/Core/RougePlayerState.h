@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/PlayerState.h"
 #include "ModularPlayerState.h"
 #include "Character/RougePawnData.h"
+#include "Teams/RougeTeamAgentInterface.h"
 #include "Templates/Casts.h"
 #include "RougePlayerState.generated.h"
 
@@ -19,7 +21,7 @@ class URougeExperienceDefinition;
  * 将技能系统组件添加到玩家状态（Player State）类的主要优势是，它有助于将GAS状态逻辑与底层 Pawn 数据分开
  */
 UCLASS()
-class ROUGEDEMO_API ARougePlayerState : public AModularPlayerState
+class ROUGEDEMO_API ARougePlayerState : public AModularPlayerState, public IAbilitySystemInterface, public IRougeTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -54,6 +56,12 @@ public:
 	const URougePawnData* GetPawnData() const { return Cast<URougePawnData>(PawnData); }
 
 	void SetPawnData(const URougePawnData* InPawnData);
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	//~IRougeTeamAgentInterface interface
+	virtual FOnRougeTeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
+	//~End of IRougeTeamAgentInterface interface
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_PawnData)
 	TObjectPtr<const URougePawnData> PawnData;
@@ -66,4 +74,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Rouge|PlayerState")
 	TObjectPtr<URougeAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+	FOnRougeTeamIndexChangedDelegate OnTeamChangedDelegate;
+
 };

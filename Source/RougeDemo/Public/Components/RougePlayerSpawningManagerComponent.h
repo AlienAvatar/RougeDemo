@@ -7,6 +7,8 @@
 #include "RougePlayerSpawningManagerComponent.generated.h"
 
 class ARougePlayerStart;
+class APlayerState;
+class APlayerStart;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ROUGEDEMO_API URougePlayerSpawningManagerComponent : public UGameStateComponent
@@ -27,6 +29,15 @@ public:
 	UPROPERTY(Transient)
 	TArray<TWeakObjectPtr<ARougePlayerStart>> CachedPlayerStarts;
 
+	AActor* ChoosePlayerStart(AController* Player);
+
+protected:
+	virtual AActor* OnChoosePlayerStart(AController* Player, TArray<ARougePlayerStart*>& PlayerStarts) { return nullptr; }
+	APlayerStart* GetFirstRandomUnoccupiedPlayerStart(AController* Controller, const TArray<ARougePlayerStart*>& FoundStartPoints) const;
 private:
 	void HandleOnActorSpawned(AActor* SpawnedActor);
+
+#if WITH_EDITOR
+	APlayerStart* FindPlayFromHereStart(AController* Player);
+#endif
 };

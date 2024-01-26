@@ -16,6 +16,7 @@
 #include "Struct/MovementSettings.h"
 #include "Struct/MovementSettingsState.h"
 #include "AbilitySystemInterface.h"
+#include "Teams/RougeTeamAgentInterface.h"
 #include "RougeCharacter.generated.h"
 
 class URougePawnExtensionComponent;
@@ -182,8 +183,12 @@ private:
 
 	bool CanSprint();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lyra|Character", Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rouge|Character", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URougePawnExtensionComponent> PawnExtComponent;
+
+	UPROPERTY()
+	FOnRougeTeamIndexChangedDelegate OnTeamChangedDelegate;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -350,4 +355,9 @@ public:
 	virtual void AdjustPassive(EPassiveAbilities Stat, float MultiplicationAmount) override;
 
 	virtual void RestoreHealth(float Health) override;
+
+	//~IRougeTeamAgentInterface interface
+	// virtual FOnRougeTeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
+	//~End of IRougeTeamAgentInterface interface
+
 };

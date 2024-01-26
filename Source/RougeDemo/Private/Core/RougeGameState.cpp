@@ -6,10 +6,16 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/RougeAbilitySystemComponent.h"
 #include "Core/GameModes/RougeExperienceManagerComponent.h"
+#include "Net/UnrealNetwork.h"
+
+extern ENGINE_API float GAverageFPS;
 
 ARougeGameState::ARougeGameState(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = true;
+	
 	AbilitySystemComponent = ObjectInitializer.CreateDefaultSubobject<URougeAbilitySystemComponent>(this, TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
@@ -44,6 +50,24 @@ void ARougeGameState::PostInitializeComponents()
 void ARougeGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+}
+
+void ARougeGameState::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	//服务器端更新ServerFPS
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		ServerFPS = GAverageFPS;
+	}
+}
+
+void ARougeGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, ServerFPS);
 }
 
 // UAbilitySystemComponent* ARougeGameState::GetAbilitySystemComponent() const
