@@ -173,8 +173,7 @@ void ARougeGameMode::Pause(bool bPause, bool bOverride)
 
 const URougePawnData* ARougeGameMode::GetPawnDataForController(const AController* InController) const
 {
-	// 查看Pawn Data是否已经在PlayerState中设置
-	// 问题无法通过模板参数获取URougePawnData
+	// 查看Pawn Data是否已经在Controller对应的PlayerState中设置
 	if (InController != nullptr)
 	{
 		if (const ARougePlayerState* RougePS = InController->GetPlayerState<ARougePlayerState>())
@@ -274,7 +273,7 @@ void ARougeGameMode::HandleMatchAssignmentIfNotExpectingOne()
 
 void ARougeGameMode::OnExperienceLoaded(const URougeExperienceDefinition* CurrentExperience)
 {
-	//遍历所有Controller
+	//遍历所有PlayerController
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		APlayerController* PC = Cast<APlayerController>(*Iterator);

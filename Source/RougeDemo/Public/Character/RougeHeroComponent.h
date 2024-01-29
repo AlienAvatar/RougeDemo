@@ -8,6 +8,7 @@
 #include "Input/RougeMappableConfigPair.h"
 #include "RougeHeroComponent.generated.h"
 
+class URougeInputConfig;
 /**
  * IGameFrameworkInitStateInterface 比如一个obj在初始化前必须要求另一个obj达到某个状态
  */
@@ -21,26 +22,34 @@ public:
 	URougeHeroComponent(const FObjectInitializer& ObjectInitializer);
 
 	//~ Begin IGameFrameworkInitStateInterface interface
+	virtual FName GetFeatureName() const override { return NAME_ActorFeatureName; }
+	virtual bool CanChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) const override;
 	virtual void HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) override;
+	virtual void OnActorInitStateChanged(const FActorInitStateChangedParams& Params) override;
 	virtual void CheckDefaultInitialization() override;
-
+	//~ End IGameFrameworkInitStateInterface interface
+	
 	/**  当输入绑定好时，扩展事件的名称发送给UGameFrameworkComponentManager */
 	static const FName NAME_BindInputsNow;
 
 	/** component-implemented 特性名字 */
 	static const FName NAME_ActorFeatureName;
+	
+	void RemoveAdditionalInputConfig(const URougeInputConfig* InputConfig);
 protected:
 	// Called when the game starts
+	virtual void OnRegister() override;
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
 	virtual void InitializePlayerInput(UInputComponent* PlayerInputComponent);
 
+	//初始化Input设置
 	UPROPERTY(EditAnywhere)
 	TArray<FMappableConfigPair> DefaultInputConfigs;
 
 	// 当Input已经被绑定应用，则为true
 	bool bReadyToBindInputs = false;
-
-	virtual void OnRegister() override;
 	
+	void Input_LookMouse(const FInputActionValue& InputActionValue);
 };

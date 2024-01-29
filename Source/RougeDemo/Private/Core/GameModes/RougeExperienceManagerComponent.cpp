@@ -148,7 +148,7 @@ void URougeExperienceManagerComponent::StartExperienceLoad()
 	TSet<FPrimaryAssetId> BundleAssetList;
 	TSet<FSoftObjectPath> RawAssetList;
 
-	//对URougeExperienceDefinition中的配置数据进行加载
+	//获取URougeExperienceDefinition中的所有资源Id
 	BundleAssetList.Add(CurrentExperience->GetPrimaryAssetId());
 	for (const TObjectPtr<URougeExperienceActionSet>& ActionSet : CurrentExperience->ActionSets)
 	{
@@ -193,7 +193,7 @@ void URougeExperienceManagerComponent::StartExperienceLoad()
 		Handle = BundleLoadHandle.IsValid() ? BundleLoadHandle : RawLoadHandle;
 	}
 	
-	//加载完成
+	// FStreamableManager提供异步加载完成
 	FStreamableDelegate OnAssetsLoadedDelegate = FStreamableDelegate::CreateUObject(this, &ThisClass::OnExperienceLoadComplete);
 	if (!Handle.IsValid() || Handle->HasLoadCompleted())
 	{
@@ -204,7 +204,7 @@ void URougeExperienceManagerComponent::StartExperienceLoad()
 	else
 	{
 		Handle->BindCompleteDelegate(OnAssetsLoadedDelegate);
-
+		//绑定加载中取消
 		Handle->BindCancelDelegate(FStreamableDelegate::CreateLambda([OnAssetsLoadedDelegate]()
 		{
 			//执行委托
@@ -228,7 +228,7 @@ void URougeExperienceManagerComponent::OnExperienceLoadComplete()
 
 	GameFeaturePluginURLs.Reset();
 
-	//加载插件
+	//加载GameFeature插件
 	auto CollectGameFeaturePluginURLs = [This=this](const UPrimaryDataAsset* Context, const TArray<FString>& FeaturePluginList)
 	{
 		for (const FString& PluginName : FeaturePluginList)
@@ -315,7 +315,7 @@ void URougeExperienceManagerComponent::OnExperienceFullLoadCompleted()
 			FTimerHandle DummyHandle;
 
 			LoadState = ERougeExperienceLoadState::LoadingChaosTestingDelay;
-			//延迟
+			//延迟再执行一次，OnExperienceFullLoadCompleted函数，检测GameFeature是否加载完成
 			GetWorld()->GetTimerManager().SetTimer(DummyHandle, this, &ThisClass::OnExperienceFullLoadCompleted, DelaySecs, /*bLooping=*/ false);
 
 			return;

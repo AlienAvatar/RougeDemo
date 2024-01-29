@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "EnhancedInputComponent.h"
+#include "Input/RougeInputConfig.h"
 #include "RougeInputComponent.generated.h"
 
 
 class UEnhancedInputLocalPlayerSubsystem;
-class URougeInputConfig;
+class UInputAction;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ROUGEDEMO_API URougeInputComponent : public UEnhancedInputComponent
@@ -28,4 +29,22 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	void AddInputMappings(const URougeInputConfig* InputConfig, UEnhancedInputLocalPlayerSubsystem* InputSubsystem) const;
+
+	//绑定键盘输入Action
+	template<class UserClass, typename FuncType>
+	void BindNativeAction(const URougeInputConfig* InputConfig, const FGameplayTag& InputTag, ETriggerEvent TriggerEvent, UserClass* Object, FuncType Func, bool bLogIfNotFound);
+
 };
+
+
+
+template <class UserClass, typename FuncType>
+void URougeInputComponent::BindNativeAction(const URougeInputConfig* InputConfig, const FGameplayTag& InputTag,
+	ETriggerEvent TriggerEvent, UserClass* Object, FuncType Func, bool bLogIfNotFound)
+{
+	check(InputConfig);
+	if (const UInputAction* IA = InputConfig->FindNativeInputActionForTag(InputTag, bLogIfNotFound))
+	{
+		BindAction(IA, TriggerEvent, Object, Func);
+	}
+}

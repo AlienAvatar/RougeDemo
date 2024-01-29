@@ -75,6 +75,7 @@ public:
 
 	//GameFreak Interface Start
 	// 重写，尝试读取默认的初始化路径
+	virtual FName GetFeatureName() const override { return NAME_ActorFeatureName; }
 	virtual void CheckDefaultInitialization() override;
 	virtual void OnActorInitStateChanged(const FActorInitStateChangedParams& Params) override;
 	//~ End IGameFrameworkInitStateInterface interface
