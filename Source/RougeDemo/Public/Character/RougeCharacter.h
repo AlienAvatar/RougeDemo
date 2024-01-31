@@ -289,6 +289,10 @@ protected:
 	void InitializeGameplayTags();
 
 	void SetMovementModeTag(EMovementMode MovementMode, uint8 CustomMovementMode, bool bTagEnabled);
+
+	//PossessedBy()现在会将Pawn的所有者设置为新的Controller
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void UnPossessed() override;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -360,4 +364,6 @@ public:
 	// virtual FOnRougeTeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
 	//~End of IRougeTeamAgentInterface interface
 
+	/*UPROPERTY(ReplicatedUsing = OnRep_MyTeamID)
+	FGenericTeamId MyTeamID;*/
 };

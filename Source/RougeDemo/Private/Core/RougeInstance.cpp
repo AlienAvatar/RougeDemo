@@ -13,11 +13,14 @@
 #include "ContentStreaming.h"
 #include "MoviePlayer.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/GameFrameworkComponentManager.h"
+#include "RougeDemo/RougeGameplayTags.h"
 
 DEFINE_LOG_CATEGORY(LogGameInstance);
 
-URougeInstance::URougeInstance()
-	: SaveSlot(TEXT("SaveGameSlot"))
+URougeInstance::URougeInstance(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+	, SaveSlot(TEXT("SaveGameSlot"))
 	, SaveUserIndex(0)
 {
 	
@@ -41,6 +44,27 @@ void URougeInstance::Init()
 		WriteSaveGame();
 		GAME_INSTANCE_LOG(Log, TEXT("New Save Game"));
 	}
+
+	UGameFrameworkComponentManager* ComponentManager = GetSubsystem<UGameFrameworkComponentManager>(this);
+
+	if (ensure(ComponentManager))
+	{
+		const FRougeGameplayTags& GameplayTags = FRougeGameplayTags::Get();
+
+		//在GameInstance初始化期间通过调用 RegisterInitState 向子系统注册, 共享给游戏中的所有Actor
+		//如果必需的数据可用，它将过渡到 DataAvailable ，但还无法过渡到 DataInitialized
+		//以尝试遵循4状态初始化链
+		ComponentManager->RegisterInitState(GameplayTags.InitState_Spawned, false, FGameplayTag());
+		//它会检查玩家状态和输入组件是否已就绪
+		ComponentManager->RegisterInitState(GameplayTags.InitState_DataAvailable, false, GameplayTags.InitState_Spawned);
+		ComponentManager->RegisterInitState(GameplayTags.InitState_DataInitialized, false, GameplayTags.InitState_DataAvailable);
+		ComponentManager->RegisterInitState(GameplayTags.InitState_GameplayReady, false, GameplayTags.InitState_DataInitialized);
+	}
+}
+
+void URougeInstance::Shutdown()
+{
+	Super::Shutdown();
 }
 
 URougeSaveGame* URougeInstance::GetCurrentSaveGame()

@@ -17,16 +17,23 @@ class ROUGEDEMO_API ARougeHUD : public AHUD
 
 public:
 
+	//~UObject interface
+	virtual void PreInitializeComponents() override;
+	//~End of UObject interface
+	
 	UPROPERTY(EditAnywhere,Category="Player State")
 	TSubclassOf<UUserWidget> PlayerOverlayClass;
 	
 	UPROPERTY()
 	UPlayerOverlayWidget* PlayerOverlayWidget;
 
+
+	
 	
 protected:
 	virtual void BeginPlay() override;
-
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
 	void AddPlayerOverlay();
 
 

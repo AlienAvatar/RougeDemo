@@ -4,6 +4,7 @@
 #include "Character/RougeHeroComponent.h"
 
 #include "EnhancedInputSubsystems.h"
+#include "AbilitySystem/RougeAbilitySystemComponent.h"
 #include "Character/RougePawnData.h"
 #include "Character/RougePawnExtensionComponent.h"
 #include "Components/GameFrameworkComponentManager.h"
@@ -12,6 +13,7 @@
 #include "RougeDemo/RougeGameplayTags.h"
 #include "Core/RougePlayerController.h"
 #include "Input/RougeInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 
 const FName URougeHeroComponent::NAME_BindInputsNow("BindInputsNow");
 const FName URougeHeroComponent::NAME_ActorFeatureName("Hero");
@@ -19,14 +21,28 @@ const FName URougeHeroComponent::NAME_ActorFeatureName("Hero");
 URougeHeroComponent::URougeHeroComponent(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
-	
+	bReadyToBindInputs = false;
+}
+
+// Called when the game starts
+void URougeHeroComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// ...
+	//以侦听初始状态更改
+	BindOnActorInitStateChanged(URougePawnExtensionComponent::NAME_ActorFeatureName, FGameplayTag(), false);
+	ensure(TryToChangeInitState(FRougeGameplayTags::Get().InitState_Spawned));
+
+	//以尝试遵循4状态初始化链
+	CheckDefaultInitialization();
 }
 
 bool URougeHeroComponent::CanChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState,
 	FGameplayTag DesiredState) const
 {
 	check(Manager);
-
+	
 	const FRougeGameplayTags& InitTags = FRougeGameplayTags::Get();
 	APawn* Pawn = GetPawn<APawn>();
 
@@ -101,9 +117,11 @@ bool URougeHeroComponent::CanChangeInitState(UGameFrameworkComponentManager* Man
 void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState,
                                                 FGameplayTag DesiredState)
 {
-	const FRougeGameplayTags& RougeGameplayTags = FRougeGameplayTags::Get();
-	if (CurrentState == RougeGameplayTags.InitState_DataAvailable && DesiredState == RougeGameplayTags.InitState_DataInitialized)
+	const FRougeGameplayTags& InitTags = FRougeGameplayTags::Get();
+	if (CurrentState == FRougeGameplayTags::Get().InitState_DataAvailable && DesiredState == FRougeGameplayTags::Get().InitState_DataInitialized)
 	{
+		APawn* Test_Pawn = GetOwner<APawn>();
+		UE_LOG(LogTemp, Warning, TEXT("TestPawn2[%s]"), *Test_Pawn->GetName());
 		APawn* Pawn = GetPawn<APawn>();
 		ARougePlayerState* RougePS = GetPlayerState<ARougePlayerState>();
 		if (!ensure(Pawn && RougePS))
@@ -111,14 +129,15 @@ void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* 
 			return;
 		}
 
+		const bool bIsLocallyControlled = Pawn->IsLocallyControlled();
 		const URougePawnData* PawnData = nullptr;
 		if (URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(Pawn))
 		{
-			//PawnData = PawnExtComp->GetPawnData<URougePawnData>();
+			PawnData = PawnExtComp->GetPawnData<URougePawnData>();
 
 			// PlayerState保存着该玩家的持久数据
 			// AbilitySystemComponent和属性设置取决于玩家的状态。
-			//PawnExtComp->InitializeAbilitySystem(RougePS->GetRougeAbilitySystemComponent(), RougePS);
+			PawnExtComp->InitializeAbilitySystem(RougePS->GetRougeAbilitySystemComponent(), RougePS);
 		}
 
 		if (ARougePlayerController* RougePC = GetController<ARougePlayerController>())
@@ -152,19 +171,11 @@ void URougeHeroComponent::CheckDefaultInitialization()
 	ContinueInitStateChain(StateChain);
 }
 
-// Called when the game starts
-void URougeHeroComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	BindOnActorInitStateChanged(URougePawnExtensionComponent::NAME_ActorFeatureName, FGameplayTag(), false);
-	ensure(TryToChangeInitState(FRougeGameplayTags::Get().InitState_Spawned));
-	CheckDefaultInitialization();
-}
-
 void URougeHeroComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	//以从系统注销并取消绑定通知委托
+	UnregisterInitStateFeature();
+	
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -223,6 +234,40 @@ void URougeHeroComponent::RemoveAdditionalInputConfig(const URougeInputConfig* I
 	//To do something
 }
 
+bool URougeHeroComponent::IsReadyToBindInputs() const
+{
+	return bReadyToBindInputs;
+}
+
+void URougeHeroComponent::AddAdditionalInputConfig(const URougeInputConfig* InputConfig)
+{
+	TArray<uint32> BindHandles;
+
+	const APawn* Pawn = GetPawn<APawn>();
+	if (!Pawn)
+	{
+		return;
+	}
+
+	URougeInputComponent* RougeIC = Pawn->FindComponentByClass<URougeInputComponent>();
+	check(RougeIC);
+
+	const APlayerController* PC = GetController<APlayerController>();
+	check(PC);
+
+	const ULocalPlayer* LP = PC->GetLocalPlayer();
+	check(LP);
+
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	check(Subsystem);
+
+	if (const URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(Pawn))
+	{
+		//绑定输入设置
+		RougeIC->BindAbilityActions(InputConfig, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, /*out*/ BindHandles);
+	}
+}
+
 void URougeHeroComponent::OnRegister()
 {
 	Super::OnRegister();
@@ -233,7 +278,8 @@ void URougeHeroComponent::OnRegister()
 		UE_LOG(LogTemp, Error, TEXT("[URougeHeroComponent::OnRegister] This component has been added to a blueprint whose base class is not a Pawn. To use this component, it MUST be placed on a Pawn Blueprint."));
 	}else
 	{
-		//尽早注册init State，这只会在游戏世界中起作用
+		//尽早注册init State，这只会在GameWorld中起作用
+		//向系统注册，但不设置状态
 		RegisterInitStateFeature();
 	}
 }
@@ -257,6 +303,37 @@ void URougeHeroComponent::Input_LookMouse(const FInputActionValue& InputActionVa
 	if (Value.Y != 0.0f)
 	{
 		Pawn->AddControllerPitchInput(Value.Y);
+	}
+}
+
+void URougeHeroComponent::Input_AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	if (const APawn* Pawn = GetPawn<APawn>())
+	{
+		if (const URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(Pawn))
+		{
+			if (URougeAbilitySystemComponent* RougeASC = PawnExtComp->GetRougeAbilitySystemComponent())
+			{
+				RougeASC->AbilityInputTagPressed(InputTag);
+			}
+		}	
+	}
+}
+
+void URougeHeroComponent::Input_AbilityInputTagReleased(FGameplayTag InputTag)
+{
+	const APawn* Pawn = GetPawn<APawn>();
+	if (!Pawn)
+	{
+		return;
+	}
+
+	if (const URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(Pawn))
+	{
+		if (URougeAbilitySystemComponent* RougeASC = PawnExtComp->GetRougeAbilitySystemComponent())
+		{
+			RougeASC->AbilityInputTagReleased(InputTag);
+		}
 	}
 }
 

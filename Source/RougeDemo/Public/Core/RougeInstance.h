@@ -19,9 +19,8 @@ class ROUGEDEMO_API URougeInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
-	URougeInstance();
-	virtual void Init() override;
-
+	URougeInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	
 	FString SaveSlot;
 
 	//FPlatformMisc::GetPlatformUserForUserIndex(UserIndex);
@@ -34,6 +33,11 @@ public:
 
 	void LoadGameLevel();
 protected:
+	// ~ UGameInstance Interface Begin
+	virtual void Init() override;
+	virtual void Shutdown() override;
+	// ~ UGameInstance Interface End
+	
 	void SetSavingEnabled(bool bEnabled);
 
 	void GetSaveSlotInfo(FString& SlotName, int32& UserIndex) const;

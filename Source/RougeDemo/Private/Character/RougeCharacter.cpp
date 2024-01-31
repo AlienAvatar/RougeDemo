@@ -159,7 +159,7 @@ void ARougeCharacter::OnAbilitySystemUninitialized()
 void ARougeCharacter::InitializeGameplayTags()
 {
 
-	if (URougeAbilitySystemComponent* LyraASC = GetRougeAbilitySystemComponent())
+	if (URougeAbilitySystemComponent* RougeASC = GetRougeAbilitySystemComponent())
 	{
 		const FRougeGameplayTags& GameplayTags = FRougeGameplayTags::Get();
 		
@@ -167,7 +167,7 @@ void ARougeCharacter::InitializeGameplayTags()
 		{
 			if (TagMapping.Value.IsValid())
 			{
-				LyraASC->SetLooseGameplayTagCount(TagMapping.Value, 0);
+				RougeASC->SetLooseGameplayTagCount(TagMapping.Value, 0);
 			}
 		}
 	}
@@ -175,7 +175,7 @@ void ARougeCharacter::InitializeGameplayTags()
 
 void ARougeCharacter::SetMovementModeTag(EMovementMode MovementMode, uint8 CustomMovementMode, bool bTagEnabled)
 {
-	if (URougeAbilitySystemComponent* LyraASC = GetRougeAbilitySystemComponent())
+	if (URougeAbilitySystemComponent* RougeASC = GetRougeAbilitySystemComponent())
 	{
 		const FGameplayTag* MovementModeTag = nullptr;
 		const FRougeGameplayTags& GameplayTags = FRougeGameplayTags::Get();
@@ -191,12 +191,26 @@ void ARougeCharacter::SetMovementModeTag(EMovementMode MovementMode, uint8 Custo
 
 		if (MovementModeTag && MovementModeTag->IsValid())
 		{
-			LyraASC->SetLooseGameplayTagCount(*MovementModeTag, (bTagEnabled ? 1 : 0));
+			RougeASC->SetLooseGameplayTagCount(*MovementModeTag, (bTagEnabled ? 1 : 0));
 		}
 	}
 
 	URougeCharacterMovementComponent* RougeMoveComp = CastChecked<URougeCharacterMovementComponent>(GetCharacterMovement());
 	SetMovementModeTag(RougeMoveComp->MovementMode, RougeMoveComp->CustomMovementMode, true);
+}
+
+void ARougeCharacter::PossessedBy(AController* NewController)
+{
+	//const FGenericTeamId OldTeamID = MyTeamID;
+
+	Super::PossessedBy(NewController);
+
+	PawnExtComponent->HandleControllerChanged();
+}
+
+void ARougeCharacter::UnPossessed()
+{
+	Super::UnPossessed();
 }
 
 // Called every frame

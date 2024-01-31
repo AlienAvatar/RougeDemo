@@ -76,6 +76,24 @@ void UGameFeatureAction_AddInputBinding::HandlePawnExtension(AActor* Actor, FNam
 
 void UGameFeatureAction_AddInputBinding::AddInputMappingForPlayer(APawn* Pawn, FPerContextData& ActiveData)
 {
+	APlayerController* PlayerController = Cast<APlayerController>(Pawn->GetController());
+	if (ULocalPlayer* LocalPlayer = PlayerController ? PlayerController->GetLocalPlayer() : nullptr)
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			URougeHeroComponent* HeroComponent = Pawn->FindComponentByClass<URougeHeroComponent>();
+			if (HeroComponent && HeroComponent->IsReadyToBindInputs())
+			{
+				for (const TSoftObjectPtr<const URougeInputConfig>& Entry : InputConfigs)
+				{
+					if (const URougeInputConfig* BindSet = Entry.Get())
+					{
+						HeroComponent->AddAdditionalInputConfig(BindSet);
+					}
+				}
+			}
+		}
+	}
 }
 
 void UGameFeatureAction_AddInputBinding::RemoveInputMapping(APawn* Pawn, FPerContextData& ActiveData)

@@ -8,6 +8,7 @@
 
 class URougeInputConfig;
 class URougeAbilitySet;
+class URougeAbilityTagRelationshipMapping;
 /**
  * 
  */
@@ -28,6 +29,10 @@ public:
 	//赋予Pawn Ability
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rouge|Abilities")
 	TArray<TObjectPtr<URougeAbilitySet>> AbilitySets;
+
+	// 用于这个Pawn的Action映射的ability tags
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rouge|Abilities")
+	TObjectPtr<URougeAbilityTagRelationshipMapping> TagRelationshipMapping;
 protected:
 
 

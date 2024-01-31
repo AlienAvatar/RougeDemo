@@ -35,7 +35,7 @@ public:
 	/** Actor/component has initially spawned and can be extended */
 	FGameplayTag InitState_Spawned;
 
-	/** All required data has been loaded/replicated and is ready for initialization */
+	/** 它会检查玩家状态和输入组件是否已就绪 */
 	FGameplayTag InitState_DataAvailable;
 
 	/** The available data has been initialized for this actor/component, but it is not ready for full gameplay */

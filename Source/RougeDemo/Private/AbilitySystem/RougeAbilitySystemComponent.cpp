@@ -69,6 +69,48 @@ void URougeAbilitySystemComponent::InitAbilityActorInfo(AActor* InOwnerActor, AA
 	}
 }
 
+void URougeAbilitySystemComponent::SetTagRelationshipMapping(URougeAbilityTagRelationshipMapping* NewMapping)
+{
+	TagRelationshipMapping = NewMapping;
+}
+
+void URougeAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
+{
+	if (InputTag.IsValid())
+	{
+		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
+		{
+			if (AbilitySpec.Ability && (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag)))
+			{
+				InputPressedSpecHandles.AddUnique(AbilitySpec.Handle);
+				InputHeldSpecHandles.AddUnique(AbilitySpec.Handle);
+			}
+		}
+	}
+}
+
+void URougeAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& InputTag)
+{
+	if (InputTag.IsValid())
+	{
+		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
+		{
+			if (AbilitySpec.Ability && (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag)))
+			{
+				InputReleasedSpecHandles.AddUnique(AbilitySpec.Handle);
+				InputHeldSpecHandles.Remove(AbilitySpec.Handle);
+			}
+		}
+	}
+}
+
+void URougeAbilitySystemComponent::ClearAbilityInput()
+{
+	InputPressedSpecHandles.Reset();
+	InputReleasedSpecHandles.Reset();
+	InputHeldSpecHandles.Reset();
+}
+
 
 // Called when the game starts
 void URougeAbilitySystemComponent::BeginPlay()
