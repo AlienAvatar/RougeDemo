@@ -43,6 +43,7 @@ public:
 
 	void TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;
 
+	ERougeAbilityActivationPolicy GetActivationPolicy() const { return ActivationPolicy; }
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rouge|Ability Activation")
 	ERougeAbilityActivationPolicy ActivationPolicy;

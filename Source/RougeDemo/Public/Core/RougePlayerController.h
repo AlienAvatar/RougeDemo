@@ -18,6 +18,19 @@ class ARougeHUD;
 class ULevelMasterWidget;
 class APlayerState;
 class ARougePlayerState;
+class URougeSettingsShared;
+
+
+namespace Rouge
+{
+	namespace Input
+	{
+		static int32 ShouldAlwaysPlayForceFeedback = 0;
+		static FAutoConsoleVariableRef CVarShouldAlwaysPlayForceFeedback(TEXT("RougePC.ShouldAlwaysPlayForceFeedback"),
+			ShouldAlwaysPlayForceFeedback,
+			TEXT("Should force feedback effects be played, even if the last input device was not a gamepad?"));
+	}
+}
 
 /**
  * 
@@ -82,6 +95,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Rouge|Character")
 	bool GetIsAutoRunning() const;
+
+	void OnSettingsChanged(URougeSettingsShared* Settings);
 protected:
 	UPROPERTY()
 	ARougeHUD* RougeDemoHUD;
@@ -107,6 +122,16 @@ protected:
 	void K2_OnStartAutoRun();
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="OnStartAutoRun"))
 	void K2_OnEndAutoRun();
+
+	//~APlayerController interface Begin
+	virtual void SetPlayer(UPlayer* InPlayer) override;
+	virtual void PreProcessInput(const float DeltaTime, const bool bGamePaused) override;
+	virtual void PostProcessInput(const float DeltaTime, const bool bGamePaused) override;
+	virtual void UpdateForceFeedback(IInputInterface* InputInterface, const int32 ControllerId) override;
+	virtual void UpdateHiddenComponents(const FVector& ViewLocation, TSet<FPrimitiveComponentId>& OutHiddenComponents) override;
+	//~APlayerController interface End
+
+	bool bHideViewTargetPawnNextFrame = false;
 private:
 	void SetupPlayer();
 
@@ -162,4 +187,6 @@ private:
 	UFUNCTION()
 	void OnPlayerStateChangedTeam(UObject* TeamAgent, int32 OldTeam, int32 NewTeam);
 
+	UPROPERTY(Transient)
+	mutable TObjectPtr<URougeSettingsShared> SharedSettings;
 };

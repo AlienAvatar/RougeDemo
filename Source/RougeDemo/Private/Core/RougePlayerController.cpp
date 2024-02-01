@@ -3,6 +3,8 @@
 
 #include "..\..\Public\Core\RougePlayerController.h"
 
+#include "CommonInputSubsystem.h"
+#include "CommonPlayerInputKey.h"
 #include "GenericTeamAgentInterface.h"
 #include "AbilitySystem/RougeAbilitySystemComponent.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
@@ -11,6 +13,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Core/GameManager.h"
+#include "Core/RougeLocalPlayer.h"
 #include "HUD/PlayerOverlayWidget.h"
 #include "HUD/RougeHUD.h"
 #include "HUD/Game/LevelMasterWidget.h"
@@ -25,6 +28,7 @@
 #include "Struct/AbilityLevelUp.h"
 #include "Core/RougePlayerState.h"
 #include "RougeDemo/RougeGameplayTags.h"
+#include "SaveGame/RougeSettingsShared.h"
 #include "Teams/RougeTeamAgentInterface.h"
 
 DEFINE_LOG_CATEGORY(LogRougeController);
@@ -190,6 +194,105 @@ void ARougePlayerController::OnEndAutoRun()
 	{
 		RougeASC->SetLooseGameplayTagCount(FRougeGameplayTags::Get().Status_AutoRunning, 0);
 		K2_OnEndAutoRun();
+	}
+}
+
+void ARougePlayerController::SetPlayer(UPlayer* InPlayer)
+{
+	Super::SetPlayer(InPlayer);
+	
+	if (const URougeLocalPlayer* RougeLocalPlayer = Cast<URougeLocalPlayer>(InPlayer))
+	{
+		URougeSettingsShared* UserSettings = RougeLocalPlayer->GetSharedSettings();
+		UserSettings->OnSettingChanged.AddUObject(this, &ThisClass::OnSettingsChanged);
+
+		OnSettingsChanged(UserSettings);
+	}
+}
+
+void ARougePlayerController::PreProcessInput(const float DeltaTime, const bool bGamePaused)
+{
+	Super::PreProcessInput(DeltaTime, bGamePaused);
+}
+
+void ARougePlayerController::PostProcessInput(const float DeltaTime, const bool bGamePaused)
+{
+	if (URougeAbilitySystemComponent* RougeASC = GetRougeAbilitySystemComponent())
+	{
+		RougeASC->ProcessAbilityInput(DeltaTime, bGamePaused);
+	}
+
+	Super::PostProcessInput(DeltaTime, bGamePaused);
+}
+
+void ARougePlayerController::UpdateForceFeedback(IInputInterface* InputInterface, const int32 ControllerId)
+{
+	if (bForceFeedbackEnabled)
+	{
+		if (const UCommonInputSubsystem* CommonInputSubsystem = UCommonInputSubsystem::Get(GetLocalPlayer()))
+		{
+			const ECommonInputType CurrentInputType = CommonInputSubsystem->GetCurrentInputType();
+			if (Rouge::Input::ShouldAlwaysPlayForceFeedback || CurrentInputType == ECommonInputType::Gamepad || CurrentInputType == ECommonInputType::Touch)
+			{
+				InputInterface->SetForceFeedbackChannelValues(ControllerId, ForceFeedbackValues);
+				return;
+			}
+		}
+	}
+	
+	InputInterface->SetForceFeedbackChannelValues(ControllerId, FForceFeedbackValues());
+}
+
+void ARougePlayerController::UpdateHiddenComponents(const FVector& ViewLocation,
+	TSet<FPrimitiveComponentId>& OutHiddenComponents)
+{
+	if (bHideViewTargetPawnNextFrame)
+	{
+		AActor* const ViewTargetPawn = PlayerCameraManager ? Cast<AActor>(PlayerCameraManager->GetViewTarget()) : nullptr;
+		if (ViewTargetPawn)
+		{
+			// internal helper func to hide all the components
+			auto AddToHiddenComponents = [&OutHiddenComponents](const TInlineComponentArray<UPrimitiveComponent*>& InComponents)
+			{
+				// add every component and all attached children
+				for (UPrimitiveComponent* Comp : InComponents)
+				{
+					if (Comp->IsRegistered())
+					{
+						OutHiddenComponents.Add(Comp->ComponentId);
+
+						for (USceneComponent* AttachedChild : Comp->GetAttachChildren())
+						{
+							static FName NAME_NoParentAutoHide(TEXT("NoParentAutoHide"));
+							UPrimitiveComponent* AttachChildPC = Cast<UPrimitiveComponent>(AttachedChild);
+							if (AttachChildPC && AttachChildPC->IsRegistered() && !AttachChildPC->ComponentTags.Contains(NAME_NoParentAutoHide))
+							{
+								OutHiddenComponents.Add(AttachChildPC->ComponentId);
+							}
+						}
+					}
+				}
+			};
+
+			//TODO Solve with an interface.  Gather hidden components or something.
+			//TODO Hiding isn't awesome, sometimes you want the effect of a fade out over a proximity, needs to bubble up to designers.
+
+			// hide pawn's components
+			TInlineComponentArray<UPrimitiveComponent*> PawnComponents;
+			ViewTargetPawn->GetComponents(PawnComponents);
+			AddToHiddenComponents(PawnComponents);
+
+			//// hide weapon too
+			//if (ViewTargetPawn->CurrentWeapon)
+			//{
+			//	TInlineComponentArray<UPrimitiveComponent*> WeaponComponents;
+			//	ViewTargetPawn->CurrentWeapon->GetComponents(WeaponComponents);
+			//	AddToHiddenComponents(WeaponComponents);
+			//}
+		}
+
+		// we consumed it, reset for next frame
+		bHideViewTargetPawnNextFrame = false;
 	}
 }
 
@@ -868,5 +971,14 @@ bool ARougePlayerController::GetIsAutoRunning() const
 	}
 	return bIsAutoRunning;
 }
+
+void ARougePlayerController::OnSettingsChanged(URougeSettingsShared* Settings)
+{
+	bForceFeedbackEnabled = Settings->GetForceFeedbackEnabled();
+}
+
+
+
+
 
 

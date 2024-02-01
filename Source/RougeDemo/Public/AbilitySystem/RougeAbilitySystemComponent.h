@@ -4,10 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
+#include "NativeGameplayTags.h"
 #include "Components/AbilityComponent.h"
 #include "RougeAbilitySystemComponent.generated.h"
 
 class URougeAbilityTagRelationshipMapping;
+
+ROUGEDEMO_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Gameplay_AbilityInputBlocked);
+
 /**
  * Rouge技能系统组件（ URougeAbilitySystemComponent )）扩展了 技能系统组件（ UAbilitySystemComponent ）功能
  */
@@ -30,6 +34,8 @@ public:
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 
 	void ClearAbilityInput();
+
+	void ProcessAbilityInput(float DeltaTime, bool bGamePaused);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

@@ -30,7 +30,8 @@ public class RougeDemo : ModuleRules
 			"Niagara",
 			"ControlFlows",
 			"PropertyPath", 
-			"CommonGame"
+			"CommonGame", 
+			"GameSubtitles"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]
@@ -56,7 +57,8 @@ public class RougeDemo : ModuleRules
 			"EngineSettings",
 			"DTLSHandlerComponent", 
 			"MoviePlayer", 
-			"AnimGraphRuntime",
+			"AnimGraphRuntime", 
+			"GameSubtitles", 
 		});
 
 		// Uncomment if you are using Slate UI

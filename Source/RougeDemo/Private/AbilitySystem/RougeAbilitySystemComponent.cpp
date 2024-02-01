@@ -8,7 +8,7 @@
 #include "Character/RougeAnimInstance.h"
 #include "Character/RougeCharacter.h"
 
-
+UE_DEFINE_GAMEPLAY_TAG(TAG_Gameplay_AbilityInputBlocked, "Gameplay.AbilityInputBlocked");
 // Sets default values for this component's properties
 URougeAbilitySystemComponent::URougeAbilitySystemComponent()
 {
@@ -109,6 +109,103 @@ void URougeAbilitySystemComponent::ClearAbilityInput()
 	InputPressedSpecHandles.Reset();
 	InputReleasedSpecHandles.Reset();
 	InputHeldSpecHandles.Reset();
+}
+
+void URougeAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGamePaused)
+{
+	if (HasMatchingGameplayTag(TAG_Gameplay_AbilityInputBlocked))
+	{
+		ClearAbilityInput();
+		return;
+	}
+static TArray<FGameplayAbilitySpecHandle> AbilitiesToActivate;
+	AbilitiesToActivate.Reset();
+
+	//@TODO: See if we can use FScopedServerAbilityRPCBatcher ScopedRPCBatcher in some of these loops
+
+	//
+	// Process all abilities that activate when the input is held.
+	//
+	for (const FGameplayAbilitySpecHandle& SpecHandle : InputHeldSpecHandles)
+	{
+		if (const FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(SpecHandle))
+		{
+			if (AbilitySpec->Ability && !AbilitySpec->IsActive())
+			{
+				const URougeGameplayAbility* RougeAbilityCDO = CastChecked<URougeGameplayAbility>(AbilitySpec->Ability);
+
+				if (RougeAbilityCDO->GetActivationPolicy() == ERougeAbilityActivationPolicy::WhileInputActive)
+				{
+					AbilitiesToActivate.AddUnique(AbilitySpec->Handle);
+				}
+			}
+		}
+	}
+
+	//
+	// Process all abilities that had their input pressed this frame.
+	//
+	for (const FGameplayAbilitySpecHandle& SpecHandle : InputPressedSpecHandles)
+	{
+		if (FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(SpecHandle))
+		{
+			if (AbilitySpec->Ability)
+			{
+				AbilitySpec->InputPressed = true;
+
+				if (AbilitySpec->IsActive())
+				{
+					// Ability is active so pass along the input event.
+					AbilitySpecInputPressed(*AbilitySpec);
+				}
+				else
+				{
+					const URougeGameplayAbility* RougeAbilityCDO = CastChecked<URougeGameplayAbility>(AbilitySpec->Ability);
+
+					if (RougeAbilityCDO->GetActivationPolicy() == ERougeAbilityActivationPolicy::OnInputTriggered)
+					{
+						AbilitiesToActivate.AddUnique(AbilitySpec->Handle);
+					}
+				}
+			}
+		}
+	}
+
+	//
+	// Try to activate all the abilities that are from presses and holds.
+	// We do it all at once so that held inputs don't activate the ability
+	// and then also send a input event to the ability because of the press.
+	//
+	for (const FGameplayAbilitySpecHandle& AbilitySpecHandle : AbilitiesToActivate)
+	{
+		TryActivateAbility(AbilitySpecHandle);
+	}
+
+	//
+	// Process all abilities that had their input released this frame.
+	//
+	for (const FGameplayAbilitySpecHandle& SpecHandle : InputReleasedSpecHandles)
+	{
+		if (FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(SpecHandle))
+		{
+			if (AbilitySpec->Ability)
+			{
+				AbilitySpec->InputPressed = false;
+
+				if (AbilitySpec->IsActive())
+				{
+					// Ability is active so pass along the input event.
+					AbilitySpecInputReleased(*AbilitySpec);
+				}
+			}
+		}
+	}
+
+	//
+	// Clear the cached ability handles.
+	//
+	InputPressedSpecHandles.Reset();
+	InputReleasedSpecHandles.Reset();
 }
 
 

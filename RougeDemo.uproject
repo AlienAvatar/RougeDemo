@@ -45,6 +45,10 @@
 		{
 			"Name": "GameFeatures",
 			"Enabled": true
+		},
+		{
+			"Name": "GameSubtitles",
+			"Enabled": true
 		}
 	]
 }

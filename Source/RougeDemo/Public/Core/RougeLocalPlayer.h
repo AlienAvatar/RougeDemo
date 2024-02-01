@@ -8,6 +8,7 @@
 #include "RougeLocalPlayer.generated.h"
 
 class URougeSettingsLocal;
+class URougeSettingsShared;
 /**
  * 
  */
@@ -43,6 +44,8 @@ public:
 	UFUNCTION()
 	URougeSettingsLocal* GetLocalSettings() const;
 
+	UFUNCTION()
+	URougeSettingsShared* GetSharedSettings() const;
 protected:
 	void OnAudioOutputDeviceChanged(const FString& InAudioOutputDeviceId);
 private:
@@ -57,4 +60,8 @@ private:
 
 	UPROPERTY()
 	FOnRougeTeamIndexChangedDelegate OnTeamChangedDelegate;
+
+	UPROPERTY(Transient)
+	mutable TObjectPtr<URougeSettingsShared> SharedSettings;
+
 };

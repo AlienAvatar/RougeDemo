@@ -3,6 +3,7 @@
 
 #include "Core/RougeLocalPlayer.h"
 
+#include "SaveGame/RougeSettingsShared.h"
 #include "Settings/RougeSettingsLocal.h"
 
 URougeLocalPlayer::URougeLocalPlayer()
@@ -59,6 +60,16 @@ FOnRougeTeamIndexChangedDelegate* URougeLocalPlayer::GetOnTeamIndexChangedDelega
 URougeSettingsLocal* URougeLocalPlayer::GetLocalSettings() const
 {
 	return URougeSettingsLocal::Get();
+}
+
+URougeSettingsShared* URougeLocalPlayer::GetSharedSettings() const
+{
+	if (!SharedSettings)
+	{
+		SharedSettings = URougeSettingsShared::LoadOrCreateSettings(this);
+	}
+
+	return SharedSettings;
 }
 
 void URougeLocalPlayer::OnAudioOutputDeviceChanged(const FString& InAudioOutputDeviceId)
