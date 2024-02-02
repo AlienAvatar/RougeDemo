@@ -97,6 +97,10 @@ public:
 	bool GetIsAutoRunning() const;
 
 	void OnSettingsChanged(URougeSettingsShared* Settings);
+
+	//~ILyraTeamAgentInterface interface
+	virtual FOnRougeTeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
+	//~End of ILyraTeamAgentInterface interface
 protected:
 	UPROPERTY()
 	ARougeHUD* RougeDemoHUD;
@@ -189,4 +193,7 @@ private:
 
 	UPROPERTY(Transient)
 	mutable TObjectPtr<URougeSettingsShared> SharedSettings;
+
+	UPROPERTY()
+	FOnRougeTeamIndexChangedDelegate OnTeamChangedDelegate;
 };

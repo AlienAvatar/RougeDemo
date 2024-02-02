@@ -6,6 +6,9 @@
 #include "GameFramework/GameUserSettings.h"
 #include "RougeSettingsLocal.generated.h"
 
+class URougeLocalPlayer;
+class UPlayerMappableInputConfig;
+struct FLoadedMappableConfigPair;
 /**
  * 
  */
@@ -34,6 +37,13 @@ public:
 	
 	DECLARE_EVENT_OneParam(URougeSettingsLocal, FAudioDeviceChanged, const FString& /*DeviceId*/);
 	FAudioDeviceChanged OnAudioOutputDeviceChanged;
+	
+	void AddOrUpdateCustomKeyboardBindings(const FName MappingName, const FKey NewKey, URougeLocalPlayer* LocalPlayer);
+
+	// 获取具有特定名称的输入配置。如果配置不存在，则返回nullptr
+	UFUNCTION(BlueprintCallable)
+	const UPlayerMappableInputConfig* GetInputConfigByName(FName ConfigName) const;
+
 protected:
 	void UpdateEffectiveFrameRateLimit();
 	
@@ -62,5 +72,12 @@ private:
 	bool bUseHeadphoneMode;
 
 	FDelegateHandle OnApplicationActivationStateChangedHandle;
+
+	UPROPERTY(Config)
+	FName InputConfigName = TEXT("Default");
+
+	//当前注册的输入配置数组。这是由游戏功能插件填充的
+	UPROPERTY(VisibleAnywhere)
+	TArray<FLoadedMappableConfigPair> RegisteredInputConfigs;
 };
 

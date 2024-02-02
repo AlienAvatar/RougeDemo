@@ -91,6 +91,7 @@ void URougeLocalPlayer::OnPlayerControllerChanged(APlayerController* NewControll
 	if (IRougeTeamAgentInterface* ControllerAsTeamProvider = Cast<IRougeTeamAgentInterface>(NewController))
 	{
 		NewTeamID = ControllerAsTeamProvider->GetGenericTeamId();
+		FOnRougeTeamIndexChangedDelegate ChangedDelegate = ControllerAsTeamProvider->GetTeamChangedDelegateChecked();
 		ControllerAsTeamProvider->GetTeamChangedDelegateChecked().AddDynamic(this, &ThisClass::OnControllerChangedTeam);
 		LastBoundPC = NewController;
 	}

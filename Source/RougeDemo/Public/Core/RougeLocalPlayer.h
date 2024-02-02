@@ -9,8 +9,9 @@
 
 class URougeSettingsLocal;
 class URougeSettingsShared;
+
 /**
- * 
+ * URougeLocalPlayer
  */
 UCLASS()
 class ROUGEDEMO_API URougeLocalPlayer : public UCommonLocalPlayer, public IRougeTeamAgentInterface

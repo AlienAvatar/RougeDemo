@@ -66,7 +66,8 @@ protected:
 	bool bReadyToBindInputs = false;
 	
 	void Input_LookMouse(const FInputActionValue& InputActionValue);
-
+	void Input_Move(const FInputActionValue& InputActionValue);
+	
 	UPROPERTY()
 	TObjectPtr<URougeAbilitySystemComponent> AbilitySystemComponent;
 	

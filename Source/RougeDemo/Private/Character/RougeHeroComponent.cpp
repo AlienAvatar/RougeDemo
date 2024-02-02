@@ -223,6 +223,7 @@ void URougeHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputComp
 
 				RougeIC->AddInputMappings(InputConfig, Subsystem);
 				RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Look_Mouse, ETriggerEvent::Triggered, this, &ThisClass::Input_LookMouse, /*bLogIfNotFound=*/ false);
+				RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move, /*bLogIfNotFound=*/ false);
 				//RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Look_Stick, ETriggerEvent::Triggered, this, &ThisClass::Input_LookStick, /*bLogIfNotFound=*/ false);
 			}
 		}
@@ -286,6 +287,7 @@ void URougeHeroComponent::OnRegister()
 
 void URougeHeroComponent::Input_LookMouse(const FInputActionValue& InputActionValue)
 {
+
 	APawn* Pawn = GetPawn<APawn>();
 
 	if (!Pawn)
@@ -294,7 +296,7 @@ void URougeHeroComponent::Input_LookMouse(const FInputActionValue& InputActionVa
 	}
 	
 	const FVector2D Value = InputActionValue.Get<FVector2D>();
-
+	UE_LOG(LogTemp, Warning, TEXT("Input_LookMouse.InputActionValue[%f]"),Value.X);
 	if (Value.X != 0.0f)
 	{
 		Pawn->AddControllerYawInput(Value.X);
@@ -303,6 +305,36 @@ void URougeHeroComponent::Input_LookMouse(const FInputActionValue& InputActionVa
 	if (Value.Y != 0.0f)
 	{
 		Pawn->AddControllerPitchInput(Value.Y);
+	}
+}
+
+void URougeHeroComponent::Input_Move(const FInputActionValue& InputActionValue)
+{
+	APawn* Pawn = GetPawn<APawn>();
+	AController* Controller = Pawn ? Pawn->GetController() : nullptr;
+
+	// If the player has attempted to move again then cancel auto running
+	if (ARougePlayerController* RougeController = Cast<ARougePlayerController>(Controller))
+	{
+		RougeController->SetIsAutoRunning(false);
+	}
+	
+	if (Controller)
+	{
+		const FVector2D Value = InputActionValue.Get<FVector2D>();
+		const FRotator MovementRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
+		UE_LOG(LogTemp, Warning, TEXT("Input_Move.InputActionValue[%f]"),Value.X);
+		if (Value.X != 0.0f)
+		{
+			const FVector MovementDirection = MovementRotation.RotateVector(FVector::RightVector);
+			Pawn->AddMovementInput(MovementDirection, Value.X);
+		}
+
+		if (Value.Y != 0.0f)
+		{
+			const FVector MovementDirection = MovementRotation.RotateVector(FVector::ForwardVector);
+			Pawn->AddMovementInput(MovementDirection, Value.Y);
+		}
 	}
 }
 

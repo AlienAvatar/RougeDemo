@@ -31,7 +31,8 @@ public class RougeDemo : ModuleRules
 			"ControlFlows",
 			"PropertyPath", 
 			"CommonGame", 
-			"GameSubtitles"
+			"GameSubtitles", 
+			"GameSettings"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]

@@ -977,6 +977,11 @@ void ARougePlayerController::OnSettingsChanged(URougeSettingsShared* Settings)
 	bForceFeedbackEnabled = Settings->GetForceFeedbackEnabled();
 }
 
+FOnRougeTeamIndexChangedDelegate* ARougePlayerController::GetOnTeamIndexChangedDelegate()
+{
+	return &OnTeamChangedDelegate;
+}
+
 
 
 
