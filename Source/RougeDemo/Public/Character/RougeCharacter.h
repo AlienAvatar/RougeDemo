@@ -16,6 +16,7 @@
 #include "Struct/MovementSettings.h"
 #include "Struct/MovementSettingsState.h"
 #include "AbilitySystemInterface.h"
+#include "ModularCharacter.h"
 #include "Teams/RougeTeamAgentInterface.h"
 #include "RougeCharacter.generated.h"
 
@@ -30,7 +31,7 @@ class ARougePlayerController;
 class URougeAbilitySystemComponent;
 
 UCLASS()
-class ROUGEDEMO_API ARougeCharacter : public ACharacter, public ICharacterInterface, public IAbilitySystemInterface
+class ROUGEDEMO_API ARougeCharacter : public AModularCharacter, public ICharacterInterface, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 

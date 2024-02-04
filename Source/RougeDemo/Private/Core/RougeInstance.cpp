@@ -54,10 +54,14 @@ void URougeInstance::Init()
 		//在GameInstance初始化期间通过调用 RegisterInitState 向子系统注册, 共享给游戏中的所有Actor
 		//如果必需的数据可用，它将过渡到 DataAvailable ，但还无法过渡到 DataInitialized
 		//以尝试遵循4状态初始化链
+		//InitState_Spawned 功能已完成生成和初始复制，从 BeginPlay 调用
 		ComponentManager->RegisterInitState(GameplayTags.InitState_Spawned, false, FGameplayTag());
 		//它会检查玩家状态和输入组件是否已就绪
+		//InitState_DataAvailable 功能需要的所有数据都已复制或加载，包括其他Actor上也可能需要复制的依赖关系
 		ComponentManager->RegisterInitState(GameplayTags.InitState_DataAvailable, false, GameplayTags.InitState_Spawned);
+		//InitState_DataInitialized 所有数据都可用之后，该状态用于完成其他初始化操作，如添加Gameplay能力
 		ComponentManager->RegisterInitState(GameplayTags.InitState_DataInitialized, false, GameplayTags.InitState_DataAvailable);
+		//InitState_GameplayReady 对象已完成所有初始化，并准备好在正常Gameplay中进行交互
 		ComponentManager->RegisterInitState(GameplayTags.InitState_GameplayReady, false, GameplayTags.InitState_DataInitialized);
 	}
 }

@@ -21,6 +21,7 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(InputTag_Look_Stick, "InputTag.Look.Stick", "Look (stick) input.");
 	AddTag(InputTag_Crouch, "InputTag.Crouch", "Crouch input.");
 	AddTag(InputTag_AutoRun, "InputTag.AutoRun", "Auto-run input.");
+	AddTag(InputTag_Test, "InputTag.Test", "Test input.");
 
 	AddMovementModeTag(Movement_Mode_Walking, "Movement.Mode.Walking", MOVE_Walking);
 	AddMovementModeTag(Movement_Mode_NavWalking, "Movement.Mode.NavWalking", MOVE_NavWalking);

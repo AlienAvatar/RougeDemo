@@ -166,8 +166,10 @@ void URougeHeroComponent::OnActorInitStateChanged(const FActorInitStateChangedPa
 void URougeHeroComponent::CheckDefaultInitialization()
 {
 	const FRougeGameplayTags& InitTags = FRougeGameplayTags::Get();
+	//状态链
 	static const TArray<FGameplayTag> StateChain = { InitTags.InitState_Spawned, InitTags.InitState_DataAvailable, InitTags.InitState_DataInitialized, InitTags.InitState_GameplayReady };
-	
+
+	//尝试遵循连接的init状态链，按顺序执行状态并返回到达的最终状态
 	ContinueInitStateChain(StateChain);
 }
 
@@ -203,14 +205,16 @@ void URougeHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputComp
 	{
 		if (const URougePawnData* PawnData = PawnExtComp->GetPawnData<URougePawnData>())
 		{
+			//读取PawnData中的数据（默认为InputData_SimplePawn）
 			if (const URougeInputConfig* InputConfig = PawnData->InputConfig)
 			{
 				const FRougeGameplayTags& GameplayTags = FRougeGameplayTags::Get();
+				//需要在Pawn中的HeroComponent中配置
 				for (const FMappableConfigPair& Pair : DefaultInputConfigs)
 				{
 					if (Pair.bShouldActivateAutomatically && Pair.CanBeActivated())
 					{
-						FModifyContextOptions Options = {};
+						FModifyContextOptions Options = {}; 
 						Options.bIgnoreAllPressedKeysUntilRelease = false;
 						// Actually add the config to the local player			
 						Subsystem->AddPlayerMappableConfig(Pair.Config.LoadSynchronous(), Options);	
@@ -222,8 +226,9 @@ void URougeHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputComp
 				URougeInputComponent* RougeIC = CastChecked<URougeInputComponent>(PlayerInputComponent);
 
 				RougeIC->AddInputMappings(InputConfig, Subsystem);
-				RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Look_Mouse, ETriggerEvent::Triggered, this, &ThisClass::Input_LookMouse, /*bLogIfNotFound=*/ false);
+ 				RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Look_Mouse, ETriggerEvent::Triggered, this, &ThisClass::Input_LookMouse, /*bLogIfNotFound=*/ false);
 				RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move, /*bLogIfNotFound=*/ false);
+				RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Test, ETriggerEvent::Triggered, this, &ThisClass::Input_Test, /*bLogIfNotFound=*/ false);
 				//RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Look_Stick, ETriggerEvent::Triggered, this, &ThisClass::Input_LookStick, /*bLogIfNotFound=*/ false);
 			}
 		}
@@ -273,7 +278,7 @@ void URougeHeroComponent::OnRegister()
 {
 	Super::OnRegister();
 
-	//如果没有挂载到Pawn上，则无法注册
+	//如果没有挂载到Pawn上，则无法注册, HeroComponent只能在Pawn上使用
 	if (!GetPawn<APawn>())
 	{
 		UE_LOG(LogTemp, Error, TEXT("[URougeHeroComponent::OnRegister] This component has been added to a blueprint whose base class is not a Pawn. To use this component, it MUST be placed on a Pawn Blueprint."));
@@ -336,6 +341,11 @@ void URougeHeroComponent::Input_Move(const FInputActionValue& InputActionValue)
 			Pawn->AddMovementInput(MovementDirection, Value.Y);
 		}
 	}
+}
+
+void URougeHeroComponent::Input_Test()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Input_Test"));
 }
 
 void URougeHeroComponent::Input_AbilityInputTagPressed(FGameplayTag InputTag)

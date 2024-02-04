@@ -67,6 +67,7 @@ protected:
 	
 	void Input_LookMouse(const FInputActionValue& InputActionValue);
 	void Input_Move(const FInputActionValue& InputActionValue);
+	void Input_Test();
 	
 	UPROPERTY()
 	TObjectPtr<URougeAbilitySystemComponent> AbilitySystemComponent;

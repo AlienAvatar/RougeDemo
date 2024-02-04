@@ -29,21 +29,24 @@ public:
 	FGameplayTag InputTag_Look_Stick;
 	FGameplayTag InputTag_Crouch;
 	FGameplayTag InputTag_AutoRun;
-
+	FGameplayTag InputTag_Test;
+	
 	// Initialization states for the GameFrameworkComponentManager, these are registered in order by LyraGameInstance and some actors will skip right to GameplayReady
 
-	/** Actor/component has initially spawned and can be extended */
+	/** 功能已完成生成和初始复制，从 BeginPlay 调用*/
 	FGameplayTag InitState_Spawned;
 
 	/** 它会检查玩家状态和输入组件是否已就绪 */
 	FGameplayTag InitState_DataAvailable;
 
-	/** The available data has been initialized for this actor/component, but it is not ready for full gameplay */
+	/** 所有数据都可用之后，该状态用于完成其他初始化操作，如添加Gameplay能力 */
 	FGameplayTag InitState_DataInitialized;
 
-	/** The actor/component is fully ready for active gameplay */
+	/** 对象已完成所有初始化，并准备好在正常Gameplay中进行交互 */
 	FGameplayTag InitState_GameplayReady;
 
+
+	
 	FGameplayTag GameplayEvent_Death;
 	FGameplayTag GameplayEvent_Reset;
 	FGameplayTag GameplayEvent_RequestReset;
