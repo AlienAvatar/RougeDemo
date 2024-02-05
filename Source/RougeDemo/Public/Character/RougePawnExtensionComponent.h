@@ -25,7 +25,6 @@ public:
 	static const FName NAME_ActorFeatureName;
 	// Sets default values for this component's properties
 	URougePawnExtensionComponent(const FObjectInitializer& ObjectInitializer);
-
 	void SetPawnData(const URougePawnData* InPawnData);
 	
 	// 注册并调用委托，如果我们的Pawn已经注册了AbilitySystemComponent，那么就注册OnAbilitySystemInitialized委托

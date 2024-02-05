@@ -175,7 +175,7 @@ void URougeHeroComponent::CheckDefaultInitialization()
 
 void URougeHeroComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	//以从系统注销并取消绑定通知委托
+	//以从系统注销状态并取消绑定委托
 	UnregisterInitStateFeature();
 	
 	Super::EndPlay(EndPlayReason);
@@ -225,6 +225,10 @@ void URougeHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputComp
 				//这里做绑定
 				URougeInputComponent* RougeIC = CastChecked<URougeInputComponent>(PlayerInputComponent);
 
+				//绑定Ability的Pressed和Released
+				TArray<uint32> BindHandles;
+				RougeIC->BindAbilityActions(InputConfig, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, /*out*/ BindHandles);
+				
 				RougeIC->AddInputMappings(InputConfig, Subsystem);
  				RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Look_Mouse, ETriggerEvent::Triggered, this, &ThisClass::Input_LookMouse, /*bLogIfNotFound=*/ false);
 				RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move, /*bLogIfNotFound=*/ false);
@@ -269,7 +273,7 @@ void URougeHeroComponent::AddAdditionalInputConfig(const URougeInputConfig* Inpu
 
 	if (const URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(Pawn))
 	{
-		//绑定输入设置
+		//绑定Ability输入设置
 		RougeIC->BindAbilityActions(InputConfig, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, /*out*/ BindHandles);
 	}
 }
@@ -309,7 +313,7 @@ void URougeHeroComponent::Input_LookMouse(const FInputActionValue& InputActionVa
 
 	if (Value.Y != 0.0f)
 	{
-		Pawn->AddControllerPitchInput(Value.Y);
+		Pawn->AddControllerPitchInput(Value.Y * (-1));
 	}
 }
 

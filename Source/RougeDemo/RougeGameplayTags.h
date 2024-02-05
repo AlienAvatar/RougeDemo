@@ -13,7 +13,7 @@ public:
 	static FGameplayTag FindTagByString(FString TagString, bool bMatchPartialString = false);
 
 public:
-
+	//应用于所有的Ability Tag
 	FGameplayTag Ability_ActivateFail_IsDead;
 	FGameplayTag Ability_ActivateFail_Cooldown;
 	FGameplayTag Ability_ActivateFail_Cost;

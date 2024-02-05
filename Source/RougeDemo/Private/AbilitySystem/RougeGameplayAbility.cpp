@@ -4,6 +4,11 @@
 #include "AbilitySystem/RougeGameplayAbility.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/RougeAbilitySystemComponent.h"
+#include "RougeDemo/RougeDemo.h"
+#include "RougeDemo/RougeGameplayTags.h"
+
+DEFINE_LOG_CATEGORY(LogAbility);
 
 void URougeGameplayAbility::OnPawnAvatarSet()
 {
@@ -35,4 +40,55 @@ void URougeGameplayAbility::TryActivateAbilityOnSpawn(const FGameplayAbilityActo
 			}
 		}
 	}
+}
+
+bool URougeGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags,
+	const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
+{
+	if (!ActorInfo || !ActorInfo->AbilitySystemComponent.IsValid())
+	{
+		return false;
+	}
+
+	URougeAbilitySystemComponent* RougeASC = CastChecked<URougeAbilitySystemComponent>(ActorInfo->AbilitySystemComponent.Get());
+	const FRougeGameplayTags& GameplayTags = FRougeGameplayTags::Get();
+
+	if (!Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
+	{
+		return false;
+	}
+
+	//@TODO Possibly remove after setting up tag relationships
+	if (RougeASC->IsActivationGroupBlocked(ActivationGroup))
+	{
+		if (OptionalRelevantTags)
+		{
+			OptionalRelevantTags->AddTag(GameplayTags.Ability_ActivateFail_ActivationGroup);
+		}
+		return false;
+	}
+
+	return true;
+}
+
+void URougeGameplayAbility::SetCanBeCanceled(bool bCanBeCanceled)
+{
+	// 如果该Ability可以被代替
+	if (!bCanBeCanceled && (ActivationGroup == ERougeAbilityActivationGroup::Exclusive_Replaceable))
+	{
+		ABILITY_LOG(Error, TEXT("SetCanBeCanceled: Ability [%s] can not block canceling because its activation group is replaceable."), *GetName());
+		return;
+	}
+
+	Super::SetCanBeCanceled(bCanBeCanceled);
+}
+
+void URougeGameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+{
+	Super::OnGiveAbility(ActorInfo, Spec);
+
+	K2_OnAbilityAdded();
+
+	TryActivateAbilityOnSpawn(ActorInfo, Spec);
 }

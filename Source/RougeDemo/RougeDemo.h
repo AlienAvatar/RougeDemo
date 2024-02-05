@@ -30,6 +30,10 @@ DECLARE_LOG_CATEGORY_EXTERN(LogPlayerState, Log, All);
 #define PLAYER_STATE_LOG(Verbosity, Format, ...) \
 UE_LOG(LogPlayerState, Verbosity, Format, ##__VA_ARGS__)
 
+DECLARE_LOG_CATEGORY_EXTERN(LogAbility, Log, All);
+#define ABILITY_LOG(Verbosity, Format, ...) \
+UE_LOG(LogAbility, Verbosity, Format, ##__VA_ARGS__)
+
 ROUGEDEMO_API DECLARE_LOG_CATEGORY_EXTERN(LogRouge, Log, All);
 
 ROUGEDEMO_API FString GetClientServerContextString(UObject* ContextObject = nullptr);

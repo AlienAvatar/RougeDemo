@@ -208,6 +208,32 @@ static TArray<FGameplayAbilitySpecHandle> AbilitiesToActivate;
 	InputReleasedSpecHandles.Reset();
 }
 
+bool URougeAbilitySystemComponent::IsActivationGroupBlocked(ERougeAbilityActivationGroup Group) const
+{
+	bool bBlocked = false;
+
+	switch (Group)
+	{
+	case ERougeAbilityActivationGroup::Independent:
+		// Independent abilities are never blocked.
+		// 独立技能不会被打断
+		bBlocked = false;
+		break;
+
+	case ERougeAbilityActivationGroup::Exclusive_Replaceable:
+	case ERougeAbilityActivationGroup::Exclusive_Blocking:
+		// Exclusive abilities can activate if nothing is blocking.
+		bBlocked = (ActivationGroupCounts[(uint8)ERougeAbilityActivationGroup::Exclusive_Blocking] > 0);
+		break;
+
+	default:
+		checkf(false, TEXT("IsActivationGroupBlocked: Invalid ActivationGroup [%d]\n"), (uint8)Group);
+		break;
+	}
+
+	return bBlocked;
+}
+
 
 // Called when the game starts
 void URougeAbilitySystemComponent::BeginPlay()

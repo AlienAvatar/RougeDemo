@@ -31,7 +31,7 @@ URougeSettingsShared* URougeSettingsShared::LoadOrCreateSettings(const URougeLoc
 {
 	URougeSettingsShared* SharedSettings = nullptr;
 
-	// If the save game exists, load it.
+	//是否在SaveGame存在，存在则读取，否则则创建
 	if (UGameplayStatics::DoesSaveGameExist(SHARED_SETTINGS_SLOT_NAME, LocalPlayer->GetLocalPlayerIndex()))
 	{
 		USaveGame* Slot = UGameplayStatics::LoadGameFromSlot(SHARED_SETTINGS_SLOT_NAME, LocalPlayer->GetLocalPlayerIndex());

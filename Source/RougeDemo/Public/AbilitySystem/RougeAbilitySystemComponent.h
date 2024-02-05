@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "NativeGameplayTags.h"
-#include "Components/AbilityComponent.h"
+#include "AbilitySystem/RougeGameplayAbility.h"
 #include "RougeAbilitySystemComponent.generated.h"
 
 class URougeAbilityTagRelationshipMapping;
@@ -36,6 +36,17 @@ public:
 	void ClearAbilityInput();
 
 	void ProcessAbilityInput(float DeltaTime, bool bGamePaused);
+
+	//是否会被激活的组别阻塞
+	bool IsActivationGroupBlocked(ERougeAbilityActivationGroup Group) const;
+
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
+							   FActorComponentTickFunction* ThisTickFunction) override;
+
+	//如果设置了，这个表用于查找Tag的激活和取消关系
+	UPROPERTY()
+	TObjectPtr<URougeAbilityTagRelationshipMapping> TagRelationshipMapping;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -51,12 +62,7 @@ protected:
 	// 处理Ability保持输入
 	TArray<FGameplayAbilitySpecHandle> InputHeldSpecHandles;
 
-public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
-
-	//如果设置了，这个表用于查找Tag的激活和取消关系
-	UPROPERTY()
-	TObjectPtr<URougeAbilityTagRelationshipMapping> TagRelationshipMapping;
+	// Number of abilities running in each activation group.
+	//在Activation Group中正在运行Ability的个数
+	int32 ActivationGroupCounts[(uint8)ERougeAbilityActivationGroup::MAX];
 };
