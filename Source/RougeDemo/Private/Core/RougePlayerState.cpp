@@ -139,6 +139,7 @@ void ARougePlayerState::SetPawnData(const URougePawnData* InPawnData)
 	MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, PawnData, this);
 	PawnData = InPawnData;
 
+	//读取配置的Ability数据，如Dash
 	for (const URougeAbilitySet* AbilitySet : PawnData->AbilitySets)
 	{
 		if (AbilitySet)

@@ -46,6 +46,9 @@ class URougeGlobalAbilitySystem : public UWorldSubsystem
 public:
 	URougeGlobalAbilitySystem();
 
+	//给全部玩家应用Gameplay Effect
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category="Lyra")
+	void ApplyEffectToAll(TSubclassOf<UGameplayEffect> Effect);
 	
 	UPROPERTY()
 	TMap<TObjectPtr<URougeAbilitySystemComponent>, FGameplayAbilitySpecHandle> Handles;

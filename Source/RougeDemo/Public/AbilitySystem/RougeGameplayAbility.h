@@ -31,22 +31,19 @@ enum class ERougeAbilityActivationPolicy : uint8
 /**
  * ERougeAbilityActivationGroup
  *
- *	Defines how an ability activates in relation to other abilities.
  *	定义一个Ability和其它Ability之间的关系
+ *	激活组决定技能是否可以自由激活，或者该技能是否会阻止或打断其他专有技能
  */
 UENUM(BlueprintType)
 enum class ERougeAbilityActivationGroup : uint8
 {
-	// Ability runs independently of all other abilities.
-	//独立运行，不会被打断
+	//该技能不会阻止或取代其他技能。默认情况下，大多数技能都应设置为此标签
 	Independent,
 
-	// Ability is canceled and replaced by other exclusive abilities.
-	//会被其它技能替代，如正在使用某个Ability，被其它Ability代替
+	//该技能不会阻止其他专有技能，但如果另一个专有技能被激活，则会被取消
 	Exclusive_Replaceable,
 
-	// Ability blocks all other exclusive abilities from activating.
-	//会被其它技能阻塞，无法使用某个Ability
+	//当技能运行时，不能激活其他专有技能
 	Exclusive_Blocking,
 
 	MAX	UMETA(Hidden)
@@ -62,18 +59,21 @@ class ROUGEDEMO_API URougeGameplayAbility : public UGameplayAbility
 	GENERATED_BODY()
 
 public:
-	virtual void OnPawnAvatarSet();
-
-	//当Ability system由Pawn初始化完成
-	/*UFUNCTION(BlueprintImplementableEvent, Category = Ability, DisplayName = "OnPawnAvatarSet")
-	void K2_OnPawnAvatarSet();*/
-
+	URougeGameplayAbility(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	
 	void TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;
 
 	ERougeAbilityActivationPolicy GetActivationPolicy() const { return ActivationPolicy; }
 
+	//获取RougeCharacter
 	UFUNCTION(BlueprintCallable, Category = "Rouge|Ability")
 	ARougeCharacter* GetRougeCharacterFromActorInfo() const;
+
+	//获取Controller
+	UFUNCTION(BlueprintCallable, Category = "Rouge|Ability")
+	AController* GetControllerFromActorInfo() const;
+
+	virtual void OnPawnAvatarSet();
 protected:
 	//~UGameplayAbility interface
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const override;
@@ -96,6 +96,10 @@ protected:
 	//当该Ability被AbilitySystemComponent授予时，删除Ability
 	UFUNCTION(BlueprintImplementableEvent, Category = Ability, DisplayName = "OnAbilityRemoved")
 	void K2_OnAbilityRemoved();
+
+	//当该Ability被Pawn初始化时
+	UFUNCTION(BlueprintImplementableEvent, Category = Ability, DisplayName = "OnPawnAvatarSet")
+	void K2_OnPawnAvatarSet();
 	
 	//定义Ability该如何激活
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rouge|Ability Activation")
@@ -106,4 +110,6 @@ protected:
 	ERougeAbilityActivationGroup ActivationGroup;
 
 	virtual void GetAbilitySource(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, float& OutSourceLevel, const IRougeAbilitySourceInterface*& OutAbilitySource, AActor*& OutEffectCauser) const;
+
+
 };

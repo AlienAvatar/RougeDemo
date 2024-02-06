@@ -17,11 +17,17 @@ DEFINE_LOG_CATEGORY(LogAbility);
 
 void URougeGameplayAbility::OnPawnAvatarSet()
 {
-	//K2_OnPawnAvatarSet();
+	K2_OnPawnAvatarSet();
+}
+
+URougeGameplayAbility::URougeGameplayAbility(const FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer)
+{
+	
 }
 
 void URougeGameplayAbility::TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilitySpec& Spec) const
+                                                      const FGameplayAbilitySpec& Spec) const
 {
 	const bool bIsPredicting = (Spec.ActivationInfo.ActivationMode == EGameplayAbilityActivationMode::Predicting);
 	
@@ -51,6 +57,36 @@ ARougeCharacter* URougeGameplayAbility::GetRougeCharacterFromActorInfo() const
 {
 	//返回当前的Player Character
 	return  (CurrentActorInfo ? Cast<ARougeCharacter>(CurrentActorInfo->AvatarActor.Get()) : nullptr);
+}
+
+AController* URougeGameplayAbility::GetControllerFromActorInfo() const
+{
+	if (CurrentActorInfo)
+	{
+		if (AController* PC = CurrentActorInfo->PlayerController.Get())
+		{
+			return PC;
+		}
+
+		// Look for a player controller or pawn in the owner chain.
+		AActor* TestActor = CurrentActorInfo->OwnerActor.Get();
+		while (TestActor)
+		{
+			if (AController* C = Cast<AController>(TestActor))
+			{
+				return C;
+			}
+
+			if (APawn* Pawn = Cast<APawn>(TestActor))
+			{
+				return Pawn->GetController();
+			}
+
+			TestActor = TestActor->GetOwner();
+		}
+	}
+
+	return nullptr;
 }
 
 bool URougeGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle,
@@ -131,14 +167,14 @@ FGameplayEffectContextHandle URougeGameplayAbility::MakeEffectContext(const FGam
 {
 	FGameplayEffectContextHandle ContextHandle = Super::MakeEffectContext(Handle, ActorInfo);
 	FRougeGameplayEffectContext* EffectContext = FRougeGameplayEffectContext::ExtractEffectContext(ContextHandle);
-	/*check(EffectContext);
+	check(EffectContext);
 
 	check(ActorInfo);
 
 	AActor* EffectCauser = nullptr;
 	const IRougeAbilitySourceInterface* AbilitySource = nullptr;
 	float SourceLevel = 0.0f;
-	GetAbilitySource(Handle, ActorInfo, /*out#1# SourceLevel, /*out#1# AbilitySource, /*out#1# EffectCauser);
+	GetAbilitySource(Handle, ActorInfo, SourceLevel,AbilitySource,EffectCauser);
 
 	UObject* SourceObject = GetSourceObject(Handle, ActorInfo);
 
@@ -146,7 +182,7 @@ FGameplayEffectContextHandle URougeGameplayAbility::MakeEffectContext(const FGam
 
 	EffectContext->SetAbilitySource(AbilitySource, SourceLevel);
 	EffectContext->AddInstigator(Instigator, EffectCauser);
-	EffectContext->AddSourceObject(SourceObject);*/
+	EffectContext->AddSourceObject(SourceObject);
 
 	return ContextHandle;
 }

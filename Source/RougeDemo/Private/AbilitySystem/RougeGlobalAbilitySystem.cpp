@@ -9,6 +9,18 @@ URougeGlobalAbilitySystem::URougeGlobalAbilitySystem()
 {
 }
 
+void URougeGlobalAbilitySystem::ApplyEffectToAll(TSubclassOf<UGameplayEffect> Effect)
+{
+	if ((Effect.Get() != nullptr) && (!AppliedEffects.Contains(Effect)))
+	{
+		FGlobalAppliedEffectList& Entry = AppliedEffects.Add(Effect);
+		for (URougeAbilitySystemComponent* ASC : RegisteredASCs)
+		{
+			Entry.AddToASC(Effect, ASC);
+		}
+	}
+}
+
 void URougeGlobalAbilitySystem::AddToASC(TSubclassOf<UGameplayAbility> Ability, URougeAbilitySystemComponent* ASC)
 {
 	if (FGameplayAbilitySpecHandle* SpecHandle = Handles.Find(ASC))

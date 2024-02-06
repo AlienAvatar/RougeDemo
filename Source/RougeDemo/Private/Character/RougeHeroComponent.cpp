@@ -120,8 +120,6 @@ void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* 
 	const FRougeGameplayTags& InitTags = FRougeGameplayTags::Get();
 	if (CurrentState == FRougeGameplayTags::Get().InitState_DataAvailable && DesiredState == FRougeGameplayTags::Get().InitState_DataInitialized)
 	{
-		APawn* Test_Pawn = GetOwner<APawn>();
-		UE_LOG(LogTemp, Warning, TEXT("TestPawn2[%s]"), *Test_Pawn->GetName());
 		APawn* Pawn = GetPawn<APawn>();
 		ARougePlayerState* RougePS = GetPlayerState<ARougePlayerState>();
 		if (!ensure(Pawn && RougePS))

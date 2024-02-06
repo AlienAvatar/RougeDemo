@@ -806,34 +806,6 @@ void ARougeCharacter::UpdateGroundedRotation(float DeltaTime)
 		const float RotationRate = CalculateGroundedRotationRate();
 		SmoothCharacterRotation(YawRotation,800.f,RotationRate);
 	}
-	
-	
-	/*if(CanUpdateMovingRotation())
-	{
-		const FRotator Target (0.f, LastVelocityRotation.Yaw, 0.f);
-		
-		/*switch (RotationMode)
-		{
-		case ERotationMode::ERM_VelocityDirection:
-			
-			
-			break;
-		case ERotationMode::ERM_LookingDirection:
-			break;
-		case ERotationMode::ERM_Aiming:
-			break;
-		}#1#
-	}else
-	{
-		const float RotationAmountValue = GetAnimCurveValue(TEXT("RotationAmount"));
-		if(UKismetMathLibrary::Abs(RotationAmountValue) > 0.001f)
-		{
-			const float DeltaRotationYaw = RotationAmountValue * (UGameplayStatics::GetWorldDeltaSeconds(GetWorld()) / (1.f / 30.f));
-			const FRotator DeltaRotation (0.f, DeltaRotationYaw, 0.f);
-			AddActorWorldRotation(DeltaRotation);
-			TargetRotation = GetActorRotation();
-		}
-	}*/
 }
 
 void ARougeCharacter::ReGenerateOverlap()
@@ -1141,19 +1113,6 @@ void ARougeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PawnExtComponent->SetupPlayerInputComponent();
-	
-	//PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&ARougeDemoCharacter::Jump);
-	// PlayerInputComponent->BindAction("RagdollAction",IE_Pressed,this,&ARougeCharacter::RagdollAction);
-	// PlayerInputComponent->BindAction("Crouch",IE_Pressed,this,&ARougeCharacter::CrouchAction);
-	// PlayerInputComponent->BindAction("LockOn",IE_Pressed,this,&ARougeCharacter::LockOnAction);
-	// PlayerInputComponent->BindAction("Sprint",IE_Pressed,this,&ARougeCharacter::StartSprint);
-	// PlayerInputComponent->BindAction("Sprint",IE_Released,this,&ARougeCharacter::StopSprint);
-	// PlayerInputComponent->BindAction("Roll",IE_Pressed,this,&ARougeCharacter::RollAction);
-	//
-	// PlayerInputComponent->BindAxis("MoveForward",this,&ARougeCharacter::MoveForward);
-	// PlayerInputComponent->BindAxis("MoveRight",this,&ARougeCharacter::MoveRight);
-	// PlayerInputComponent->BindAxis("Turn",this,&ARougeCharacter::Turn);
-	// PlayerInputComponent->BindAxis("LookUp",this,&ARougeCharacter::LookUp);
 }
 
 void ARougeCharacter::SetDisableInput(bool bNewDisableInput)
