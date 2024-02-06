@@ -225,10 +225,11 @@ void URougeHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputComp
 				//这里做绑定
 				URougeInputComponent* RougeIC = CastChecked<URougeInputComponent>(PlayerInputComponent);
 
-				//绑定Ability的Pressed和Released
+				//绑定Ability Action的Pressed和Released
 				TArray<uint32> BindHandles;
 				RougeIC->BindAbilityActions(InputConfig, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, /*out*/ BindHandles);
-				
+
+				//绑定Native Action
 				RougeIC->AddInputMappings(InputConfig, Subsystem);
  				RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Look_Mouse, ETriggerEvent::Triggered, this, &ThisClass::Input_LookMouse, /*bLogIfNotFound=*/ false);
 				RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move, /*bLogIfNotFound=*/ false);

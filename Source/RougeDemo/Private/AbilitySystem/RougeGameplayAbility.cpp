@@ -4,9 +4,14 @@
 #include "AbilitySystem/RougeGameplayAbility.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/RougeAbilitySourceInterface.h"
 #include "AbilitySystem/RougeAbilitySystemComponent.h"
+#include "AbilitySystem/RougeGameplayEffectContext.h"
+#include "Character/RougeCharacter.h"
+#include "Physics/PhysicalMaterialWithTag.h"
 #include "RougeDemo/RougeDemo.h"
 #include "RougeDemo/RougeGameplayTags.h"
+
 
 DEFINE_LOG_CATEGORY(LogAbility);
 
@@ -42,9 +47,15 @@ void URougeGameplayAbility::TryActivateAbilityOnSpawn(const FGameplayAbilityActo
 	}
 }
 
+ARougeCharacter* URougeGameplayAbility::GetRougeCharacterFromActorInfo() const
+{
+	//返回当前的Player Character
+	return  (CurrentActorInfo ? Cast<ARougeCharacter>(CurrentActorInfo->AvatarActor.Get()) : nullptr);
+}
+
 bool URougeGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags,
-	const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
+                                               const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags,
+                                               const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
 {
 	if (!ActorInfo || !ActorInfo->AbilitySystemComponent.IsValid())
 	{
@@ -92,3 +103,82 @@ void URougeGameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* Actor
 
 	TryActivateAbilityOnSpawn(ActorInfo, Spec);
 }
+
+void URougeGameplayAbility::OnRemoveAbility(const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec)
+{
+	K2_OnAbilityRemoved();
+
+	Super::OnRemoveAbility(ActorInfo, Spec);
+}
+
+void URougeGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
+void URougeGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility, bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+FGameplayEffectContextHandle URougeGameplayAbility::MakeEffectContext(const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo) const
+{
+	FGameplayEffectContextHandle ContextHandle = Super::MakeEffectContext(Handle, ActorInfo);
+	FRougeGameplayEffectContext* EffectContext = FRougeGameplayEffectContext::ExtractEffectContext(ContextHandle);
+	/*check(EffectContext);
+
+	check(ActorInfo);
+
+	AActor* EffectCauser = nullptr;
+	const IRougeAbilitySourceInterface* AbilitySource = nullptr;
+	float SourceLevel = 0.0f;
+	GetAbilitySource(Handle, ActorInfo, /*out#1# SourceLevel, /*out#1# AbilitySource, /*out#1# EffectCauser);
+
+	UObject* SourceObject = GetSourceObject(Handle, ActorInfo);
+
+	AActor* Instigator = ActorInfo ? ActorInfo->OwnerActor.Get() : nullptr;
+
+	EffectContext->SetAbilitySource(AbilitySource, SourceLevel);
+	EffectContext->AddInstigator(Instigator, EffectCauser);
+	EffectContext->AddSourceObject(SourceObject);*/
+
+	return ContextHandle;
+}
+
+void URougeGameplayAbility::ApplyAbilityTagsToGameplayEffectSpec(FGameplayEffectSpec& Spec,
+	FGameplayAbilitySpec* AbilitySpec) const
+{
+	Super::ApplyAbilityTagsToGameplayEffectSpec(Spec, AbilitySpec);
+
+	if (const FHitResult* HitResult = Spec.GetContext().GetHitResult())
+	{
+		if (const UPhysicalMaterialWithTag* PhysMatWithTags = Cast<const UPhysicalMaterialWithTag>(HitResult->PhysMaterial.Get()))
+		{
+			Spec.CapturedTargetTags.GetSpecTags().AppendTags(PhysMatWithTags->Tags);
+		}
+	}
+}
+
+void URougeGameplayAbility::GetAbilitySource(FGameplayAbilitySpecHandle Handle,
+                                             const FGameplayAbilityActorInfo* ActorInfo, float& OutSourceLevel,
+                                             const IRougeAbilitySourceInterface*& OutAbilitySource, AActor*& OutEffectCauser) const
+{
+	OutSourceLevel = 0.0f;
+	OutAbilitySource = nullptr;
+	OutEffectCauser = nullptr;
+
+	OutEffectCauser = ActorInfo->AvatarActor.Get();
+
+	// If we were added by something that's an ability info source, use it
+	UObject* SourceObject = GetSourceObject(Handle, ActorInfo);
+
+	OutAbilitySource = Cast<IRougeAbilitySourceInterface>(SourceObject);
+}
+
+
