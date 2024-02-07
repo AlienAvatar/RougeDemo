@@ -231,7 +231,7 @@ void URougeHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputComp
 				RougeIC->AddInputMappings(InputConfig, Subsystem);
  				RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Look_Mouse, ETriggerEvent::Triggered, this, &ThisClass::Input_LookMouse, /*bLogIfNotFound=*/ false);
 				RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move, /*bLogIfNotFound=*/ false);
-				RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Test, ETriggerEvent::Triggered, this, &ThisClass::Input_Test, /*bLogIfNotFound=*/ false);
+				//RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Test, ETriggerEvent::Triggered, this, &ThisClass::Input_Test, /*bLogIfNotFound=*/ false);
 				//RougeIC->BindNativeAction(InputConfig, GameplayTags.InputTag_Look_Stick, ETriggerEvent::Triggered, this, &ThisClass::Input_LookStick, /*bLogIfNotFound=*/ false);
 			}
 		}
@@ -304,7 +304,6 @@ void URougeHeroComponent::Input_LookMouse(const FInputActionValue& InputActionVa
 	}
 	
 	const FVector2D Value = InputActionValue.Get<FVector2D>();
-	UE_LOG(LogTemp, Warning, TEXT("Input_LookMouse.InputActionValue[%f]"),Value.X);
 	if (Value.X != 0.0f)
 	{
 		Pawn->AddControllerYawInput(Value.X);

@@ -9,7 +9,7 @@
 #include "AbilitySystem/RougeAbilitySystemComponent.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Character/RougeCharacter.h"
-#include "Components/AbilityComponent.h"
+#include "Components/MagicComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Core/GameManager.h"

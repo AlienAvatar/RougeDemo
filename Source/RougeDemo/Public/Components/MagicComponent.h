@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Enum/EActiveAbilities.h"
 #include "Enum/EPassiveAbilities.h"
-#include "AbilityComponent.generated.h"
+#include "MagicComponent.generated.h"
 
 class AProjectileBase;
 class ABaseProjectile;
@@ -14,13 +14,13 @@ class ABaseExplosion;
 class UNiagaraSystem;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class ROUGEDEMO_API UAbilityComponent : public UActorComponent
+class ROUGEDEMO_API UMagicComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this component's properties
-	UAbilityComponent();
+	UMagicComponent();
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 							   FActorComponentTickFunction* ThisTickFunction) override;
@@ -41,6 +41,7 @@ public:
 
 	void RefreshAbilities();
 
+	UFUNCTION(BlueprintCallable)
 	void LevelUpLightning();
 
 	void LevelUpFrostBolt();

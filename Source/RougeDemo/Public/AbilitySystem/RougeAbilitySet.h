@@ -54,6 +54,19 @@ public:
 	float EffectLevel = 1.0f;
 };
 
+// 数据属性
+USTRUCT(BlueprintType)
+struct FRougeAbilitySet_AttributeSet
+{
+	GENERATED_BODY()
+
+public:
+	// Gameplay effect to grant.
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UAttributeSet> AttributeSet;
+
+};
+
 USTRUCT(BlueprintType)
 struct FRougeAbilitySet_GrantedHandles
 {
@@ -105,4 +118,8 @@ protected:
 	// 一系列要赋予的Gameplay效果，以及赋予该效果的默认关卡
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Effects", meta=(TitleProperty=GameplayEffect))
 	TArray<FRougeAbilitySet_GameplayEffect> GrantedGameplayEffects;
+
+	// 一系列要赋予的Gameplay属性，以及赋予该效果的默认关卡
+	UPROPERTY(EditDefaultsOnly, Category = "Attribute Sets", meta=(TitleProperty=AttributeSet))
+	TArray<FRougeAbilitySet_AttributeSet> GrantedAttributes;
 };

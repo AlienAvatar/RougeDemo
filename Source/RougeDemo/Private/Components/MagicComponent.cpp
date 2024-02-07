@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Components/AbilityComponent.h"
+#include "Components/MagicComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Lib/RougeDemoFunctionLibary.h"
 #include "SaveGame/PlayerSaveGame.h"
@@ -16,7 +16,7 @@
 #include "Weapon/ProjectileBase.h"
 
 // Sets default values for this component's properties
-UAbilityComponent::UAbilityComponent()
+UMagicComponent::UMagicComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -28,7 +28,7 @@ UAbilityComponent::UAbilityComponent()
 
 
 // Called when the game starts
-void UAbilityComponent::BeginPlay()
+void UMagicComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -38,7 +38,7 @@ void UAbilityComponent::BeginPlay()
 
 
 // Called every frame
-void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+void UMagicComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                       FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -46,7 +46,7 @@ void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	// ...
 }
 
-void UAbilityComponent::SetStartingAbility()
+void UMagicComponent::SetStartingAbility()
 {
 	//开始添加一个Hammer skill
 	UPlayerSaveGame* PlayerSaveGame = URougeDemoFunctionLibary::LoadPlayerData();
@@ -68,7 +68,7 @@ void UAbilityComponent::SetStartingAbility()
 	}
 }
 
-void UAbilityComponent::LevelUpHammer()
+void UMagicComponent::LevelUpHammer()
 {
 	int32 Local_Level = 1;
 	if(ActiveAbilitiesMap.Contains(EActiveAbilities::EAA_Hammer))
@@ -97,7 +97,7 @@ void UAbilityComponent::LevelUpHammer()
 	}
 }
 
-void UAbilityComponent::GrantHammer(bool Cast)
+void UMagicComponent::GrantHammer(bool Cast)
 {
 	PrepareHammer();
 
@@ -112,7 +112,7 @@ void UAbilityComponent::GrantHammer(bool Cast)
 	ActiveTimerArr.AddUnique(PrepareHammerTimerHandle);
 }
 
-void UAbilityComponent::PrepareHammer()
+void UMagicComponent::PrepareHammer()
 {
 	TArray<FHitResult> OutHits;
 	TArray<AActor*> IgnoreActor;
@@ -136,7 +136,7 @@ void UAbilityComponent::PrepareHammer()
 	
 }
 
-void UAbilityComponent::ExecuteHammer(TArray<FHitResult> Hits, float Damage, float Radius,
+void UMagicComponent::ExecuteHammer(TArray<FHitResult> Hits, float Damage, float Radius,
 	APlayerController* Controller)
 {
 	if(HammerFX)
@@ -156,7 +156,7 @@ void UAbilityComponent::ExecuteHammer(TArray<FHitResult> Hits, float Damage, flo
 	}
 }
 
-void UAbilityComponent::PrepareLightning()
+void UMagicComponent::PrepareLightning()
 {
 	ICharacterInterface* CharacterInterface = Cast<ICharacterInterface>(GetOwner());
 	if(CharacterInterface)
@@ -194,22 +194,22 @@ void UAbilityComponent::PrepareLightning()
 	
 }
 
-void UAbilityComponent::PrepareHammerTimerHandleCallback()
+void UMagicComponent::PrepareHammerTimerHandleCallback()
 {
 	PrepareHammer();
 }
 
-void UAbilityComponent::PrepareLightningTimerHandleCallback()
+void UMagicComponent::PrepareLightningTimerHandleCallback()
 {
 	PrepareLightning();
 }
 
-float UAbilityComponent::CalculateHammerCoolDown()
+float UMagicComponent::CalculateHammerCoolDown()
 {
 	return 1.0f * AbilityCoolDownTimeMultiplier;
 }
 
-void UAbilityComponent::PrepareFrostBolt()
+void UMagicComponent::PrepareFrostBolt()
 {
 	FrostBoltIndex = 0;
 	ICharacterInterface* CharacterImpl = Cast<ICharacterInterface>(GetOwner());
@@ -247,7 +247,7 @@ void UAbilityComponent::PrepareFrostBolt()
 	}
 }
 
-void UAbilityComponent::ExecuteFrostBolt(AActor* TargetActor, ACharacter* Instigator, float Damage)
+void UMagicComponent::ExecuteFrostBolt(AActor* TargetActor, ACharacter* Instigator, float Damage)
 {
 	FRotator LookDirection = UKismetMathLibrary::FindLookAtRotation(
 		Instigator->GetActorLocation(),
@@ -272,17 +272,17 @@ void UAbilityComponent::ExecuteFrostBolt(AActor* TargetActor, ACharacter* Instig
 	}
 }
 
-void UAbilityComponent::PrepareFrostBoltTimerHandleCallback()
+void UMagicComponent::PrepareFrostBoltTimerHandleCallback()
 {
 	PrepareFrostBolt();
 }
 
-void UAbilityComponent::GrantFrostBolt(bool Cast)
+void UMagicComponent::GrantFrostBolt(bool Cast)
 {
 	GetWorld()->GetTimerManager().SetTimer(
 		PrepareFrostBoltTimerHandle,
 		this,
-		&UAbilityComponent::PrepareFrostBoltTimerHandleCallback,
+		&UMagicComponent::PrepareFrostBoltTimerHandleCallback,
 		2.0f,
 		true,
 		-1
@@ -291,7 +291,7 @@ void UAbilityComponent::GrantFrostBolt(bool Cast)
 	ActiveTimerArr.AddUnique(PrepareFrostBoltTimerHandle);
 }
 
-void UAbilityComponent::RefreshAbilities()
+void UMagicComponent::RefreshAbilities()
 {
 	ActiveTimerArr.Empty();
 	TArray<EActiveAbilities> ActiveArr;
@@ -318,7 +318,7 @@ void UAbilityComponent::RefreshAbilities()
 	
 }
 
-void UAbilityComponent::LevelUpLightning()
+void UMagicComponent::LevelUpLightning()
 {
 	int32 Local_Level = 1;
 	if(ActiveAbilitiesMap.Contains(EActiveAbilities::EAA_Lightning))
@@ -347,7 +347,7 @@ void UAbilityComponent::LevelUpLightning()
 	}
 }
 
-void UAbilityComponent::LevelUpFrostBolt()
+void UMagicComponent::LevelUpFrostBolt()
 {
 	int32 Local_Level = 1;
 	if(ActiveAbilitiesMap.Contains(EActiveAbilities::EAA_FrostBolt))
@@ -377,7 +377,7 @@ void UAbilityComponent::LevelUpFrostBolt()
 }
 
 
-void UAbilityComponent::ExecuteLightning(FVector TargetLocation, ACharacter* Instigator, float Damage,
+void UMagicComponent::ExecuteLightning(FVector TargetLocation, ACharacter* Instigator, float Damage,
                                          float Radius)
 {
 	if(LightningClass)
@@ -398,12 +398,12 @@ void UAbilityComponent::ExecuteLightning(FVector TargetLocation, ACharacter* Ins
 	}
 }
 
-void UAbilityComponent::GrantLightning(bool Case)
+void UMagicComponent::GrantLightning(bool Case)
 {
 	GetWorld()->GetTimerManager().SetTimer(
 		PrepareLightningTimerHandle,
 		this,
-		&UAbilityComponent::PrepareLightningTimerHandleCallback,
+		&UMagicComponent::PrepareLightningTimerHandleCallback,
 		2.0f,
 		true
 	);
@@ -411,7 +411,7 @@ void UAbilityComponent::GrantLightning(bool Case)
 	ActiveTimerArr.AddUnique(PrepareLightningTimerHandle);
 }
 
-void UAbilityComponent::LevelUpMaxHealth(bool PowerUp)
+void UMagicComponent::LevelUpMaxHealth(bool PowerUp)
 {
 	int32 Local_Level = 1;
 	ICharacterInterface* CharacterImpl = Cast<ICharacterInterface>(GetOwner());
@@ -455,7 +455,7 @@ void UAbilityComponent::LevelUpMaxHealth(bool PowerUp)
 	}
 }
 
-void UAbilityComponent::LevelUpTimerReduction(bool PowerUp)
+void UMagicComponent::LevelUpTimerReduction(bool PowerUp)
 {
 	int32 Local_Level = 1;
 	if(PowerUp)
@@ -488,7 +488,7 @@ void UAbilityComponent::LevelUpTimerReduction(bool PowerUp)
 	}
 }
 
-void UAbilityComponent::LevelUpWalkSpeed(bool PowerUp)
+void UMagicComponent::LevelUpWalkSpeed(bool PowerUp)
 {
 	int32 Local_Level = 1;
 	ICharacterInterface* CharacterImpl = Cast<ICharacterInterface>(GetOwner());
@@ -532,7 +532,7 @@ void UAbilityComponent::LevelUpWalkSpeed(bool PowerUp)
 	}
 }
 
-void UAbilityComponent::LevelUpAbilityDamage(bool PowerUp)
+void UMagicComponent::LevelUpAbilityDamage(bool PowerUp)
 {
 	int32 Local_Level = 1;
 	if(PowerUp)

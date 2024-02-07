@@ -8,7 +8,7 @@
 #include "AI/BaseAIAnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Character/RougeAnimInstance.h"
-#include "Components/AbilityComponent.h"
+#include "Components/MagicComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/CombatComponent.h"
@@ -72,7 +72,8 @@ ARougeCharacter::ARougeCharacter()
 
 	//AbilityComp = CreateDefaultSubobject<UAbilityComponent>(TEXT("AbilityComp"));
 	AbilitySphere = CreateDefaultSubobject<USphereComponent>(TEXT("AbilitySphere"));
-
+	AbilitySphere->SetSphereRadius(960.f);
+	
 	PawnExtComponent = CreateDefaultSubobject<URougePawnExtensionComponent>(TEXT("PawnExtensionComponent"));
 	PawnExtComponent->OnAbilitySystemInitialized_RegisterAndCall(FSimpleMulticastDelegate::FDelegate::CreateUObject(this, &ThisClass::OnAbilitySystemInitialized));
 	PawnExtComponent->OnAbilitySystemUninitialized_Register(FSimpleMulticastDelegate::FDelegate::CreateUObject(this, &ThisClass::OnAbilitySystemUninitialized));

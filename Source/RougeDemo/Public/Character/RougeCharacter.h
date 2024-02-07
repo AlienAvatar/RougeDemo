@@ -21,7 +21,7 @@
 #include "RougeCharacter.generated.h"
 
 class URougePawnExtensionComponent;
-class UAbilityComponent;
+class UMagicComponent;
 class URougeAnimInstance;
 class UCombatComponent;
 class ULockOnComponent;
@@ -281,7 +281,7 @@ protected:
 	float AttackYaw = 0.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat)
-	UAbilityComponent* AbilityComp;
+	UMagicComponent* AbilityComp;
 
 	//技能释放范围
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat)
@@ -353,7 +353,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool bHitting = false;
 
-	UAbilityComponent* GetAbilityComponent() const { return AbilityComp; }
+	UMagicComponent* GetAbilityComponent() const { return AbilityComp; }
 
 	virtual USphereComponent* GetAbilitySphere() override;
 

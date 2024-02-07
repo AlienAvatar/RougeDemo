@@ -192,13 +192,24 @@ void URougeGameplayAbility::ApplyAbilityTagsToGameplayEffectSpec(FGameplayEffect
 {
 	Super::ApplyAbilityTagsToGameplayEffectSpec(Spec, AbilitySpec);
 
+	//检查GameplayEffect Spec是否有命中
 	if (const FHitResult* HitResult = Spec.GetContext().GetHitResult())
 	{
+		// 获取其物理材质
 		if (const UPhysicalMaterialWithTag* PhysMatWithTags = Cast<const UPhysicalMaterialWithTag>(HitResult->PhysMaterial.Get()))
 		{
 			Spec.CapturedTargetTags.GetSpecTags().AppendTags(PhysMatWithTags->Tags);
 		}
 	}
+}
+
+bool URougeGameplayAbility::DoesAbilitySatisfyTagRequirements(const UAbilitySystemComponent& AbilitySystemComponent,
+	const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags,
+	FGameplayTagContainer* OptionalRelevantTags) const
+{
+	
+	return Super::DoesAbilitySatisfyTagRequirements(AbilitySystemComponent, SourceTags, TargetTags,
+	                                                OptionalRelevantTags);
 }
 
 void URougeGameplayAbility::GetAbilitySource(FGameplayAbilitySpecHandle Handle,

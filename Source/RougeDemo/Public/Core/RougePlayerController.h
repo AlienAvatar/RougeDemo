@@ -13,7 +13,7 @@
 
 class URougeAbilitySystemComponent;
 class UDataTable;
-class UAbilityComponent;
+class UMagicComponent;
 class ARougeHUD;
 class ULevelMasterWidget;
 class APlayerState;
@@ -107,7 +107,7 @@ protected:
 
 	// GAS will instead it
 	UPROPERTY()
-	UAbilityComponent* AbilityComponent; 
+	UMagicComponent* AbilityComponent; 
 
 	UPROPERTY(EditDefaultsOnly, Category="DataTable")
 	UDataTable* DT_ActiveAbilities;

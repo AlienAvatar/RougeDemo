@@ -14,6 +14,9 @@ ROUGEDEMO_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Gameplay_AbilityInputBlocked);
 
 /**
  * Rouge技能系统组件（ URougeAbilitySystemComponent )）扩展了 技能系统组件（ UAbilitySystemComponent ）功能
+ * 负责和GA、GE、AS打交道
+ * Gameplay Ability(GA)标识了游戏中一个对象（Actor）可以做的行为或技能
+ * 
  */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ROUGEDEMO_API URougeAbilitySystemComponent : public UAbilitySystemComponent
