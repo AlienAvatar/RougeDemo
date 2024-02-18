@@ -17,13 +17,11 @@ void URougeGameplayAbility_Lighting::ActivateAbility(const FGameplayAbilitySpecH
 	const FGameplayEventData* TriggerEventData)
 {
 	check(ActorInfo);
-
 	
 	URougeAbilitySystemComponent* RougeASC = CastChecked<URougeAbilitySystemComponent>(ActorInfo->AbilitySystemComponent.Get());
 	PrepareLightning();
 	
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
 }
 
 void URougeGameplayAbility_Lighting::EndAbility(const FGameplayAbilitySpecHandle Handle,

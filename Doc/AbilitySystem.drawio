@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2024-02-06T01:29:52.965Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="lRwNXAFcNLMZjoZdWzxh" version="22.0.3" type="device">
+<mxfile host="Electron" modified="2024-02-18T09:22:07.006Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="oV_ouqJSVYGXUnZFQHUS" version="22.0.3" type="device">
   <diagram name="第 1 页" id="naipP5yu4KR9WeXx8-Vf">
-    <mxGraphModel dx="1175" dy="1148" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2074" dy="1196" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -32,6 +32,21 @@
           <mxGeometry width="160" relative="1" as="geometry">
             <mxPoint x="525" y="885" as="sourcePoint" />
             <mxPoint x="525" y="780" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GC5rKUr2KKgXfRCcTe5S-1" value="从UGameplayAbility类扩展而来，可提供额外的实用程序和与Rouge框架连接的接口" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="640" y="570" width="470" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="wEf4CcnapFqKi51uISp2-1" value="RougeAbilitySet" style="shape=dataStorage;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="1430" y="380" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="wEf4CcnapFqKi51uISp2-2" value="AbilitySet_ShooterHero" style="shape=dataStorage;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="1430" y="570" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="wEf4CcnapFqKi51uISp2-3" value="Extends" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="wEf4CcnapFqKi51uISp2-2" target="wEf4CcnapFqKi51uISp2-1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="1500" y="550" as="sourcePoint" />
+            <mxPoint x="1660" y="550" as="targetPoint" />
           </mxGeometry>
         </mxCell>
       </root>

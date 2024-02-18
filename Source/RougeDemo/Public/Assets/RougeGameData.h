@@ -25,4 +25,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Default Gameplay Effects")
 	TSoftClassPtr<UGameplayEffect> DynamicTagGameplayEffect;
 
+	// Gameplay effect used to apply damage.  Uses SetByCaller for the damage magnitude.
+	UPROPERTY(EditDefaultsOnly, Category = "Default Gameplay Effects", meta = (DisplayName = "Damage Gameplay Effect (SetByCaller)"))
+	TSoftClassPtr<UGameplayEffect> DamageGameplayEffect_SetByCaller;
+
+	// Gameplay effect used to apply healing.  Uses SetByCaller for the healing magnitude.
+	UPROPERTY(EditDefaultsOnly, Category = "Default Gameplay Effects", meta = (DisplayName = "Heal Gameplay Effect (SetByCaller)"))
+	TSoftClassPtr<UGameplayEffect> HealGameplayEffect_SetByCaller;
 };

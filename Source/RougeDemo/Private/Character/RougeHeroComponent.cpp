@@ -330,7 +330,6 @@ void URougeHeroComponent::Input_Move(const FInputActionValue& InputActionValue)
 	{
 		const FVector2D Value = InputActionValue.Get<FVector2D>();
 		const FRotator MovementRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
-		UE_LOG(LogTemp, Warning, TEXT("Input_Move.InputActionValue[%f]"),Value.X);
 		if (Value.X != 0.0f)
 		{
 			const FVector MovementDirection = MovementRotation.RotateVector(FVector::RightVector);

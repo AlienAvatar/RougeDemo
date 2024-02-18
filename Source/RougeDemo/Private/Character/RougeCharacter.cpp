@@ -102,6 +102,7 @@ void ARougeCharacter::OnBeginPlay()
 	RougeDemoPlayerController = Cast<ARougePlayerController>(Controller);
 	//绑定受击函数
 	OnTakeAnyDamage.AddDynamic(this,&ARougeCharacter::ReceiveDamage);
+
 	
 	//设置当前血量
 	if(RougeDemoPlayerController)

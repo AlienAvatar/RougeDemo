@@ -165,7 +165,9 @@ void URougeGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 FGameplayEffectContextHandle URougeGameplayAbility::MakeEffectContext(const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo) const
 {
-	FGameplayEffectContextHandle ContextHandle = Super::MakeEffectContext(Handle, ActorInfo);
+	return Super::MakeEffectContext(Handle, ActorInfo);
+	/*FGameplayEffectContextHandle ContextHandle = Super::MakeEffectContext(Handle, ActorInfo);
+	//负责将上下文指针转换为专用类型
 	FRougeGameplayEffectContext* EffectContext = FRougeGameplayEffectContext::ExtractEffectContext(ContextHandle);
 	check(EffectContext);
 
@@ -180,11 +182,13 @@ FGameplayEffectContextHandle URougeGameplayAbility::MakeEffectContext(const FGam
 
 	AActor* Instigator = ActorInfo ? ActorInfo->OwnerActor.Get() : nullptr;
 
-	EffectContext->SetAbilitySource(AbilitySource, SourceLevel);
-	EffectContext->AddInstigator(Instigator, EffectCauser);
-	EffectContext->AddSourceObject(SourceObject);
-
-	return ContextHandle;
+	if(EffectContext != nullptr)
+	{
+		EffectContext->SetAbilitySource(AbilitySource, SourceLevel);
+		EffectContext->AddInstigator(Instigator, EffectCauser);
+		EffectContext->AddSourceObject(SourceObject);
+	}
+	return ContextHandle;*/
 }
 
 void URougeGameplayAbility::ApplyAbilityTagsToGameplayEffectSpec(FGameplayEffectSpec& Spec,
