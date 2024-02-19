@@ -7,7 +7,7 @@
 #include "RougeDamageExecution.generated.h"
 
 /**
- * 
+ * 负责关键的最终伤害计算，继承UGameplayEffectExecutionCalculation，专门用于GE相关计算
  */
 UCLASS()
 class ROUGEDEMO_API URougeDamageExecution : public UGameplayEffectExecutionCalculation

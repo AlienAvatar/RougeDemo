@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemComponent.h"
 #include "RougeAttributeSet.h"
 #include "RougeHealthSet.generated.h"
 
@@ -17,6 +18,7 @@ class ROUGEDEMO_API URougeHealthSet : public URougeAttributeSet
 public:
 	URougeHealthSet();
 
+	ATTRIBUTE_ACCESSORS(URougeHealthSet, Damage);
 protected:
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldValue);
@@ -44,4 +46,7 @@ private:
 
 	// Used to track when the health reaches 0.
 	bool bOutOfHealth;
+
+	UPROPERTY(BlueprintReadOnly, Category="Rouge|Health", Meta=(HideFromModifiers, AllowPrivateAccess=true))
+	FGameplayAttributeData Damage;
 };

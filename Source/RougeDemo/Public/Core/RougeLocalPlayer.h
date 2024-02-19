@@ -12,6 +12,7 @@ class URougeSettingsShared;
 
 /**
  * URougeLocalPlayer
+ * LocalPlayer作为源头Spawn出PlayerController继而PlayerState就是实证之一
  */
 UCLASS()
 class ROUGEDEMO_API URougeLocalPlayer : public UCommonLocalPlayer, public IRougeTeamAgentInterface

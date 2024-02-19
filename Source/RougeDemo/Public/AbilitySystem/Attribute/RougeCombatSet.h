@@ -11,6 +11,7 @@
 
 /**
  * 定义了施加伤害或治疗所必需的属性
+ * 提供伤害和治疗支持。Gameplay效果将负责修改这些属性之一
  */
 UCLASS(BlueprintType)
 class  URougeCombatSet : public UAttributeSet

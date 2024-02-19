@@ -23,7 +23,8 @@ public:
 
 	// Sets up the ability system
 	void InitializeAbilitySystem();
-
+	void InitializeGameplayCueManager();
+	
 	const URougeGameData& GetGameData();
 
 	// 返回URougeAssetManager的单例模式

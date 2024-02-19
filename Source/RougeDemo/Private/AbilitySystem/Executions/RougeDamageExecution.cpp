@@ -49,7 +49,7 @@ void URougeDamageExecution::Execute_Implementation(const FGameplayEffectCustomEx
 		const AActor* EffectCauser = TypedContext->GetEffectCauser();
 		const FHitResult* HitActorResult = TypedContext->GetHitResult();
 	}
-
+	
 	
 #endif 
 	Super::Execute_Implementation(ExecutionParams, OutExecutionOutput);

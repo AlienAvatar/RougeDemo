@@ -50,7 +50,7 @@ void ARougePlayerController::BeginPlay()
 	SetActorHiddenInGame(false);
 	
 	RougeDemoHUD = Cast<ARougeHUD>(GetHUD());
-	SetupPlayer();
+	//SetupPlayer();
 }
 
 void ARougePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -304,11 +304,11 @@ void ARougePlayerController::SetupPlayer()
 		ARougeCharacter* RougeDemoCharacter = Cast<ARougeCharacter>(GetPawn());
 		if(RougeDemoCharacter)
 		{
-			AbilityComponent = RougeDemoCharacter->GetAbilityComponent();
-			if(AbilityComponent)
+			MagicComponent = RougeDemoCharacter->GetAbilityComponent();
+			if(MagicComponent)
 			{
 				//初始化技能
-				AbilityComponent->SetStartingAbility();
+				MagicComponent->SetStartingAbility();
 			}
 		}
 	}
@@ -357,12 +357,12 @@ void ARougePlayerController::PrepareLevelUp()
 
 void ARougePlayerController::ExecuteLevelUp()
 {
-	if(AbilityComponent == nullptr) { return; }
+	if(MagicComponent == nullptr) { return; }
 
 	//保存为本地变量，记录角色每个技能的技能情况
-	TMap<EActiveAbilities, int32> Local_ActiveAbilitiesMap = AbilityComponent->ActiveAbilitiesMap;
-	TMap<EPassiveAbilities, int32> Local_PassiveAbilitiesMap = AbilityComponent->PassiveAbilitiesMap;
-	int32 Local_MaxAbilityLevel = AbilityComponent->MaxAbilityLevel;
+	TMap<EActiveAbilities, int32> Local_ActiveAbilitiesMap = MagicComponent->ActiveAbilitiesMap;
+	TMap<EPassiveAbilities, int32> Local_PassiveAbilitiesMap = MagicComponent->PassiveAbilitiesMap;
+	int32 Local_MaxAbilityLevel = MagicComponent->MaxAbilityLevel;
 
 	//检查是否有可以升级的主动技能
 	EActiveAbilities Local_EvoAbility;
@@ -490,8 +490,8 @@ void ARougePlayerController::ExecuteLevelUp()
 
 bool ARougePlayerController::CheckIfEVOReady(EActiveAbilities& Ability)
 {
-	TArray<EPassiveAbilities> Local_PassiveArr = AbilityComponent->EvolutionPassiveArr;
-	TMap<EActiveAbilities, EPassiveAbilities> Local_EvoMap = AbilityComponent->EvolutionMap;
+	TArray<EPassiveAbilities> Local_PassiveArr = MagicComponent->EvolutionPassiveArr;
+	TMap<EActiveAbilities, EPassiveAbilities> Local_EvoMap = MagicComponent->EvolutionMap;
 	
 	if(!Local_EvoMap.IsEmpty())
 	{
@@ -820,7 +820,7 @@ void ARougePlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilities 
 	UpdateHotbar();
 	
 	//RefreshAbilities();
-	AbilityComponent->RefreshAbilities();
+	MagicComponent->RefreshAbilities();
 }
 
 void ARougePlayerController::AssignAbility(EAbilityType Type, EActiveAbilities ActiveAbilities,
@@ -832,16 +832,16 @@ void ARougePlayerController::AssignAbility(EAbilityType Type, EActiveAbilities A
 			switch (ActiveAbilities)
 			{
 				case EActiveAbilities::EAA_Hammer:
-					AbilityComponent->LevelUpHammer();
+					MagicComponent->LevelUpHammer();
 					break;
 				case EActiveAbilities::EAA_FireBall:
 					
 					break;
 				case EActiveAbilities::EAA_Lightning:
-					AbilityComponent->LevelUpLightning();
+					MagicComponent->LevelUpLightning();
 					break;
 				case EActiveAbilities::EAA_FrostBolt:
-					AbilityComponent->LevelUpFrostBolt();
+					MagicComponent->LevelUpFrostBolt();
 					break;
 			}
 			break;
@@ -849,16 +849,16 @@ void ARougePlayerController::AssignAbility(EAbilityType Type, EActiveAbilities A
 			switch (PassiveAbilities)
 			{
 				case EPassiveAbilities::EPA_Health:
-					AbilityComponent->LevelUpMaxHealth(false);
+					MagicComponent->LevelUpMaxHealth(false);
 					break;
 				case EPassiveAbilities::EPA_Speed:
-					AbilityComponent->LevelUpWalkSpeed(false);
+					MagicComponent->LevelUpWalkSpeed(false);
 					break;
 				case EPassiveAbilities::EPA_AbilityDamage:
-					AbilityComponent->LevelUpAbilityDamage(false);
+					MagicComponent->LevelUpAbilityDamage(false);
 					break;
 				case EPassiveAbilities::EPA_CooldownReduction:
-					AbilityComponent->LevelUpTimerReduction(false);
+					MagicComponent->LevelUpTimerReduction(false);
 					break;
 			}
 			break;
@@ -927,10 +927,10 @@ void ARougePlayerController::OnPlayerStateChangedTeam(UObject* TeamAgent, int32 
 
 void ARougePlayerController::UpdateHotbar()
 {
-	if(AbilityComponent == nullptr) { return; }
+	if(MagicComponent == nullptr) { return; }
 	UpdateHudHotbar(
-		AbilityComponent->ActiveAbilitiesMap,
-		AbilityComponent->PassiveAbilitiesMap
+		MagicComponent->ActiveAbilitiesMap,
+		MagicComponent->PassiveAbilitiesMap
 	);
 }
 

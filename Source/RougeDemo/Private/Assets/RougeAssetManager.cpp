@@ -5,6 +5,7 @@
 #include "AbilitySystemGlobals.h"
 #include "RougeDemo/RougeDemo.h"
 #include "../RougeDemo.h"
+#include "AbilitySystem/RougeGameplayCueManager.h"
 
 #include "RougeDemo/RougeGameplayTags.h"
 
@@ -28,12 +29,22 @@ void URougeAssetManager::InitializeAbilitySystem()
 	UAbilitySystemGlobals::Get().InitGlobalData();
 }
 
+void URougeAssetManager::InitializeGameplayCueManager()
+{
+	SCOPED_BOOT_TIMING("URougeAssetManager::InitializeGameplayCueManager");
+
+	URougeGameplayCueManager* GCM = URougeGameplayCueManager::Get();
+	check(GCM);
+	GCM->LoadAlwaysLoadedCues();
+}
+
 void URougeAssetManager::StartInitialLoading()
 {
 	SCOPED_BOOT_TIMING("URougeAssetManager::StartInitialLoading");
 	Super::StartInitialLoading();
 
 	STARTUP_JOB(InitializeAbilitySystem());
+	STARTUP_JOB(InitializeGameplayCueManager());
 
 	DoAllStartupJobs();
 }

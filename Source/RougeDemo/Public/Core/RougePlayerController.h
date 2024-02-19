@@ -107,7 +107,7 @@ protected:
 
 	// GAS will instead it
 	UPROPERTY()
-	UMagicComponent* AbilityComponent; 
+	UMagicComponent* MagicComponent; 
 
 	UPROPERTY(EditDefaultsOnly, Category="DataTable")
 	UDataTable* DT_ActiveAbilities;

@@ -37,6 +37,7 @@ struct FGlobalAppliedEffectList
 
 /**
  * Rouge全局技能系统 （ URougeGlobalAbilitySystem ）提供了一种快速跟踪关卡中所有Rouge技能系统组件并与之交互的方法
+ * 如全体冷却时间
  */
 UCLASS()
 class URougeGlobalAbilitySystem : public UWorldSubsystem

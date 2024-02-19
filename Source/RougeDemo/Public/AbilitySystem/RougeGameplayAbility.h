@@ -9,6 +9,7 @@
 class IRougeAbilitySourceInterface;
 struct FRougeGameplayEffectContext;
 class ARougeCharacter;
+class URougeAbilitySystemComponent;
 
 /**
  * ERougeAbilityActivationPolicy
@@ -60,6 +61,9 @@ class ROUGEDEMO_API URougeGameplayAbility : public UGameplayAbility
 
 public:
 	URougeGameplayAbility(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	UFUNCTION(BlueprintCallable, Category = "Rouge|Ability")
+	URougeAbilitySystemComponent* GetRougeAbilitySystemComponentFromActorInfo() const;
 	
 	void TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;
 
@@ -74,6 +78,9 @@ public:
 	AController* GetControllerFromActorInfo() const;
 
 	virtual void OnPawnAvatarSet();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = "Rouge|Ability", Meta = (ExpandBoolAsExecs = "ReturnValue"))
+	bool CanChangeActivationGroup(ERougeAbilityActivationGroup NewGroup) const;
 protected:
 	//~UGameplayAbility interface
 	//是否可以激活此Ability

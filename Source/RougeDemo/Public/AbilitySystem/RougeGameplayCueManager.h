@@ -6,6 +6,8 @@
 #include "GameplayCueManager.h"
 #include "RougeGameplayCueManager.generated.h"
 
+
+
 /**
  * 
  */
@@ -18,6 +20,9 @@ public:
 	URougeGameplayCueManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	static URougeGameplayCueManager* Get();
+
+	//当延迟加载Cue, 无论如何都将被加载
+	void LoadAlwaysLoadedCues();
 	
 	//~UGameplayCueManager interface
 	virtual void OnCreated() override;
@@ -28,4 +33,9 @@ public:
 
 	//更新单一游戏玩法提示主要资产的捆绑包
 	void RefreshGameplayCuePrimaryAsset();
+
+	static void DumpGameplayCues(const TArray<FString>& Args);
+private:
+	void ProcessTagToPreload(const FGameplayTag& Tag, UObject* OwningObject);
+	bool ShouldDelayLoadGameplayCues() const;
 };

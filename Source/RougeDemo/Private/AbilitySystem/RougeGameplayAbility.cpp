@@ -15,16 +15,53 @@
 
 DEFINE_LOG_CATEGORY(LogAbility);
 
-void URougeGameplayAbility::OnPawnAvatarSet()
-{
-	K2_OnPawnAvatarSet();
-}
-
 URougeGameplayAbility::URougeGameplayAbility(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
 	
 }
+
+URougeAbilitySystemComponent* URougeGameplayAbility::GetRougeAbilitySystemComponentFromActorInfo() const
+{
+	return (CurrentActorInfo ? Cast<URougeAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent.Get()) : nullptr);
+}
+
+void URougeGameplayAbility::OnPawnAvatarSet()
+{
+	K2_OnPawnAvatarSet();
+}
+
+bool URougeGameplayAbility::CanChangeActivationGroup(ERougeAbilityActivationGroup NewGroup) const
+{
+	if (!IsInstantiated() || !IsActive())
+	{
+		return false;
+	}
+
+	if (ActivationGroup == NewGroup)
+	{
+		return true;
+	}
+
+	URougeAbilitySystemComponent* RougeASC = GetRougeAbilitySystemComponentFromActorInfo();
+	check(RougeASC);
+
+	if ((ActivationGroup != ERougeAbilityActivationGroup::Exclusive_Blocking) && RougeASC->IsActivationGroupBlocked(NewGroup))
+	{
+		// This ability can't change groups if it's blocked (unless it is the one doing the blocking).
+		return false;
+	}
+
+	if ((NewGroup == ERougeAbilityActivationGroup::Exclusive_Replaceable) && !CanBeCanceled())
+	{
+		// This ability can't become replaceable if it can't be canceled.
+		return false;
+	}
+
+	return true;
+}
+
+
 
 void URougeGameplayAbility::TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo,
                                                       const FGameplayAbilitySpec& Spec) const

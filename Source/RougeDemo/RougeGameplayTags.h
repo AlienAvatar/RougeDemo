@@ -45,8 +45,6 @@ public:
 	/** 对象已完成所有初始化，并准备好在正常Gameplay中进行交互 */
 	FGameplayTag InitState_GameplayReady;
 
-
-	
 	FGameplayTag GameplayEvent_Death;
 	FGameplayTag GameplayEvent_Reset;
 	FGameplayTag GameplayEvent_RequestReset;

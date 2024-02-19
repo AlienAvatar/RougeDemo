@@ -11,6 +11,9 @@
 class UEnhancedInputLocalPlayerSubsystem;
 class UInputAction;
 
+/**
+ * URougeInputComponent将使用这些已注册的配置在玩家初始化时将映射添加到增强输入
+ */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ROUGEDEMO_API URougeInputComponent : public UEnhancedInputComponent
 {

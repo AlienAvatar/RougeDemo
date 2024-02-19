@@ -27,6 +27,7 @@
 #include "Struct/AttributeInfo.h"
 #include "Weapon/Weapon.h"
 #include "../RougeGameplayTags.h"
+#include "Character/RougeHealthComponent.h"
 #include "Components/RougeCharacterMovementComponent.h"
 
 
@@ -77,6 +78,10 @@ ARougeCharacter::ARougeCharacter()
 	PawnExtComponent = CreateDefaultSubobject<URougePawnExtensionComponent>(TEXT("PawnExtensionComponent"));
 	PawnExtComponent->OnAbilitySystemInitialized_RegisterAndCall(FSimpleMulticastDelegate::FDelegate::CreateUObject(this, &ThisClass::OnAbilitySystemInitialized));
 	PawnExtComponent->OnAbilitySystemUninitialized_Register(FSimpleMulticastDelegate::FDelegate::CreateUObject(this, &ThisClass::OnAbilitySystemUninitialized));
+
+	HealthComponent = CreateDefaultSubobject<URougeHealthComponent>(TEXT("HealthComponent"));
+	HealthComponent->OnDeathStarted.AddDynamic(this, &ThisClass::OnDeathStarted);
+	HealthComponent->OnDeathFinished.AddDynamic(this, &ThisClass::OnDeathFinished);
 }
 
 
@@ -103,7 +108,6 @@ void ARougeCharacter::OnBeginPlay()
 	//绑定受击函数
 	OnTakeAnyDamage.AddDynamic(this,&ARougeCharacter::ReceiveDamage);
 
-	
 	//设置当前血量
 	if(RougeDemoPlayerController)
 	{
@@ -160,11 +164,11 @@ void ARougeCharacter::OnAbilitySystemUninitialized()
 
 void ARougeCharacter::InitializeGameplayTags()
 {
-
 	if (URougeAbilitySystemComponent* RougeASC = GetRougeAbilitySystemComponent())
 	{
 		const FRougeGameplayTags& GameplayTags = FRougeGameplayTags::Get();
-		
+
+		//遍历移动模式Map
 		for (const TPair<uint8, FGameplayTag>& TagMapping : GameplayTags.MovementModeTagMap)
 		{
 			if (TagMapping.Value.IsValid())
@@ -213,6 +217,60 @@ void ARougeCharacter::PossessedBy(AController* NewController)
 void ARougeCharacter::UnPossessed()
 {
 	Super::UnPossessed();
+}
+
+void ARougeCharacter::OnDeathStarted(AActor* OwningActor)
+{
+	//禁止输入，清除碰撞
+	DisableMovementAndCollision();
+}
+
+void ARougeCharacter::OnDeathFinished(AActor* OwningActor)
+{
+	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::DestroyDueToDeath);
+}
+
+void ARougeCharacter::DisableMovementAndCollision()
+{
+	if (Controller)
+	{
+		Controller->SetIgnoreMoveInput(true);
+	}
+
+	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
+	check(CapsuleComp);
+	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+}
+
+void ARougeCharacter::DestroyDueToDeath()
+{
+	K2_OnDeathFinished();
+
+	UninitAndDestroy();
+}
+
+void ARougeCharacter::UninitAndDestroy()
+{
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		DetachFromControllerPendingDestroy();
+		SetLifeSpan(0.1f);
+	}
+
+	// Uninitialize the ASC if we're still the avatar actor (otherwise another pawn already did it when they became the avatar actor)
+	if (URougeAbilitySystemComponent* RougeASC = GetRougeAbilitySystemComponent())
+	{
+		if (RougeASC->GetAvatarActor() == this)
+		{
+			PawnExtComponent->UninitializeAbilitySystem();
+		}
+	}
+
+	SetActorHiddenInGame(true);
 }
 
 // Called every frame
