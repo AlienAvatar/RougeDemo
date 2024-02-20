@@ -33,9 +33,9 @@ void URougeAssetManager::InitializeGameplayCueManager()
 {
 	SCOPED_BOOT_TIMING("URougeAssetManager::InitializeGameplayCueManager");
 
-	URougeGameplayCueManager* GCM = URougeGameplayCueManager::Get();
+	/*URougeGameplayCueManager* GCM = URougeGameplayCueManager::Get();
 	check(GCM);
-	GCM->LoadAlwaysLoadedCues();
+	GCM->LoadAlwaysLoadedCues();*/
 }
 
 void URougeAssetManager::StartInitialLoading()

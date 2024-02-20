@@ -10,12 +10,25 @@
 URougeGameplayAbility_Death::URougeGameplayAbility_Death(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	
+	UGameplayTagsManager::Get().CallOrRegister_OnDoneAddingNativeTagsDelegate(FSimpleDelegate::CreateUObject(this, &ThisClass::DoneAddingNativeTags));
+}
+
+void URougeGameplayAbility_Death::DoneAddingNativeTags()
+{
+	//检查该object是否是默认object
+	if (HasAnyFlags(RF_ClassDefaultObject))
+	{
+		// Add the ability trigger tag as default to the CDO.
+		FAbilityTriggerData TriggerData;
+		TriggerData.TriggerTag = FRougeGameplayTags::Get().GameplayEvent_Death;
+		TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+		AbilityTriggers.Add(TriggerData);
+	}
 }
 
 void URougeGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData)
+                                                  const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+                                                  const FGameplayEventData* TriggerEventData)
 {
 	UE_LOG(LogTemp,Warning,TEXT("URougeGameplayAbility_Death.ActivateAbility"))
 	check(ActorInfo);

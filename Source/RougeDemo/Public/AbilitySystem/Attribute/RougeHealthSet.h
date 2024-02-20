@@ -7,6 +7,8 @@
 #include "RougeAttributeSet.h"
 #include "RougeHealthSet.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_FourParams(FRougeAttributeEvent, AActor* /*EffectInstigator*/, AActor* /*EffectCauser*/, const FGameplayEffectSpec& /*EffectSpec*/, float /*EffectMagnitude*/);
+
 /**
  * 
  */
@@ -19,6 +21,10 @@ public:
 	URougeHealthSet();
 
 	ATTRIBUTE_ACCESSORS(URougeHealthSet, Damage);
+	ATTRIBUTE_ACCESSORS(URougeHealthSet, Health);
+	ATTRIBUTE_ACCESSORS(URougeHealthSet, MaxHealth);
+
+	mutable FRougeAttributeEvent OnOutOfHealth;
 protected:
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldValue);

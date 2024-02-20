@@ -29,6 +29,7 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(InputTag_Look_Stick, "InputTag.Look.Stick", "Look (stick) input.");
 	AddTag(InputTag_Crouch, "InputTag.Crouch", "Crouch input.");
 	AddTag(InputTag_AutoRun, "InputTag.AutoRun", "Auto-run input.");
+	AddTag(InputTag_Sprint, "InputTag.Sprint", "Sprint input.");
 	AddTag(InputTag_Test, "InputTag.Test", "Test input.");
 
 	AddMovementModeTag(Movement_Mode_Walking, "Movement.Mode.Walking", MOVE_Walking);
@@ -43,6 +44,16 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(InitState_DataInitialized, "InitState.DataInitialized", "3: The available data has been initialized for this actor/component, but it is not ready for full gameplay");
 	AddTag(InitState_GameplayReady, "InitState.GameplayReady", "4: The actor/component is fully ready for active gameplay");
 	AddTag(Status_AutoRunning, "Status.AutoRunning", "Target is auto-running.");
+
+
+	AddTag(GameplayEvent_Death, "GameplayEvent.Death", "Event that fires on death. This event only fires on the server.");
+	
+	AddTag(SetByCaller_Damage, "SetByCaller.Damage", "SetByCaller tag used by damage gameplay effects.");
+	AddTag(SetByCaller_Heal, "SetByCaller.Heal", "SetByCaller tag used by healing gameplay effects.");
+
+	AddTag(Status_Death, "Status.Death", "Target has the death status.");
+	AddTag(Status_Death_Dying, "Status.Death.Dying", "Target has begun the death process.");
+	AddTag(Status_Death_Dead, "Status.Death.Dead", "Target has finished the death process.");
 }
 
 void FRougeGameplayTags::AddTag(FGameplayTag& OutTag, const ANSICHAR* TagName, const ANSICHAR* TagComment)

@@ -63,6 +63,7 @@ public:
 	virtual FOnRougeTeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
 	//~End of IRougeTeamAgentInterface interface
 
+	UFUNCTION(BlueprintCallable)
 	URougeAbilitySystemComponent* GetRougeAbilitySystemComponent() const { return AbilitySystemComponent; }
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_PawnData)

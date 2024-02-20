@@ -59,7 +59,7 @@ public class RougeDemo : ModuleRules
 			"DTLSHandlerComponent", 
 			"MoviePlayer", 
 			"AnimGraphRuntime", 
-			"GameSubtitles", 
+			"GameSubtitles", "GameplayMessageRuntime", 
 		});
 
 		// Uncomment if you are using Slate UI

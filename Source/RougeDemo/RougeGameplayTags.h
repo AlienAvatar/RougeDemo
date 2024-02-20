@@ -29,6 +29,7 @@ public:
 	FGameplayTag InputTag_Look_Stick;
 	FGameplayTag InputTag_Crouch;
 	FGameplayTag InputTag_AutoRun;
+	FGameplayTag InputTag_Sprint;
 	FGameplayTag InputTag_Test;
 	
 	// Initialization states for the GameFrameworkComponentManager, these are registered in order by LyraGameInstance and some actors will skip right to GameplayReady

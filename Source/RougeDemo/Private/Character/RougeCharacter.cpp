@@ -118,16 +118,6 @@ void ARougeCharacter::OnBeginPlay()
 	Gait = DesiredGait;
 	RotationMode = DesiredRotationMode;
 	
-	switch (DesiredStance)
-	{
-	case EStance::ES_Standing:
-		UnCrouch();
-		break;
-	case EStance::ES_Crouching:
-		Crouch();
-		break;
-	}
-
 	//读取DataTable
 	SetMovementModel();
 	
@@ -153,7 +143,8 @@ void ARougeCharacter::OnAbilitySystemInitialized()
 	check(RougeASC);
 
 	//To do初始化HealthComponent
-
+	HealthComponent->InitializeWithAbilitySystem(RougeASC);
+	
 	//初始化Gameplay Tags
 	InitializeGameplayTags();
 }
@@ -280,7 +271,7 @@ void ARougeCharacter::Tick(float DeltaTime)
 
 	//AimOffset(DeltaTime);
 	
-	SetEssentialValues(DeltaTime);
+	/*SetEssentialValues(DeltaTime);
 	CacheValues(DeltaTime);
 
 	//在锁定状态下启用
@@ -307,7 +298,7 @@ void ARougeCharacter::Tick(float DeltaTime)
 		break;
 	default:
 		UE_LOG(LogTemp,Error,TEXT("No MovementState setting, Please check it."));
-	}
+	}*/
 	
 	//DebugMessage
 	//UE_LOG(LogTemp,Warning,TEXT("LastRagdollVelocity[%f]"),LastRagdollVelocity.Size());
