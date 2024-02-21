@@ -118,9 +118,6 @@ private:
 
 	FRotator AimingRotation;
 
-	//播放翻滚Root Motion Montage动画
-	void RollEvent();
-
 	//从Table中读取数据保存到Struct中
 	void SetMovementModel();
 
@@ -155,9 +152,6 @@ private:
 
 	UAnimMontage* GetGetUpAnimation();
 
-	//蹲伏事件
-	void CrouchAction();
-
 	//防止重复输入，每次输入都有间隔时间（CD)
 	void MultiTapInput(float ResetTime);
 
@@ -181,8 +175,6 @@ private:
 
 	float ElimDelay = 3.f;
 
-	bool CanSprint();
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rouge|Character", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URougePawnExtensionComponent> PawnExtComponent;
 
@@ -191,7 +183,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rouge|Character", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URougeHealthComponent> HealthComponent;
-	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -230,13 +222,7 @@ protected:
 	UPROPERTY()
 	URougeAnimInstance* RougeDemoAnimInstance;
 
-	void StartSprint();
-
-	void StopSprint();
-
 	bool bIsSprint = false;
-
-	void RollAction();
 
 	UPROPERTY(EditDefaultsOnly,Category=MovementSystem)
 	UAnimMontage* F_RollMontage;
@@ -311,6 +297,8 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="OnDeathFinished"))
 	void K2_OnDeathFinished();
+
+	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -378,10 +366,5 @@ public:
 
 	virtual void RestoreHealth(float Health) override;
 
-	//~IRougeTeamAgentInterface interface
-	// virtual FOnRougeTeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
-	//~End of IRougeTeamAgentInterface interface
-
-	/*UPROPERTY(ReplicatedUsing = OnRep_MyTeamID)
-	FGenericTeamId MyTeamID;*/
+	USpringArmComponent* GetCameraBoom() { return CameraBoom; }
 };

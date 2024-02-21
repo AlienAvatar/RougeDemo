@@ -305,17 +305,6 @@ void ARougeCharacter::Tick(float DeltaTime)
 	//UE_LOG(LogTemp,Warning,TEXT("DeltaRotation[%f]"),DeltaDirectRotation.Yaw);
 }
 
-bool ARougeCharacter::CanSprint()
-{
-	if(bHasMovementInput)
-	{
-		return MovementInputAmount > 0.9f;
-	}else
-	{
-		return false;
-	}
-}
-
 EMovementDirection ARougeCharacter::CalculateInputDirection()
 {
 	//前进输入
@@ -379,12 +368,6 @@ void ARougeCharacter::RestoreHealth(float Health)
 	AttributeInfo.Health += Health;
 	UpdateHealthHUD();
 }
-
-// FOnRougeTeamIndexChangedDelegate* ARougeCharacter::GetOnTeamIndexChangedDelegate()
-// {
-// 	return &OnTeamChangedDelegate;
-// }
-
 
 void ARougeCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                     AController* InstigatorController, AActor* DamageCauser)
@@ -468,58 +451,6 @@ void ARougeCharacter::PlayHitReactMontage(EMovementDirection HitDirection)
 	}
 }
 
-void ARougeCharacter::StartSprint()
-{
-	bIsSprint = true;
-	CameraBoom->CameraLagSpeed = 5.f;
-	DesiredGait = EGait::EG_Sprinting;
-}
-
-void ARougeCharacter::StopSprint()
-{
-	bIsSprint = false;
-	CameraBoom->CameraLagSpeed = 10.f;
-	DesiredGait = EGait::EG_Running;
-}
-
-void ARougeCharacter::RollAction()
-{
-	if(bRolling){ return; }
-
-	bRolling = true;
-	//前
-	if(UKismetMathLibrary::InRange_FloatFloat(DeltaDirectRotation.Yaw,-45.f,45.f,true,true))
-	{
-		if(F_RollMontage)
-		{
-			RougeDemoAnimInstance->Montage_Play(F_RollMontage,1.5f);
-		}
-	//左
-	}else if(UKismetMathLibrary::InRange_FloatFloat(DeltaDirectRotation.Yaw,-135.f,-45.f,true,true))
-	{
-		if(L_RollMontage)
-		{
-			RougeDemoAnimInstance->Montage_Play(L_RollMontage,1.5f);
-		}
-	//右
-	}else if(UKismetMathLibrary::InRange_FloatFloat(DeltaDirectRotation.Yaw,45.f,135.f,true,true))
-	{
-		if(R_RollMontage)
-		{
-			RougeDemoAnimInstance->Montage_Play(R_RollMontage,1.5f);
-		}
-	//后
-	}else
-	{
-		if(B_RollMontage)
-		{
-			RougeDemoAnimInstance->Montage_Play(B_RollMontage,1.5f);
-		}
-	}
-}
-
-
-
 void ARougeCharacter::RagdollUpdate(float DeltaTime)
 {
 	LastRagdollVelocity = GetMesh()->GetPhysicsLinearVelocity(FName("root"));
@@ -599,8 +530,6 @@ void ARougeCharacter::RollTimerHandlerCallback()
 	{
 		ZYaw = DeltaDirectRotation.Yaw;
 	}
-
-	
 }
 
 void ARougeCharacter::SetActorLocationAndRotationFromTarget(FVector NewLocation,FRotator NewRotation,bool bSweep,bool bTeleport)
@@ -703,29 +632,6 @@ UAnimMontage* ARougeCharacter::GetGetUpAnimation()
 		default:
 			UE_LOG(LogTemp,Warning,TEXT("Can't setting Getup Montage Anim"));
 			return nullptr;
-		}
-	}
-	
-}
-
-void ARougeCharacter::CrouchAction()
-{
-	//检查角色是否是着地状态
-	if(MovementState == EMovementState::EMS_Grounded)
-	{
-		//检查角色是否是站姿
-		switch (Stance)
-		{
-		case EStance::ES_Standing:
-			Stance = EStance::ES_Crouching;
-			Crouch();
-			break;
-		case EStance::ES_Crouching:
-			Stance = EStance::ES_Standing;
-			UnCrouch();
-			break;
-		default:
-			UE_LOG(LogTemp,Warning,TEXT("Can't setting stance,please check it"))
 		}
 	}
 }
@@ -998,24 +904,7 @@ EGait ARougeCharacter::GetActualGait()
 
 EGait ARougeCharacter::GetAllowedGait()
 {
-	if(RotationMode == ERotationMode::ERM_VelocityDirection || RotationMode == ERotationMode::ERM_LookingDirection)
-	{
-		switch (DesiredGait)
-		{
-		case EGait::EG_Walking:
-			return EGait::EG_Walking;
-		case EGait::EG_Running:
-			return EGait::EG_Running;
-		case EGait::EG_Sprinting:
-			if(CanSprint())
-			{
-				return EGait::EG_Sprinting;
-			}else
-			{
-				return EGait::EG_Running;
-			}
-		}
-	}
+
 	return EGait::EG_Walking;
 }
 
