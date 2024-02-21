@@ -175,8 +175,6 @@ private:
 
 	FTimerHandle ControlRotationTimerHandle;
 
-	void ControlRotationCallback();
-
 	FTimerHandle ElimTimerHandle;
 
 	void ElimTimerFinished();

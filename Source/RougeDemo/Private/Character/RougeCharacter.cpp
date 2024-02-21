@@ -468,11 +468,6 @@ void ARougeCharacter::PlayHitReactMontage(EMovementDirection HitDirection)
 	}
 }
 
-void ARougeCharacter::ControlRotationCallback()
-{
-	
-}
-
 void ARougeCharacter::StartSprint()
 {
 	bIsSprint = true;

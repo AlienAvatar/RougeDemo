@@ -68,4 +68,9 @@ protected:
 	// Number of abilities running in each activation group.
 	//在Activation Group中正在运行Ability的个数
 	int32 ActivationGroupCounts[(uint8)ERougeAbilityActivationGroup::MAX];
+
+	//复制事件替代，让WaitInputPress可以工作
+	virtual void AbilitySpecInputPressed(FGameplayAbilitySpec& Spec) override;
+	//复制事件替代，让WaitInputReleased可以工作
+	virtual void AbilitySpecInputReleased(FGameplayAbilitySpec& Spec) override;
 };
