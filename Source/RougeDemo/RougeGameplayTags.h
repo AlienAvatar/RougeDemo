@@ -21,9 +21,10 @@ public:
 	FGameplayTag Ability_ActivateFail_TagsMissing;
 	FGameplayTag Ability_ActivateFail_Networking;
 	FGameplayTag Ability_ActivateFail_ActivationGroup;
-
 	FGameplayTag Ability_Behavior_SurvivesDeath;
-
+	
+	FGameplayTag Ability_Action_Type_Lighting;
+	
 	FGameplayTag InputTag_Move;
 	FGameplayTag InputTag_Look_Mouse;
 	FGameplayTag InputTag_Look_Stick;

@@ -14,6 +14,7 @@
 #include "Core/RougePlayerController.h"
 #include "Input/RougeInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "HUD/RougeHUD.h"
 
 const FName URougeHeroComponent::NAME_BindInputsNow("BindInputsNow");
 const FName URougeHeroComponent::NAME_ActorFeatureName("Hero");
@@ -136,6 +137,7 @@ void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* 
 			// PlayerState保存着该玩家的持久数据
 			// AbilitySystemComponent和属性设置取决于玩家的状态。
 			PawnExtComp->InitializeAbilitySystem(RougePS->GetRougeAbilitySystemComponent(), RougePS);
+
 		}
 
 		if (ARougePlayerController* RougePC = GetController<ARougePlayerController>())
@@ -143,6 +145,19 @@ void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* 
 			if (Pawn->InputComponent != nullptr)
 			{
 				InitializePlayerInput(Pawn->InputComponent);
+			}
+
+			//Init HUD
+			if(PawnData)
+			{
+				if(ARougeHUD* RougeHUD = Cast<ARougeHUD>(RougePC->GetHUD()))
+				{
+					RougeHUD->AddPlayerOverlay(PawnData->PlayerOverlayClass);
+				}
+				RougePC->UpdateHotbar();
+
+				//set LevelUp UI
+				RougePC->LevelMasterWidgetClass = PawnData->LevelMasterWidgetClass;
 			}
 		}
 	}

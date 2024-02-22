@@ -188,10 +188,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void MoveForward(float Value);
-	void MoveRight(float Value);
-	void Turn(float Value);
-	void LookUp(float Value);
 	void OnBeginPlay();
 
 	virtual void OnAbilitySystemInitialized();
@@ -223,18 +219,6 @@ protected:
 	URougeAnimInstance* RougeDemoAnimInstance;
 
 	bool bIsSprint = false;
-
-	UPROPERTY(EditDefaultsOnly,Category=MovementSystem)
-	UAnimMontage* F_RollMontage;
-
-	UPROPERTY(EditDefaultsOnly,Category=MovementSystem)
-	UAnimMontage* B_RollMontage;
-
-	UPROPERTY(EditDefaultsOnly,Category=MovementSystem)
-	UAnimMontage* L_RollMontage;
-
-	UPROPERTY(EditDefaultsOnly,Category=MovementSystem)
-	UAnimMontage* R_RollMontage;
 
 	float MoveF;
 
@@ -358,7 +342,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool bHitting = false;
 
-	UMagicComponent* GetAbilityComponent() const { return AbilityComp; }
+	UMagicComponent* GetMagicComponent() const { return AbilityComp; }
 
 	virtual USphereComponent* GetAbilitySphere() override;
 

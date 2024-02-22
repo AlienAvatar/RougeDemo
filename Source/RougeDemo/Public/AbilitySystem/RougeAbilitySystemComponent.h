@@ -50,6 +50,8 @@ public:
 	//如果设置了，这个表用于查找Tag的激活和取消关系
 	UPROPERTY()
 	TObjectPtr<URougeAbilityTagRelationshipMapping> TagRelationshipMapping;
+
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

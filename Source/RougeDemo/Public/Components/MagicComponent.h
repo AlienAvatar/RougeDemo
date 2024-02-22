@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "Components/ActorComponent.h"
 #include "Enum/EActiveAbilities.h"
 #include "Enum/EPassiveAbilities.h"
@@ -53,6 +54,9 @@ public:
 	void LevelUpTimerReduction(bool PowerUp);
 	
 	void LevelUpWalkSpeed(bool PowerUp);
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayAbilitySpecHandle StartGameplayAbilitySpecHandle;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

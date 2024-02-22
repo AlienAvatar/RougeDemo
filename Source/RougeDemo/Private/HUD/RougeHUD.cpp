@@ -20,8 +20,6 @@ void ARougeHUD::BeginPlay()
 {
 	UGameFrameworkComponentManager::SendGameFrameworkComponentExtensionEvent(this, UGameFrameworkComponentManager::NAME_GameActorReady);
 	Super::BeginPlay();
-	
-	AddPlayerOverlay();
 }
 
 void ARougeHUD::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -30,19 +28,13 @@ void ARougeHUD::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void ARougeHUD::AddPlayerOverlay()
+void ARougeHUD::AddPlayerOverlay(TSubclassOf<UUserWidget> PlayerOverlayClass)
 {
-	ARougePlayerController* PlayerController = Cast<ARougePlayerController>(GetOwningPlayerController());
-	if(PlayerController && PlayerOverlayClass)
+	if(PlayerOverlayClass)
 	{
 		UWidgetLayoutLibrary::RemoveAllWidgets(GetWorld());
-		PlayerOverlayWidget = CreateWidget<UPlayerOverlayWidget>(PlayerController,PlayerOverlayClass);	
+		PlayerOverlayWidget = CreateWidget<UPlayerOverlayWidget>(GetOwningPlayerController(),PlayerOverlayClass);	
 		PlayerOverlayWidget->AddToViewport();
-
-		PlayerController->UpdateHotbar();
-
 	}
-
-	
 }
 

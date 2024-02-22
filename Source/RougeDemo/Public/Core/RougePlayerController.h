@@ -101,6 +101,9 @@ public:
 	//~ILyraTeamAgentInterface interface
 	virtual FOnRougeTeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
 	//~End of ILyraTeamAgentInterface interface
+	
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<ULevelMasterWidget> LevelMasterWidgetClass;
 protected:
 	UPROPERTY()
 	ARougeHUD* RougeDemoHUD;
@@ -116,9 +119,6 @@ protected:
 	UDataTable* DT_PassiveAbilities;
 
 	virtual void SetupInputComponent() override;
-
-	UPROPERTY(EditDefaultsOnly, Category="UI")
-	TSubclassOf<ULevelMasterWidget> LevelMasterWidgetClass;
 
 	void OnStartAutoRun();
 	void OnEndAutoRun();
@@ -138,8 +138,6 @@ protected:
 	bool bHideViewTargetPawnNextFrame = false;
 private:
 	void SetupPlayer();
-
-	void SetReference();
 
 	//当每次升级后，弹出升级界面
 	void CreateLevelUpUI();
@@ -164,6 +162,7 @@ private:
 	//更新玩家XP和Level
 	void UpdateCharacterUI(float Percent, int32 Level);
 
+	UFUNCTION(BlueprintCallable)
 	void TestAction();
 
 	virtual void UpdateTime(FText Time) override;

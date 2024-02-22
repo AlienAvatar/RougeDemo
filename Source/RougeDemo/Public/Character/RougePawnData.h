@@ -9,6 +9,7 @@
 class URougeInputConfig;
 class URougeAbilitySet;
 class URougeAbilityTagRelationshipMapping;
+class ULevelMasterWidget;
 /**
  * 
  */
@@ -33,6 +34,12 @@ public:
 	// 用于这个Pawn的Action映射的ability tags
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rouge|Abilities")
 	TObjectPtr<URougeAbilityTagRelationshipMapping> TagRelationshipMapping;
+
+	UPROPERTY(EditAnywhere, Category="PlayerHUD")
+	TSubclassOf<UUserWidget> PlayerOverlayClass;
+
+	UPROPERTY(EditAnywhere, Category="PlayerHUD")
+	TSubclassOf<ULevelMasterWidget> LevelMasterWidgetClass;
 protected:
 
 

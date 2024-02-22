@@ -6,13 +6,16 @@
 #include "Lib/RougeDemoFunctionLibary.h"
 #include "SaveGame/PlayerSaveGame.h"
 #include "NiagaraFunctionLibrary.h"
+#include "AbilitySystem/RougeAbilitySystemComponent.h"
 #include "Actor/BaseExplosion.h"
 #include "Character/RougeCharacter.h"
+#include "Character/RougePawnExtensionComponent.h"
 #include "Interface/CharacterInterface.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "RougeDemo/RougeDemo.h"
+#include "RougeDemo/RougeGameplayTags.h"
 #include "Weapon/ProjectileBase.h"
 
 // Sets default values for this component's properties
@@ -48,8 +51,23 @@ void UMagicComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UMagicComponent::SetStartingAbility()
 {
+	const FRougeGameplayTags& GameplayTags = FRougeGameplayTags::Get();
+
+	const APawn* Pawn = GetOwner<APawn>();
+	if (!Pawn)
+	{
+		return;
+	}
+
+	if (const URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(Pawn))
+	{
+		if (URougeAbilitySystemComponent* RougeASC = PawnExtComp->GetRougeAbilitySystemComponent())
+		{
+			RougeASC->TryActivateAbility(StartGameplayAbilitySpecHandle,false);
+		}
+	}
 	//开始添加一个Hammer skill
-	UPlayerSaveGame* PlayerSaveGame = URougeDemoFunctionLibary::LoadPlayerData();
+	/*UPlayerSaveGame* PlayerSaveGame = URougeDemoFunctionLibary::LoadPlayerData();
 	if(PlayerSaveGame)
 	{
 		EActiveAbilities ActiveAbilities = PlayerSaveGame->AvailableCharacter.ActiveAbilities;
@@ -65,7 +83,7 @@ void UMagicComponent::SetStartingAbility()
 			LevelUpFrostBolt();
 			break;
 		}
-	}
+	}*/
 }
 
 void UMagicComponent::LevelUpHammer()

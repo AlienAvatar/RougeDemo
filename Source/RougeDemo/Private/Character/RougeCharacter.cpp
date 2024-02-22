@@ -908,39 +908,29 @@ EGait ARougeCharacter::GetAllowedGait()
 	return EGait::EG_Walking;
 }
 
-void ARougeCharacter::MoveForward(float Value)
-{
-	if(Controller != nullptr && Value != 0.f)
-	{
-		const FRotator YawRotation(0.f,Controller->GetControlRotation().Yaw,0.f);
-		const FVector Direction(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X));
-		AddMovementInput(2 * Direction,Value);	 
-	}
-	MoveF = Value;
-	//UE_LOG(LogTemp,Warning,TEXT("MoveF[%f]"),MoveF);
-}
-
-void ARougeCharacter::MoveRight(float Value)
-{
-	if(Controller != nullptr && Value != 0.f)
-	{
-		const FRotator YawRotation(0.f,Controller->GetControlRotation().Yaw,0.f);
-		const FVector Direction(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y));
-		AddMovementInput(2 * Direction,Value);
-	}
-
-	MoveR = Value;
-}
-
-void ARougeCharacter::Turn(float Value)
-{
-	AddControllerYawInput(Value);
-}
-
-void ARougeCharacter::LookUp(float Value)
-{
-	AddControllerPitchInput(Value);
-}
+// void ARougeCharacter::MoveForward(float Value)
+// {
+// 	if(Controller != nullptr && Value != 0.f)
+// 	{
+// 		const FRotator YawRotation(0.f,Controller->GetControlRotation().Yaw,0.f);
+// 		const FVector Direction(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X));
+// 		AddMovementInput(2 * Direction,Value);	 
+// 	}
+// 	MoveF = Value;
+// 	//UE_LOG(LogTemp,Warning,TEXT("MoveF[%f]"),MoveF);
+// }
+//
+// void ARougeCharacter::MoveRight(float Value)
+// {
+// 	if(Controller != nullptr && Value != 0.f)
+// 	{
+// 		const FRotator YawRotation(0.f,Controller->GetControlRotation().Yaw,0.f);
+// 		const FVector Direction(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y));
+// 		AddMovementInput(2 * Direction,Value);
+// 	}
+//
+// 	MoveR = Value;
+// }
 
 void ARougeCharacter::AimOffset2Target(float DeltaTime, AActor* TargetActor)
 {

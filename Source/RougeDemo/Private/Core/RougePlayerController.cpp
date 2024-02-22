@@ -208,6 +208,21 @@ void ARougePlayerController::SetPlayer(UPlayer* InPlayer)
 
 		OnSettingsChanged(UserSettings);
 	}
+
+	//检查是否是本地,设置Magic
+	if(IsLocalPlayerController())
+	{
+		ARougeCharacter* RougeDemoCharacter = Cast<ARougeCharacter>(GetPawn());
+		if(RougeDemoCharacter)
+		{
+			MagicComponent = RougeDemoCharacter->GetMagicComponent();
+			if(MagicComponent)
+			{
+				//初始化技能
+				MagicComponent->SetStartingAbility();
+			}
+		}
+	}
 }
 
 void ARougePlayerController::PreProcessInput(const float DeltaTime, const bool bGamePaused)
@@ -297,24 +312,6 @@ void ARougePlayerController::UpdateHiddenComponents(const FVector& ViewLocation,
 }
 
 void ARougePlayerController::SetupPlayer()
-{
-	//检查是否是本地
-	if(IsLocalPlayerController())
-	{
-		ARougeCharacter* RougeDemoCharacter = Cast<ARougeCharacter>(GetPawn());
-		if(RougeDemoCharacter)
-		{
-			MagicComponent = RougeDemoCharacter->GetAbilityComponent();
-			if(MagicComponent)
-			{
-				//初始化技能
-				MagicComponent->SetStartingAbility();
-			}
-		}
-	}
-}
-
-void ARougePlayerController::SetReference()
 {
 	
 }
