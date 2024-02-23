@@ -104,6 +104,12 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="UI")
 	TSubclassOf<ULevelMasterWidget> LevelMasterWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="DataTable")
+	UDataTable* DT_ActiveAbilities;
+
+	UPROPERTY(EditDefaultsOnly, Category="DataTable")
+	UDataTable* DT_PassiveAbilities;
 protected:
 	UPROPERTY()
 	ARougeHUD* RougeDemoHUD;
@@ -112,11 +118,7 @@ protected:
 	UPROPERTY()
 	UMagicComponent* MagicComponent; 
 
-	UPROPERTY(EditDefaultsOnly, Category="DataTable")
-	UDataTable* DT_ActiveAbilities;
 
-	UPROPERTY(EditDefaultsOnly, Category="DataTable")
-	UDataTable* DT_PassiveAbilities;
 
 	virtual void SetupInputComponent() override;
 
@@ -137,8 +139,6 @@ protected:
 
 	bool bHideViewTargetPawnNextFrame = false;
 private:
-	void SetupPlayer();
-
 	//当每次升级后，弹出升级界面
 	void CreateLevelUpUI();
 	

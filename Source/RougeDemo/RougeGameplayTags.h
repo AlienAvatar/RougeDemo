@@ -23,7 +23,10 @@ public:
 	FGameplayTag Ability_ActivateFail_ActivationGroup;
 	FGameplayTag Ability_Behavior_SurvivesDeath;
 	
-	FGameplayTag Ability_Action_Type_Lighting;
+	FGameplayTag Ability_Type_Action_Lighting;
+	FGameplayTag Ability_Type_Action_FireBall;
+	FGameplayTag Ability_Type_Action_Hammer;
+	FGameplayTag Ability_Type_Attr_Heal;
 	
 	FGameplayTag InputTag_Move;
 	FGameplayTag InputTag_Look_Mouse;

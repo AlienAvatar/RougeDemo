@@ -10,6 +10,7 @@ class URougeInputConfig;
 class URougeAbilitySet;
 class URougeAbilityTagRelationshipMapping;
 class ULevelMasterWidget;
+class UDataTable;
 /**
  * 
  */
@@ -40,6 +41,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="PlayerHUD")
 	TSubclassOf<ULevelMasterWidget> LevelMasterWidgetClass;
+
+	UPROPERTY(EditAnywhere, Category="PlayerHUD")
+	UDataTable* DT_ActiveAbilities;
+
+	UPROPERTY(EditAnywhere, Category="PlayerHUD")
+	UDataTable* DT_PassiveAbilities;
 protected:
 
 

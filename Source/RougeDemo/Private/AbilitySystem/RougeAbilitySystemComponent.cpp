@@ -3,8 +3,10 @@
 
 #include "AbilitySystem/RougeAbilitySystemComponent.h"
 
+#include "BlueprintGameplayTagLibrary.h"
 #include "AbilitySystem/RougeGameplayAbility.h"
 #include "AbilitySystem/RougeGlobalAbilitySystem.h"
+#include "Assets/RougeAssetManager.h"
 #include "Character/RougeAnimInstance.h"
 #include "Character/RougeCharacter.h"
 #include "RougeDemo/RougeDemo.h"
@@ -59,7 +61,6 @@ void URougeAbilitySystemComponent::InitAbilityActorInfo(AActor* InOwnerActor, AA
 		// 当我们确实有一个Pawn时，向RougeGlobalAbilitySytem中注册，我们等待到直到下一次需要avatar时
 		if (URougeGlobalAbilitySystem* GlobalAbilitySystem = UWorld::GetSubsystem<URougeGlobalAbilitySystem>(GetWorld()))
 		{
-		// 	//  UnrealBuildTool failed with exit code 0x00000006
 			GlobalAbilitySystem->RegisterASC(this);
 		}
 
@@ -284,7 +285,6 @@ void URougeAbilitySystemComponent::AbilitySpecInputReleased(FGameplayAbilitySpec
 	}
 }
 
-
 // Called every frame
 void URougeAbilitySystemComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                                      FActorComponentTickFunction* ThisTickFunction)
@@ -292,6 +292,45 @@ void URougeAbilitySystemComponent::TickComponent(float DeltaTime, ELevelTick Tic
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void URougeAbilitySystemComponent::AddDynamicTagGameplayEffect(const FGameplayTag& Tag)
+{
+	//获取GameData中的数据
+	const TSubclassOf<UGameplayEffect> DynamicTagGE = URougeAssetManager::GetSubclass(URougeGameData::Get().DynamicTagGameplayEffect);
+	if (!DynamicTagGE)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AddDynamicTagGameplayEffect: Unable to find DynamicTagGameplayEffect [%s]."), *URougeGameData::Get().DynamicTagGameplayEffect.GetAssetName());
+		return;
+	}
+
+	const FGameplayEffectSpecHandle SpecHandle = MakeOutgoingSpec(DynamicTagGE, 1.0f, MakeEffectContext());
+	FGameplayEffectSpec* Spec = SpecHandle.Data.Get();
+
+	if (!Spec)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AddDynamicTagGameplayEffect: Unable to make outgoing spec for [%s]."), *GetNameSafe(DynamicTagGE));
+		return;
+	}
+
+	Spec->DynamicGrantedTags.AddTag(Tag);
+
+	ApplyGameplayEffectSpecToSelf(*Spec);
+}
+
+void URougeAbilitySystemComponent::RemoveDynamicTagGameplayEffect(const FGameplayTag& Tag)
+{
+	const TSubclassOf<UGameplayEffect> DynamicTagGE = URougeAssetManager::GetSubclass(URougeGameData::Get().DynamicTagGameplayEffect);
+	if (!DynamicTagGE)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RemoveDynamicTagGameplayEffect: Unable to find gameplay effect [%s]."), *URougeGameData::Get().DynamicTagGameplayEffect.GetAssetName());
+		return;
+	}
+
+	FGameplayEffectQuery Query = FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(FGameplayTagContainer(Tag));
+	Query.EffectDefinition = DynamicTagGE;
+
+	RemoveActiveEffects(Query);
 }
 
 

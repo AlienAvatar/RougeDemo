@@ -22,14 +22,16 @@ public:
 	URougeCombatSet();
 	
 	ATTRIBUTE_ACCESSORS(URougeCombatSet, BaseDamage);
+
+	// The base amount of damage to apply in the damage execution.
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_BaseDamage, Category = "Rouge|Combat", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData BaseDamage;
 protected:
 
 	UFUNCTION()
 	void OnRep_BaseDamage(const FGameplayAttributeData& OldValue);
 private:
 
-	// The base amount of damage to apply in the damage execution.
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_BaseDamage, Category = "Rouge|Combat", Meta = (AllowPrivateAccess = true))
-	FGameplayAttributeData BaseDamage;
+
 
 };

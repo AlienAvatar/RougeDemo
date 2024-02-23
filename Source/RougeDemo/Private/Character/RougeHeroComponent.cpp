@@ -3,6 +3,7 @@
 
 #include "Character/RougeHeroComponent.h"
 
+#include "BlueprintGameplayTagLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "AbilitySystem/RougeAbilitySystemComponent.h"
 #include "Character/RougePawnData.h"
@@ -137,7 +138,6 @@ void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* 
 			// PlayerState保存着该玩家的持久数据
 			// AbilitySystemComponent和属性设置取决于玩家的状态。
 			PawnExtComp->InitializeAbilitySystem(RougePS->GetRougeAbilitySystemComponent(), RougePS);
-
 		}
 
 		if (ARougePlayerController* RougePC = GetController<ARougePlayerController>())
@@ -158,6 +158,10 @@ void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* 
 
 				//set LevelUp UI
 				RougePC->LevelMasterWidgetClass = PawnData->LevelMasterWidgetClass;
+
+				//Init Data table
+				RougePC->DT_ActiveAbilities = PawnData->DT_ActiveAbilities;
+				RougePC->DT_PassiveAbilities = PawnData->DT_PassiveAbilities;
 			}
 		}
 	}
@@ -186,12 +190,23 @@ void URougeHeroComponent::CheckDefaultInitialization()
 	ContinueInitStateChain(StateChain);
 }
 
+void URougeHeroComponent::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	UE_LOG(LogTemp, Warning, TEXT("PostInitProperties"));
+}
+
 void URougeHeroComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	//以从系统注销状态并取消绑定委托
 	UnregisterInitStateFeature();
 	
 	Super::EndPlay(EndPlayReason);
+
+	UE_LOG(LogTemp, Warning, TEXT("EndPlay"));
+
+	
 }
 
 void URougeHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputComponent)
@@ -394,5 +409,6 @@ void URougeHeroComponent::Input_AbilityInputTagReleased(FGameplayTag InputTag)
 		}
 	}
 }
+
 
 

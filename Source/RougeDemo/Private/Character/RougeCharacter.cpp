@@ -4,6 +4,7 @@
 #include "Character/RougeCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "BlueprintGameplayTagLibrary.h"
 #include "AI/BaseAI.h"
 #include "AI/BaseAIAnimInstance.h"
 #include "Camera/CameraComponent.h"
@@ -135,6 +136,14 @@ void ARougeCharacter::OnBeginPlay()
 		true
 	);
 
+	GetWorld()->GetTimerManager().SetTimer(
+		StartTimerHandle,
+		this,
+		&ARougeCharacter::StartTimerHandleCallback,
+		0.2f,
+		false,
+		0
+	);
 }
 
 void ARougeCharacter::OnAbilitySystemInitialized()
@@ -262,6 +271,41 @@ void ARougeCharacter::UninitAndDestroy()
 	}
 
 	SetActorHiddenInGame(true);
+}
+
+void ARougeCharacter::StartTimerHandleCallback()
+{
+	GetWorld()->GetTimerManager().SetTimer(
+		AbilityLoopTimerHandle,
+		this,
+		&ARougeCharacter::AbilityLoopTimerHandleCallback,
+		5.f,
+		true,
+		-5.f
+	);
+	GetWorld()->GetTimerManager().ClearTimer(StartTimerHandle);
+}
+
+void ARougeCharacter::AbilityLoopTimerHandleCallback()
+{
+	//Init Ability
+	const bool bIsLocallyControlled = IsLocallyControlled();
+	if(bIsLocallyControlled)
+	{
+		const URougePawnData* PawnData = nullptr;
+		if (URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(this))
+		{
+			const FRougeGameplayTags& StartMagicTags = FRougeGameplayTags::Get();
+			if(URougeAbilitySystemComponent* RougeASC = PawnExtComp->GetRougeAbilitySystemComponent())
+			{
+				FGameplayTagContainer StartContainer = UBlueprintGameplayTagLibrary::MakeGameplayTagContainerFromTag(StartMagicTags.Ability_Type_Action_Lighting);
+				bool bSuccess = RougeASC->TryActivateAbilitiesByTag(StartContainer,true);
+				//Log Test
+				//FString Success = bSuccess ? "true" : "false";
+				//UE_LOG(LogTemp, Warning, TEXT("Success[%s]"), *Success);
+			}
+		}
+	}
 }
 
 // Called every frame

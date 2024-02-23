@@ -55,8 +55,6 @@ public:
 	
 	void LevelUpWalkSpeed(bool PowerUp);
 
-	UPROPERTY(EditDefaultsOnly)
-	FGameplayAbilitySpecHandle StartGameplayAbilitySpecHandle;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

@@ -35,7 +35,10 @@ public:
 	//它会尽可能告知其他组件将其初始化状态机向前移动
 	virtual void CheckDefaultInitialization() override;
 	//~ End IGameFrameworkInitStateInterface interface
-	
+
+	// Start UActorComponent interface
+	virtual void PostInitProperties() override;
+	// ~ End UActorComponent interface 
 	/**  当输入绑定好时，扩展事件的名称发送给UGameFrameworkComponentManager */
 	static const FName NAME_BindInputsNow;
 
@@ -57,7 +60,6 @@ protected:
 	
 	virtual void InitializePlayerInput(UInputComponent* PlayerInputComponent);
 
-
 	//初始化Input设置
 	UPROPERTY(EditAnywhere)
 	TArray<FMappableConfigPair> DefaultInputConfigs;
@@ -74,4 +76,5 @@ protected:
 	
 	void Input_AbilityInputTagPressed(FGameplayTag InputTag);
 	void Input_AbilityInputTagReleased(FGameplayTag InputTag);
+
 };

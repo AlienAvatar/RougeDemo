@@ -282,7 +282,13 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="OnDeathFinished"))
 	void K2_OnDeathFinished();
 
-	
+	FTimerHandle StartTimerHandle;
+
+	void StartTimerHandleCallback();
+
+	FTimerHandle AbilityLoopTimerHandle;
+
+	void AbilityLoopTimerHandleCallback();
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

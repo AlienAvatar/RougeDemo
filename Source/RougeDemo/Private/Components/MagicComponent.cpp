@@ -2,6 +2,8 @@
 
 
 #include "Components/MagicComponent.h"
+
+#include "BlueprintGameplayTagLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Lib/RougeDemoFunctionLibary.h"
 #include "SaveGame/PlayerSaveGame.h"
@@ -51,21 +53,6 @@ void UMagicComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UMagicComponent::SetStartingAbility()
 {
-	const FRougeGameplayTags& GameplayTags = FRougeGameplayTags::Get();
-
-	const APawn* Pawn = GetOwner<APawn>();
-	if (!Pawn)
-	{
-		return;
-	}
-
-	if (const URougePawnExtensionComponent* PawnExtComp = URougePawnExtensionComponent::FindPawnExtensionComponent(Pawn))
-	{
-		if (URougeAbilitySystemComponent* RougeASC = PawnExtComp->GetRougeAbilitySystemComponent())
-		{
-			RougeASC->TryActivateAbility(StartGameplayAbilitySpecHandle,false);
-		}
-	}
 	//开始添加一个Hammer skill
 	/*UPlayerSaveGame* PlayerSaveGame = URougeDemoFunctionLibary::LoadPlayerData();
 	if(PlayerSaveGame)

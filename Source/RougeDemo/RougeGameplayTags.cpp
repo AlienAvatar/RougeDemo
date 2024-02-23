@@ -24,7 +24,10 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(Ability_ActivateFail_Networking, "Ability.ActivateFail.Networking", "Ability failed to activate because it did not pass the network checks.");
 	AddTag(Ability_ActivateFail_ActivationGroup, "Ability.ActivateFail.ActivationGroup", "Ability failed to activate because of its activation group.");
 	
-	AddTag(Ability_Action_Type_Lighting, "Ability.Action.Type.Lighting", "Lighting Ability");
+	AddTag(Ability_Type_Action_Lighting, "Ability.Type.Action.Lighting", "Lighting Ability");
+	AddTag(Ability_Type_Action_FireBall, "Ability.Type.Action.FireBall", "Fire Ball Ability");
+	AddTag(Ability_Type_Action_Hammer, "Ability.Type.Action.Hammer", "Hammer Ability");
+	AddTag(Ability_Type_Attr_Heal, "Ability.Type.Attr.Heal", "Health Heal");
 
 	AddTag(InputTag_Move, "InputTag.Move", "Move input.");
 	AddTag(InputTag_Look_Mouse, "InputTag.Look.Mouse", "Look (mouse) input.");

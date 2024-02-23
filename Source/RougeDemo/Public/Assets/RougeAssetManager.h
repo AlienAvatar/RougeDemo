@@ -29,12 +29,20 @@ public:
 
 	// 返回URougeAssetManager的单例模式
 	static URougeAssetManager& Get();
+
+	template<typename AssetType>
+	static TSubclassOf<AssetType> GetSubclass(const TSoftClassPtr<AssetType>& AssetPointer, bool bKeepInMemory = true);
 protected:
 	//UAssetManager Interface
 	virtual void StartInitialLoading() override;
 
 	void UpdateInitialGameContentLoadPercent(float GameContentPercent);
+	static UObject* SynchronousLoadAsset(const FSoftObjectPath& AssetPath);
+	static bool ShouldLogAssetLoads();
 
+	// 线程安全的方式添加数据到内存中
+	void AddLoadedAsset(const UObject* Asset);
+	
 	template <typename GameDataClass>
 	const GameDataClass& GetOrLoadTypedGameData(const TSoftObjectPtr<GameDataClass>& DataPath)
 	{
@@ -63,5 +71,37 @@ private:
 
 	void DoAllStartupJobs();
 
-	
+	// AssetManager进行资产读取
+	UPROPERTY()
+	TSet<TObjectPtr<const UObject>> LoadedAssets;
+
+	//当更改数据的时候加锁
+	FCriticalSection LoadedAssetsCritical;
 };
+
+
+template<typename AssetType>
+TSubclassOf<AssetType> URougeAssetManager::GetSubclass(const TSoftClassPtr<AssetType>& AssetPointer, bool bKeepInMemory)
+{
+	TSubclassOf<AssetType> LoadedSubclass;
+
+	const FSoftObjectPath& AssetPath = AssetPointer.ToSoftObjectPath();
+
+	if (AssetPath.IsValid())
+	{
+		LoadedSubclass = AssetPointer.Get();
+		if (!LoadedSubclass)
+		{
+			LoadedSubclass = Cast<UClass>(SynchronousLoadAsset(AssetPath));
+			ensureAlwaysMsgf(LoadedSubclass, TEXT("Failed to load asset class [%s]"), *AssetPointer.ToString());
+		}
+
+		if (LoadedSubclass && bKeepInMemory)
+		{
+			// Added to loaded asset list.
+			Get().AddLoadedAsset(Cast<UObject>(LoadedSubclass));
+		}
+	}
+
+	return LoadedSubclass;
+}

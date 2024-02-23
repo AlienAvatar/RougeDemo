@@ -8,6 +8,8 @@
 #include "..\..\Public\Core\RougePlayerController.h"
 #include "AbilitySystem/RougeAbilitySet.h"
 #include "AbilitySystem/RougeAbilitySystemComponent.h"
+#include "AbilitySystem/Attribute/RougeCombatSet.h"
+#include "AbilitySystem/Attribute/RougeHealthSet.h"
 #include "Character/RougePawnExtensionComponent.h"
 #include "Components/GameFrameworkComponentManager.h"
 #include "Core/RougeGameMode.h"
@@ -24,6 +26,9 @@ ARougePlayerState::ARougePlayerState(const FObjectInitializer& ObjectInitializer
 	AbilitySystemComponent = ObjectInitializer.CreateDefaultSubobject<URougeAbilitySystemComponent>(this, TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+
+	CreateDefaultSubobject<URougeHealthSet>(TEXT("HealthSet"));
+	CreateDefaultSubobject<URougeCombatSet>(TEXT("CombatSet"));
 }
 
 void ARougePlayerState::Reset()
