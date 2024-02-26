@@ -23,6 +23,8 @@ URougeHealthComponent::URougeHealthComponent(const FObjectInitializer& ObjectIni
 	
 	AbilitySystemComponent = nullptr;
 	DeathState = ERougeDeathState::NotDead;
+
+	
 }
 
 static AActor* GetInstigatorFromAttrChangeData(const FOnAttributeChangeData& ChangeData)
@@ -190,9 +192,9 @@ void URougeHealthComponent::InitializeWithAbilitySystem(URougeAbilitySystemCompo
 		return;
 	}
 
-	// Register to listen for attribute changes.
+	//当AttributeSet中的Value改变时，注册绑定事件
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URougeHealthSet::GetHealthAttribute()).AddUObject(this, &ThisClass::HandleHealthChanged);
-	//AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URougeHealthSet::GetMaxHealthAttribute()).AddUObject(this, &ThisClass::HandleMaxHealthChanged);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URougeHealthSet::GetMaxHealthAttribute()).AddUObject(this, &ThisClass::HandleMaxHealthChanged);
 	HealthSet->OnOutOfHealth.AddUObject(this, &ThisClass::HandleOutOfHealth);
 
 	// TEMP: Reset attributes to default values.  Eventually this will be driven by a spread sheet.
@@ -203,6 +205,30 @@ void URougeHealthComponent::InitializeWithAbilitySystem(URougeAbilitySystemCompo
 	OnHealthChanged.Broadcast(this, HealthSet->GetHealth(), HealthSet->GetHealth(), nullptr);
 	OnMaxHealthChanged.Broadcast(this, HealthSet->GetHealth(), HealthSet->GetHealth(), nullptr);
 }
+
+float URougeHealthComponent::GetHealth() const
+{
+	return (HealthSet ? HealthSet->GetHealth() : 0.0f);
+}
+
+float URougeHealthComponent::GetMaxHealth() const
+{
+	return (HealthSet ? HealthSet->GetMaxHealth() : 0.0f);
+}
+
+float URougeHealthComponent::GetHealthNormalized() const
+{
+	if (HealthSet)
+	{
+		const float Health = HealthSet->GetHealth();
+		const float MaxHealth = HealthSet->GetMaxHealth();
+
+		return ((MaxHealth > 0.0f) ? (Health / MaxHealth) : 0.0f);
+	}
+
+	return 0.0f;
+}
+
 
 // Called every frame
 void URougeHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,

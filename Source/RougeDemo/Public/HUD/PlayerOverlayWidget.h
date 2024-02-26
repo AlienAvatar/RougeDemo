@@ -22,8 +22,10 @@ class ROUGEDEMO_API UPlayerOverlayWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	/*
 	UPROPERTY(meta=(BindWidget))
 	UProgressBar* HealthBar;
+	*/
 
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* HealthText;

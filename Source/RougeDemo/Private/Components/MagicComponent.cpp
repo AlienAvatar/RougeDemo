@@ -172,15 +172,6 @@ void UMagicComponent::PrepareLightning()
 		TArray<AActor*> IgnoreActorArr;
 		TArray<AActor*> EnemyActorArr;
 		//检查是否有Actor与AbilityComponent发送碰撞
-		UKismetSystemLibrary::ComponentOverlapActors(
-			CharacterInterface->GetAbilitySphere(),
-			GetOwner()->GetTransform(),
-			ObjectTypeQueryArr,
-			nullptr,
-			IgnoreActorArr,
-			EnemyActorArr
-		);
-
 		if(EnemyActorArr.Num() > 0 && EnemyActorArr[0])
 		{
 			ARougeCharacter* Instigator = Cast<ARougeCharacter>(GetOwner());
@@ -227,15 +218,7 @@ void UMagicComponent::PrepareFrostBolt()
 		TArray<AActor*> IgnoreActorArr;
 		TArray<AActor*> EnemyActorArr;
 		//检查是否有Actor与AbilityComponent发送碰撞
-		UKismetSystemLibrary::ComponentOverlapActors(
-			CharacterImpl->GetAbilitySphere(),
-			GetOwner()->GetTransform(),
-			ObjectTypeQueryArr,
-			nullptr,
-			IgnoreActorArr,
-			EnemyActorArr
-		);
-
+		
 		if(EnemyActorArr.Num() > 0 && EnemyActorArr[0])
 		{
 			ARougeCharacter* Character = Cast<ARougeCharacter>(GetOwner());

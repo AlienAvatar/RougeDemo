@@ -64,6 +64,15 @@ public:
 	// Initialize the component using an ability system component.
 	UFUNCTION(BlueprintCallable, Category = "Rouge|Health")
 	void InitializeWithAbilitySystem(URougeAbilitySystemComponent* InASC);
+
+	UFUNCTION(BlueprintCallable, Category = "Rouge|Health")
+	float GetHealth() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Rouge|Health")
+	float GetMaxHealth() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Rouge|Health")
+	float GetHealthNormalized() const;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -83,7 +92,6 @@ protected:
 
 	void ClearGameplayTags();
 
-	
 protected:
 	UPROPERTY()
 	TObjectPtr<URougeAbilitySystemComponent> AbilitySystemComponent;

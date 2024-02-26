@@ -14,6 +14,7 @@
 #include "Struct/EnemySpawnType.h"
 #include "BaseAI.generated.h"
 
+class URougeHealthComponent;
 class URougeAbilitySystemComponent;
 struct FEnemySpawn;
 class AAIEnemyController;
@@ -220,6 +221,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category="Attribute")
 	FName AttributeRowName;
+
+	//生命组件
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	URougeHealthComponent* HealthComponent; 
 private:
 	void Dead();
 

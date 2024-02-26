@@ -72,10 +72,6 @@ ARougeCharacter::ARougeCharacter()
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
-	//AbilityComp = CreateDefaultSubobject<UAbilityComponent>(TEXT("AbilityComp"));
-	AbilitySphere = CreateDefaultSubobject<USphereComponent>(TEXT("AbilitySphere"));
-	AbilitySphere->SetSphereRadius(960.f);
-	
 	PawnExtComponent = CreateDefaultSubobject<URougePawnExtensionComponent>(TEXT("PawnExtensionComponent"));
 	PawnExtComponent->OnAbilitySystemInitialized_RegisterAndCall(FSimpleMulticastDelegate::FDelegate::CreateUObject(this, &ThisClass::OnAbilitySystemInitialized));
 	PawnExtComponent->OnAbilitySystemUninitialized_Register(FSimpleMulticastDelegate::FDelegate::CreateUObject(this, &ThisClass::OnAbilitySystemUninitialized));
@@ -380,11 +376,6 @@ EMovementDirection ARougeCharacter::CalculateInputDirection()
 	{
 		return EMovementDirection::EMD_MAX;
 	}
-}
-
-USphereComponent* ARougeCharacter::GetAbilitySphere()
-{
-	return AbilitySphere;
 }
 
 void ARougeCharacter::AdjustPassive(EPassiveAbilities Stat, float MultiplicationAmount)

@@ -255,10 +255,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat)
 	UMagicComponent* AbilityComp;
 
-	//技能释放范围
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat)
-	USphereComponent* AbilitySphere;
-
 	void InitializeGameplayTags();
 
 	void SetMovementModeTag(EMovementMode MovementMode, uint8 CustomMovementMode, bool bTagEnabled);
@@ -349,8 +345,6 @@ public:
 	bool bHitting = false;
 
 	UMagicComponent* GetMagicComponent() const { return AbilityComp; }
-
-	virtual USphereComponent* GetAbilitySphere() override;
 
 	virtual void AdjustPassive(EPassiveAbilities Stat, float MultiplicationAmount) override;
 

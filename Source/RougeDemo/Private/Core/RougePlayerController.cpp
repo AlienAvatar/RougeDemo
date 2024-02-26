@@ -109,7 +109,7 @@ void ARougePlayerController::SetHUDHealth(float Health, float MaxHealth)
 {
 	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeHUD>(GetHUD()) : RougeDemoHUD;
 
-	bool bHUDValid = RougeDemoHUD &&
+	/*bool bHUDValid = RougeDemoHUD &&
 		RougeDemoHUD->PlayerOverlayWidget &&
 		RougeDemoHUD->PlayerOverlayWidget->HealthBar &&
 		RougeDemoHUD->PlayerOverlayWidget->HealthText;
@@ -120,7 +120,7 @@ void ARougePlayerController::SetHUDHealth(float Health, float MaxHealth)
 		RougeDemoHUD->PlayerOverlayWidget->HealthBar->SetPercent(HealthPercent);
 		const FString HealthText = FString::Printf(TEXT("%d/%d"),FMath::CeilToInt(Health),FMath::CeilToInt(MaxHealth));
 		RougeDemoHUD->PlayerOverlayWidget->HealthText->SetText(FText::FromString(HealthText));
-	}
+	}*/
 }
 
 void ARougePlayerController::SetHUDScore(float Score)
@@ -148,7 +148,7 @@ void ARougePlayerController::SetHUDSkillValue(float SkillValue,float MaxSkillVal
 	if(bHUDValid)
 	{
 		const float HealthPercent = SkillValue / MaxSkillValue;
-		RougeDemoHUD->PlayerOverlayWidget->HealthBar->SetPercent(HealthPercent);
+//		RougeDemoHUD->PlayerOverlayWidget->HealthBar->SetPercent(HealthPercent);
 	}
 }
 

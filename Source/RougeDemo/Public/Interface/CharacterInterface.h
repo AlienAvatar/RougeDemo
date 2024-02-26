@@ -24,9 +24,6 @@ class ROUGEDEMO_API ICharacterInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	
-	virtual USphereComponent* GetAbilitySphere() = 0;
-	
 	virtual void AdjustPassive(EPassiveAbilities Stat, float MultiplicationAmount) = 0;
 
 	virtual void RestoreHealth(float Health) = 0;

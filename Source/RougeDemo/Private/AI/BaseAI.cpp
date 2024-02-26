@@ -13,6 +13,7 @@
 #include "..\..\Public\Core\RougeGameMode.h"
 #include "..\..\Public\Core\RougePlayerController.h"
 #include "AbilitySystem/RougeAbilitySystemComponent.h"
+#include "Character/RougeHealthComponent.h"
 #include "Enum/EMovementDirection.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/EnemyHealthBarWidget.h"
@@ -58,6 +59,8 @@ ABaseAI::ABaseAI()
 	State = EState::ES_Passive;
 
 	RougeAbilitySystemComponent = CreateDefaultSubobject<URougeAbilitySystemComponent>(TEXT("RougeAbility"));
+
+	HealthComponent = CreateDefaultSubobject<URougeHealthComponent>(TEXT("HealthComponent"));
 }
 
 float ABaseAI::GetIdealRange()
