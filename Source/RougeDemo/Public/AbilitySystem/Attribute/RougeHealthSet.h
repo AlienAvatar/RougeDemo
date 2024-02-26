@@ -43,7 +43,7 @@ protected:
 	
 private:
 	// 当前生命值属性.  生命值将受到最大生命值属性的限制.  生命值对修改器是隐藏的，所以只有执行才能修改它.
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Rouge|Health", Meta = (HideFromModifiers, AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Rouge|Health", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData Health;
 
 	// 最大生命值属性. gameplay effects 可以修改它.
@@ -53,6 +53,6 @@ private:
 	// Used to track when the health reaches 0.
 	bool bOutOfHealth;
 
-	UPROPERTY(BlueprintReadOnly, Category="Rouge|Health", Meta=(HideFromModifiers, AllowPrivateAccess=true))
+	UPROPERTY(BlueprintReadOnly, Category="Rouge|Health", Meta=(AllowPrivateAccess=true))
 	FGameplayAttributeData Damage;
 };

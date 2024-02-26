@@ -12,6 +12,7 @@
 #include "Components/WidgetComponent.h"
 #include "..\..\Public\Core\RougeGameMode.h"
 #include "..\..\Public\Core\RougePlayerController.h"
+#include "AbilitySystem/RougeAbilitySystemComponent.h"
 #include "Enum/EMovementDirection.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/EnemyHealthBarWidget.h"
@@ -55,6 +56,8 @@ ABaseAI::ABaseAI()
 	RightAttackSphere->SetCollisionResponseToChannel(ECC_Pawn,ECR_Overlap);
 
 	State = EState::ES_Passive;
+
+	RougeAbilitySystemComponent = CreateDefaultSubobject<URougeAbilitySystemComponent>(TEXT("RougeAbility"));
 }
 
 float ABaseAI::GetIdealRange()
@@ -173,8 +176,6 @@ void ABaseAI::ToggleMarket(bool bLockOn)
 		TargetWidget->SetVisibility(bLockOn);
 	}
 }
-
-
 
 void ABaseAI::UpdateHUDHealth()
 {

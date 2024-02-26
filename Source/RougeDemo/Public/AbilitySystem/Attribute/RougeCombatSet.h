@@ -14,7 +14,7 @@
  * 提供伤害和治疗支持。Gameplay效果将负责修改这些属性之一
  */
 UCLASS(BlueprintType)
-class  URougeCombatSet : public UAttributeSet
+class ROUGEDEMO_API URougeCombatSet : public URougeAttributeSet
 {
 	GENERATED_BODY()
 

@@ -26,6 +26,7 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	
 	AddTag(Ability_Type_Action_Lighting, "Ability.Type.Action.Lighting", "Lighting Ability");
 	AddTag(Ability_Type_Action_FireBall, "Ability.Type.Action.FireBall", "Fire Ball Ability");
+	AddTag(Ability_Type_Action_Test, "Ability.Type.Action.Testing", "Test");
 	AddTag(Ability_Type_Action_Hammer, "Ability.Type.Action.Hammer", "Hammer Ability");
 	AddTag(Ability_Type_Attr_Heal, "Ability.Type.Attr.Heal", "Health Heal");
 

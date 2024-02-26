@@ -18,11 +18,11 @@ struct SDamageStatics
 	}
 };
 
-static const SDamageStatics& DamageStatics()
-{
-	static SDamageStatics DStatics;
-	return DStatics;
-}
+// static const SDamageStatics& DamageStatics()
+// {
+// 	static SDamageStatics DStatics;
+// 	return DStatics;
+// }
 
 URougeDamageMagnitudeCalculation::URougeDamageMagnitudeCalculation()
 {
@@ -37,9 +37,9 @@ float URougeDamageMagnitudeCalculation::CalculateBaseMagnitude_Implementation(co
 	EvaluationParameters.SourceTags = SourceTags;
 	EvaluationParameters.TargetTags = TargetTags;
 
-	float Damage = 0.0f;
+	float Damage = 1.0f;
 	//判断是否成功获取了对应的属性值
-	GetCapturedAttributeMagnitude(DamageStatics().BaseDamageDef, Spec, EvaluationParameters, Damage);
+	//GetCapturedAttributeMagnitude(DamageStatics().BaseDamageDef, Spec, EvaluationParameters, Damage);
 
 	return Damage;
 }

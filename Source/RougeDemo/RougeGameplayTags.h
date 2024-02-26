@@ -26,6 +26,8 @@ public:
 	FGameplayTag Ability_Type_Action_Lighting;
 	FGameplayTag Ability_Type_Action_FireBall;
 	FGameplayTag Ability_Type_Action_Hammer;
+	FGameplayTag Ability_Type_Action_Test;
+	
 	FGameplayTag Ability_Type_Attr_Heal;
 	
 	FGameplayTag InputTag_Move;

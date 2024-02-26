@@ -8,6 +8,7 @@
 #include "AbilitySystem/RougeGameplayAbility.h"
 #include "RougeAbilitySystemComponent.generated.h"
 
+class URougeAttributeSet;
 class URougeAbilityTagRelationshipMapping;
 
 ROUGEDEMO_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Gameplay_AbilityInputBlocked);
@@ -58,6 +59,7 @@ public:
 	// Removes all active instances of the gameplay effect that was used to add the specified dynamic granted tag.
 	UFUNCTION(BlueprintCallable)
 	void RemoveDynamicTagGameplayEffect(const FGameplayTag& Tag);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

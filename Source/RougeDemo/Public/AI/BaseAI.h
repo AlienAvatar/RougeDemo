@@ -14,6 +14,7 @@
 #include "Struct/EnemySpawnType.h"
 #include "BaseAI.generated.h"
 
+class URougeAbilitySystemComponent;
 struct FEnemySpawn;
 class AAIEnemyController;
 class USphereComponent;
@@ -25,6 +26,7 @@ class UAIPerceptionComponent;
 class UAISenseConfig;
 class UBoxComponent;
 class UDataTable;
+class URougeAttributeSet;
 
 UCLASS()
 class ROUGEDEMO_API ABaseAI : public ACharacter, public IEnemyAIInterface
@@ -46,6 +48,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	UWidgetComponent* FinisherWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	URougeAbilitySystemComponent* RougeAbilitySystemComponent;
 	
 	bool bCanBeExecuted = true;
 
@@ -110,6 +115,9 @@ public:
 	virtual float GetIdealRange() override;
 
 	FORCEINLINE UBaseAIAnimInstance* GetBaseAIAnimInstance() const { return BaseAIAnimInstance; }
+
+	UPROPERTY(EditDefaultsOnly)
+	URougeAttributeSet* AttributeSet;
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UBoxComponent* LeftAttackSphere;
