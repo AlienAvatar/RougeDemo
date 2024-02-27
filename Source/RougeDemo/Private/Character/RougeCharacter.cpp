@@ -147,7 +147,7 @@ void ARougeCharacter::OnAbilitySystemInitialized()
 	URougeAbilitySystemComponent* RougeASC = GetRougeAbilitySystemComponent();
 	check(RougeASC);
 
-	//To do初始化HealthComponent
+	//初始化HealthComponent
 	HealthComponent->InitializeWithAbilitySystem(RougeASC);
 	
 	//初始化Gameplay Tags

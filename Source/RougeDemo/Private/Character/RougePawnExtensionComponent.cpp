@@ -6,6 +6,7 @@
 #include "AbilitySystem/RougeAbilitySystemComponent.h"
 #include "Character/RougePawnData.h"
 #include "Components/GameFrameworkComponentManager.h"
+#include "Net/UnrealNetwork.h"
 #include "UObject/UObjectBaseUtility.h"
 
 const FName URougePawnExtensionComponent::NAME_ActorFeatureName("PawnExtension");
@@ -14,6 +15,13 @@ URougePawnExtensionComponent::URougePawnExtensionComponent(const FObjectInitiali
 	: Super(ObjectInitializer)
 {
 	AbilitySystemComponent = nullptr;
+}
+
+void URougePawnExtensionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(URougePawnExtensionComponent, PawnData);
 }
 
 void URougePawnExtensionComponent::OnRegister()
@@ -104,10 +112,10 @@ void URougePawnExtensionComponent::OnAbilitySystemUninitialized_Register(FSimple
 	}
 }
 
-
-// void URougePawnExtensionComponent::OnRep_PawnData()
-// {
-// }
+void URougePawnExtensionComponent::OnRep_PawnData()
+{
+	CheckDefaultInitialization();
+}
 
 void URougePawnExtensionComponent::HandlePlayerStateReplicated()
 {
@@ -266,6 +274,9 @@ void URougePawnExtensionComponent::InitializeAbilitySystem(URougeAbilitySystemCo
 	{
 		InASC->SetTagRelationshipMapping(PawnData->TagRelationshipMapping);
 	}
+
+	//广播当前AbilitySystem初始化完成
+	OnAbilitySystemInitialized.Broadcast();
 }
 
 void URougePawnExtensionComponent::UninitializeAbilitySystem()

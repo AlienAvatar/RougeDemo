@@ -28,6 +28,7 @@ public:
 	void SetPawnData(const URougePawnData* InPawnData);
 	
 	// 注册并调用委托，如果我们的Pawn已经注册了AbilitySystemComponent，那么就注册OnAbilitySystemInitialized委托
+	// 当在PawnExtensionComponent中InitializeAbilitySystem完成时，OnAbilitySystemInitialized会进行广播
 	void OnAbilitySystemInitialized_RegisterAndCall(FSimpleMulticastDelegate::FDelegate Delegate);
 
 	//注销委托
@@ -56,12 +57,12 @@ protected:
 	TObjectPtr<URougeAbilitySystemComponent> AbilitySystemComponent;
 
 	/** Pawn data 用来创建 pawn. 从Spwan函数或者实例中指定 */
-	UPROPERTY(EditInstanceOnly, Category = "Rouge|Pawn")
+	UPROPERTY(EditInstanceOnly, ReplicatedUsing = OnRep_PawnData, Category = "Rouge|Pawn")
 	TObjectPtr<const URougePawnData> PawnData;
 	
-	// UFUNCTION()
-	// void OnRep_PawnData();
-	//
+	UFUNCTION()
+	void OnRep_PawnData();
+	
 
 	// 当PlayerState复制时，应该被调用
 	void HandlePlayerStateReplicated();
