@@ -198,7 +198,7 @@ void URougeHealthComponent::InitializeWithAbilitySystem(URougeAbilitySystemCompo
 	HealthSet->OnOutOfHealth.AddUObject(this, &ThisClass::HandleOutOfHealth);
 
 	// TEMP: Reset attributes to default values.  Eventually this will be driven by a spread sheet.
-	AbilitySystemComponent->SetNumericAttributeBase(URougeHealthSet::GetHealthAttribute(), HealthSet->GetMaxHealth());
+	//AbilitySystemComponent->SetNumericAttributeBase(URougeHealthSet::GetHealthAttribute(), HealthSet->GetMaxHealth());
 
 	ClearGameplayTags();
 

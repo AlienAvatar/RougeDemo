@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2024-02-20T09:25:24.127Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="oTlUr-9BXthgIzAHn7Ta" version="22.0.3" type="device">
+<mxfile host="Electron" modified="2024-02-27T09:30:02.733Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="uYz5vcgaaTLKOOpo532Z" version="22.0.3" type="device">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
-    <mxGraphModel dx="9280" dy="4119" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="6299" dy="2409" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
@@ -1521,10 +1521,11 @@
         <mxCell id="eagHTyB9en_uMktL0cWu-19" value="绑定委托" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
           <mxGeometry x="-3200" y="6300" width="70" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="eagHTyB9en_uMktL0cWu-20" value="&lt;b&gt;&lt;u&gt;TryToChangeInitState()&lt;/u&gt;&lt;/b&gt;" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" edge="1">
-          <mxGeometry width="80" relative="1" as="geometry">
+        <mxCell id="eagHTyB9en_uMktL0cWu-20" value="TryToChangeInitState()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" edge="1">
+          <mxGeometry x="0.0022" width="80" relative="1" as="geometry">
             <mxPoint x="-3298" y="6400.22" as="sourcePoint" />
             <mxPoint x="-3025" y="6400" as="targetPoint" />
+            <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="eagHTyB9en_uMktL0cWu-22" value="绑定委托" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
@@ -1601,6 +1602,21 @@
         </mxCell>
         <mxCell id="PYXO8t3iwlhXUkj87XeZ-125" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="PYXO8t3iwlhXUkj87XeZ-38" vertex="1">
           <mxGeometry x="110" y="1302" width="10" height="138" as="geometry" />
+        </mxCell>
+        <mxCell id="oMnVuy2UlV-5QsGLFpuQ-1" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="PYXO8t3iwlhXUkj87XeZ-38" vertex="1">
+          <mxGeometry x="110" y="478" width="10" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="oMnVuy2UlV-5QsGLFpuQ-4" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="PYXO8t3iwlhXUkj87XeZ-38" vertex="1">
+          <mxGeometry x="111" y="578" width="10" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="oMnVuy2UlV-5QsGLFpuQ-5" value="InitAbilityActorInfo()" style="html=1;align=left;spacingLeft=2;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;curved=0;rounded=0;" parent="PYXO8t3iwlhXUkj87XeZ-38" source="oMnVuy2UlV-5QsGLFpuQ-1" target="oMnVuy2UlV-5QsGLFpuQ-4" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="116" y="558" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="146" y="532" />
+              <mxPoint x="146" y="588" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="PYXO8t3iwlhXUkj87XeZ-40" value="CancelAbilities()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" edge="1">
           <mxGeometry width="80" relative="1" as="geometry">
@@ -1922,9 +1938,6 @@
         <mxCell id="kxgjj5ZRO5BQYAc2HYKu-1" value="解绑OnAbilitySystemInitialized()" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
           <mxGeometry x="-3000" y="7230" width="190" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="kxgjj5ZRO5BQYAc2HYKu-2" value="初始化GameplayTags" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-          <mxGeometry x="-2880" y="7260" width="140" height="30" as="geometry" />
-        </mxCell>
         <mxCell id="kxgjj5ZRO5BQYAc2HYKu-3" value="设置当前的移动Tag" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" edge="1">
           <mxGeometry width="80" relative="1" as="geometry">
             <mxPoint x="-3045" y="7418" as="sourcePoint" />
@@ -1951,8 +1964,8 @@
         </mxCell>
         <mxCell id="kxgjj5ZRO5BQYAc2HYKu-12" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="-2480" y="3830" as="sourcePoint" />
-            <mxPoint x="-2380" y="3830" as="targetPoint" />
+            <mxPoint x="-2490" y="3843.89" as="sourcePoint" />
+            <mxPoint x="-2390" y="3843.89" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="kxgjj5ZRO5BQYAc2HYKu-13" value="&lt;h1&gt;GameMode游戏模式&lt;/h1&gt;决定了一局游戏的玩法规则&lt;br&gt;1.初始化GameState，新增了URougeExperienceManagerComponent的加载完成回调&lt;br&gt;2.初始化GameMode，查找相关的Experience配置，并完成Experience的加载&lt;br&gt;3.OnExperienceLoaded 。Experience资源加载完成之后回调，并执行RestartPlayer相关的逻辑&lt;br&gt;4.RestartPlayer。这里引入了URougePlayerSpawningManagerComponent来管理玩家的重生状态，并影响到所有跟玩家出生相关的逻辑" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
@@ -1990,18 +2003,36 @@
             <mxPoint x="2135" y="8228" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="ZOVOvTTlCzecuSlYOzHO-0" value="URougeHealthComponent" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+        <mxCell id="ZOVOvTTlCzecuSlYOzHO-0" value="URougeHealthComponent" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
           <mxGeometry x="-2220" y="7200" width="170" height="300" as="geometry" />
         </mxCell>
-        <mxCell id="ZOVOvTTlCzecuSlYOzHO-2" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="ZOVOvTTlCzecuSlYOzHO-0">
+        <mxCell id="ZOVOvTTlCzecuSlYOzHO-2" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="ZOVOvTTlCzecuSlYOzHO-0" vertex="1">
           <mxGeometry x="80" y="75" width="10" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="ZOVOvTTlCzecuSlYOzHO-1" value="InitializeWithAbilitySystem()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" target="ZOVOvTTlCzecuSlYOzHO-2">
+        <mxCell id="ZOVOvTTlCzecuSlYOzHO-1" value="InitializeWithAbilitySystem()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" target="ZOVOvTTlCzecuSlYOzHO-2" edge="1">
           <mxGeometry x="0.0004" width="80" relative="1" as="geometry">
             <mxPoint x="-3045" y="7290" as="sourcePoint" />
             <mxPoint x="-2174.9999999999995" y="7290" as="targetPoint" />
             <mxPoint as="offset" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="oMnVuy2UlV-5QsGLFpuQ-0" value="InitializeAbilitySystem()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" target="oMnVuy2UlV-5QsGLFpuQ-1" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="-2734" y="6520" as="sourcePoint" />
+            <mxPoint x="-2570" y="6520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oMnVuy2UlV-5QsGLFpuQ-2" value="当AttributeSet中的Value改变时，注册绑定事件" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="-2695" y="7240" width="270" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="oMnVuy2UlV-5QsGLFpuQ-3" value="return ASC" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;curved=0;rounded=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="oMnVuy2UlV-5QsGLFpuQ-1" target="PYXO8t3iwlhXUkj87XeZ-22" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-2450" y="6560" as="sourcePoint" />
+            <mxPoint x="-2530" y="6560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-bMv9U6KeIZE2oEyol-5-1" value="TryToChangeInitState()&lt;br&gt;1.CanChangeInitState() 确定当前的InitTag&lt;br&gt;2.HandleChangeInitState() 这里要初始化AbilitySystem&lt;br&gt;3.OnActorInitStateChanged()&lt;br&gt;4.CheckDefaultInitialization()" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="-3600" y="6273" width="250" height="161" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
