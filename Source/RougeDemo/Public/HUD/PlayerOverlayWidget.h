@@ -33,8 +33,8 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* ScoreAmount;
 
-	UPROPERTY(meta=(BindWidget))
-	UProgressBar* SkillValueBar;
+	/*UPROPERTY(meta=(BindWidget))
+	UProgressBar* SkillValueBar;*/
 
 	UPROPERTY()
 	UVerticalBox* VB_Skill;

@@ -141,7 +141,7 @@ void ARougePlayerController::SetHUDSkillValue(float SkillValue,float MaxSkillVal
 {
 	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeHUD>(GetHUD()) : RougeDemoHUD;
 
-	bool bHUDValid = RougeDemoHUD &&
+	/*bool bHUDValid = RougeDemoHUD &&
 		RougeDemoHUD->PlayerOverlayWidget &&
 		RougeDemoHUD->PlayerOverlayWidget->SkillValueBar;
 
@@ -149,7 +149,7 @@ void ARougePlayerController::SetHUDSkillValue(float SkillValue,float MaxSkillVal
 	{
 		const float HealthPercent = SkillValue / MaxSkillValue;
 //		RougeDemoHUD->PlayerOverlayWidget->HealthBar->SetPercent(HealthPercent);
-	}
+	}*/
 }
 
 void ARougePlayerController::OnLevelUp()

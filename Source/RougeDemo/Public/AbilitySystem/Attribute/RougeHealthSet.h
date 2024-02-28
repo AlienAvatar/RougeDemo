@@ -23,6 +23,8 @@ public:
 	ATTRIBUTE_ACCESSORS(URougeHealthSet, Damage);
 	ATTRIBUTE_ACCESSORS(URougeHealthSet, Health);
 	ATTRIBUTE_ACCESSORS(URougeHealthSet, MaxHealth);
+	ATTRIBUTE_ACCESSORS(URougeHealthSet, Mana);
+	ATTRIBUTE_ACCESSORS(URougeHealthSet, MaxMana);
 
 	mutable FRougeAttributeEvent OnOutOfHealth;
 protected:
@@ -32,6 +34,17 @@ protected:
 	UFUNCTION()
 	void OnRep_MaxHealth(const FGameplayAttributeData& OldValue);
 
+	UFUNCTION()
+	void OnRep_Mana(const FGameplayAttributeData& OldValue);
+	
+	UFUNCTION()
+	void OnRep_MaxMana(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_Rage(const FGameplayAttributeData& OldValue);
+	
+	UFUNCTION()
+	void OnRep_MaxRage(const FGameplayAttributeData& OldValue);
 	// Attribute Interface Set Start 
 	virtual bool PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
@@ -50,6 +63,18 @@ private:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth, Category = "Rouge|Health", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxHealth;
 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana, Category = "Rouge|Mana", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Mana;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxMana, Category = "Rouge|Mana", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData MaxMana;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Rage, Category = "Rouge|Rage", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Rage;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxRage, Category = "Rouge|Rage", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData MaxRage;
+	
 	// Used to track when the health reaches 0.
 	bool bOutOfHealth;
 

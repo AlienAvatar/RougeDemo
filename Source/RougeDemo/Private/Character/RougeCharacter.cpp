@@ -217,8 +217,9 @@ void ARougeCharacter::UnPossessed()
 
 void ARougeCharacter::OnDeathStarted(AActor* OwningActor)
 {
+	RagdollStart();
 	//禁止输入，清除碰撞
-	DisableMovementAndCollision();
+	//DisableMovementAndCollision();
 }
 
 void ARougeCharacter::OnDeathFinished(AActor* OwningActor)
@@ -244,6 +245,7 @@ void ARougeCharacter::DisableMovementAndCollision()
 
 void ARougeCharacter::DestroyDueToDeath()
 {
+	RagdollEnd();
 	K2_OnDeathFinished();
 
 	UninitAndDestroy();

@@ -8,6 +8,10 @@
 URougeHealthSet::URougeHealthSet()
 	: Health(100.0f)
 	, MaxHealth(100.0f)
+	, Mana(100.0f)
+	, MaxMana(100.f)
+	, Rage(0.0f)
+	, MaxRage(100.0f)
 {
 }
 
@@ -21,11 +25,32 @@ void URougeHealthSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 void URougeHealthSet::OnRep_Health(const FGameplayAttributeData& OldValue)
 {
-	
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URougeHealthSet, Health, OldValue);
 }
 
 void URougeHealthSet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)
 {
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URougeHealthSet, MaxHealth, OldValue);
+}
+
+void URougeHealthSet::OnRep_Mana(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URougeHealthSet, Mana, OldValue);
+}
+
+void URougeHealthSet::OnRep_MaxMana(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URougeHealthSet, MaxMana, OldValue);
+}
+
+void URougeHealthSet::OnRep_Rage(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URougeHealthSet, Rage, OldValue);
+}
+
+void URougeHealthSet::OnRep_MaxRage(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URougeHealthSet, MaxRage, OldValue);
 }
 
 bool URougeHealthSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data)

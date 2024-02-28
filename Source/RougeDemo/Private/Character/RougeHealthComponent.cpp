@@ -196,12 +196,13 @@ void URougeHealthComponent::InitializeWithAbilitySystem(URougeAbilitySystemCompo
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URougeHealthSet::GetHealthAttribute()).AddUObject(this, &ThisClass::HandleHealthChanged);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URougeHealthSet::GetMaxHealthAttribute()).AddUObject(this, &ThisClass::HandleMaxHealthChanged);
 	HealthSet->OnOutOfHealth.AddUObject(this, &ThisClass::HandleOutOfHealth);
-
+	
 	// TEMP: Reset attributes to default values.  Eventually this will be driven by a spread sheet.
 	//AbilitySystemComponent->SetNumericAttributeBase(URougeHealthSet::GetHealthAttribute(), HealthSet->GetMaxHealth());
 
 	ClearGameplayTags();
 
+	//init Attribute
 	OnHealthChanged.Broadcast(this, HealthSet->GetHealth(), HealthSet->GetHealth(), nullptr);
 	OnMaxHealthChanged.Broadcast(this, HealthSet->GetHealth(), HealthSet->GetHealth(), nullptr);
 }
