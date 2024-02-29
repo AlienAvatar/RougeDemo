@@ -50,7 +50,10 @@ void ARougePlayerController::BeginPlay()
 	SetActorHiddenInGame(false);
 	
 	RougeDemoHUD = Cast<ARougeHUD>(GetHUD());
-	//SetupPlayer();
+
+	FRougeGameplayTags GameplayTags = FRougeGameplayTags::Get();
+
+	
 }
 
 void ARougePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -108,19 +111,6 @@ void ARougePlayerController::SetupInputComponent()
 void ARougePlayerController::SetHUDHealth(float Health, float MaxHealth)
 {
 	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeHUD>(GetHUD()) : RougeDemoHUD;
-
-	/*bool bHUDValid = RougeDemoHUD &&
-		RougeDemoHUD->PlayerOverlayWidget &&
-		RougeDemoHUD->PlayerOverlayWidget->HealthBar &&
-		RougeDemoHUD->PlayerOverlayWidget->HealthText;
-
-	if(bHUDValid)
-	{
-		const float HealthPercent = Health / MaxHealth;
-		RougeDemoHUD->PlayerOverlayWidget->HealthBar->SetPercent(HealthPercent);
-		const FString HealthText = FString::Printf(TEXT("%d/%d"),FMath::CeilToInt(Health),FMath::CeilToInt(MaxHealth));
-		RougeDemoHUD->PlayerOverlayWidget->HealthText->SetText(FText::FromString(HealthText));
-	}*/
 }
 
 void ARougePlayerController::SetHUDScore(float Score)
@@ -336,7 +326,7 @@ void ARougePlayerController::PrepareLevelUp()
 
 void ARougePlayerController::ExecuteLevelUp()
 {
-	if(MagicComponent == nullptr) { return; }
+	/*if(MagicComponent == nullptr) { return; }
 
 	//保存为本地变量，记录角色每个技能的技能情况
 	TMap<EActiveAbilities, int32> Local_ActiveAbilitiesMap = MagicComponent->ActiveAbilitiesMap;
@@ -463,8 +453,51 @@ void ARougePlayerController::ExecuteLevelUp()
 			}
 		}
 	}
-	//如果没有技能可以添加，就加血
+	//如果没有技能可以添加，就加血*/
+
+
+	//RougeGameplayTagAbilitySystem
+
+	/*TArray<FGameplayTag> GameplayTagArr;
+	AbilitiesArr->GetGameplayTagArray(GameplayTagArr);*/
 	
+	// 	
+	// FString EvoAbilityStr = UEnum::GetValueAsString(Local_EvoAbility);
+	// const FText EvoAbilityText = UKismetTextLibrary::Conv_StringToText(EvoAbilityStr);
+	// int32 Num = UKismetSystemLibrary::MakeLiteralInt(-1);
+	// FText LevelNum = UKismetTextLibrary::Conv_IntToText(Num);
+	// FText SkillLevelText = FText::Format(FText::FromString(TEXT("{0}{1}")), EvoAbilityText, LevelNum);
+	TArray<FName> OutRowNames;
+	UDataTableFunctionLibrary::GetDataTableRowNames(DT_ActiveAbilities, OutRowNames);
+	for(FName RowName : OutRowNames)
+	{
+		//testAA
+		FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
+		if(AbilityLevelUp->bActive)
+		{
+			AbilitiesArr.AppendTags(AbilityLevelUp->AbilityTag);
+		}
+	}
+	
+	if(AbilitiesArr.Num() > 0)
+	{
+		FRougeGameplayTags GameplayTags = FRougeGameplayTags::Get();
+
+		FGameplayTagContainer Local_ActiveAbilitiesArr;
+		for(auto Ability : AbilitiesArr)
+		{
+			//是否是ActiveAbility
+			if(Ability.MatchesTag(GameplayTags.Ability_Type_Magic_Warrior_ActiveAbility))
+			{
+				Local_ActiveAbilitiesArr.AddTag(Ability);
+			//是否是PassiveAbility
+			}else if(Ability.MatchesTag(GameplayTags.Ability_Type_Magic_Warrior_PassiveAbility))
+			{
+				
+			}
+			
+		}
+	}
 }
 
 bool ARougePlayerController::CheckIfEVOReady(EActiveAbilities& Ability)
@@ -655,7 +688,7 @@ void ARougePlayerController::UpdateTime(FText Time)
 void ARougePlayerController::CreateActiveCard(int32 Local_MaxCount, TArray<EActiveAbilities>& Local_AvailableActiveAbilities,
 	TMap<EActiveAbilities, int32>& Local_ActiveAbilitiesMap)
 {
-	EActiveAbilities Local_ActiveAbility;
+	/*EActiveAbilities Local_ActiveAbility;
 	//随机选择一个随机技能
 	int32 RandomIndex = UKismetMathLibrary::RandomIntegerInRange(0, Local_AvailableActiveAbilities.Num() - 1); //0 || 1 || 2 || 3
     Local_ActiveAbility = Local_AvailableActiveAbilities[RandomIndex];
@@ -707,11 +740,19 @@ void ARougePlayerController::CreateActiveCard(int32 Local_MaxCount, TArray<EActi
 				break;
 			}
 		}
-	}
+	}*/
+
+	
+}
+
+void ARougePlayerController::CreateActiveCard(FRougeGameplayTags RougeGameplayTags)
+{
+	//从DataTable中获取技能信息
+	
 }
 
 void ARougePlayerController::CreatePassiveCard(int32 Local_MaxCount,
-	TArray<EPassiveAbilities>& Local_AvailablePassiveAbilities,TMap<EPassiveAbilities, int32>& Local_PassiveAbilitiesMap)
+                                               TArray<EPassiveAbilities>& Local_AvailablePassiveAbilities,TMap<EPassiveAbilities, int32>& Local_PassiveAbilitiesMap)
 {
 	//从本地数组中删除，这样我们就没有重复项了
 	EPassiveAbilities Local_PassiveAbility;

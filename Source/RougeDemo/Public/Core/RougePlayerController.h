@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Enum/EAbilityType.h"
 #include "Enum/EActiveAbilities.h"
 #include "Enum/EPassiveAbilities.h"
@@ -11,6 +12,8 @@
 #include "Teams/RougeTeamAgentInterface.h"
 #include "RougePlayerController.generated.h"
 
+struct FRougeGameplayTags;
+struct FGameplayTagContainer;
 class URougeAbilitySystemComponent;
 class UDataTable;
 class UMagicComponent;
@@ -118,8 +121,6 @@ protected:
 	UPROPERTY()
 	UMagicComponent* MagicComponent; 
 
-
-
 	virtual void SetupInputComponent() override;
 
 	void OnStartAutoRun();
@@ -154,6 +155,9 @@ private:
 	//检查给出的卡片中是否有可以升级的
 	bool CheckIfEVOReady(EActiveAbilities& Ability);
 
+	//技能
+	FGameplayTagContainer AbilitiesArr;
+	
 	//检查主动技能，防止某个技能重复出现
 	TArray<EActiveAbilities> CheckActiveAbilities(TMap<EActiveAbilities, int32> ActiveMap, int32 MaxLevel);
 	
@@ -169,6 +173,7 @@ private:
 
 	//创建主动技能的升级卡片
 	void CreateActiveCard(int32 Local_MaxCount, TArray<EActiveAbilities>& Local_AvailableActiveAbilities, TMap<EActiveAbilities, int32>& Local_ActiveAbilitiesMap);
+	void CreateActiveCard(FRougeGameplayTags RougeGameplayTags);
 
 	//创建被动技能的升级卡片
 	void CreatePassiveCard(int32 Local_MaxCount, TArray<EPassiveAbilities>& Local_AvailablePassiveAbilities, TMap<EPassiveAbilities, int32>& Local_PassiveAbilitiesMap);

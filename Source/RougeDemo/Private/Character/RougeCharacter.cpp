@@ -104,12 +104,6 @@ void ARougeCharacter::OnBeginPlay()
 	RougeDemoPlayerController = Cast<ARougePlayerController>(Controller);
 	//绑定受击函数
 	OnTakeAnyDamage.AddDynamic(this,&ARougeCharacter::ReceiveDamage);
-
-	//设置当前血量
-	if(RougeDemoPlayerController)
-	{
-		RougeDemoPlayerController->SetHUDHealth(AttributeInfo.Health,AttributeInfo.MaxHealth);
-	}
 	
 	//设置默认状态
 	Gait = DesiredGait;
@@ -395,7 +389,7 @@ void ARougeCharacter::AdjustPassive(EPassiveAbilities Stat, float Multiplication
 			float MaxHealth = AttributeInfo.MaxHealth;
 			MaxHealth *= MultiplicationAmount;
 			AttributeInfo.MaxHealth = MaxHealth;
-			UpdateHealthHUD();
+
 			break;
 	}
 }
@@ -403,7 +397,6 @@ void ARougeCharacter::AdjustPassive(EPassiveAbilities Stat, float Multiplication
 void ARougeCharacter::RestoreHealth(float Health)
 {
 	AttributeInfo.Health += Health;
-	UpdateHealthHUD();
 }
 
 void ARougeCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
@@ -415,7 +408,6 @@ void ARougeCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UD
 		bHitting = true;
 		AttributeInfo.Health = FMath::Clamp(AttributeInfo.Health - Damage, 0.f, AttributeInfo.MaxHealth);
 
-		UpdateHealthHUD();
 		//判断DamageCauser的受击方向
 		const EMovementDirection LocalHitDirection = UReceiveDamageLibrary::CalculateDamageCauserDirection(DamagedActor,DamageCauser);
 		UE_LOG(LogTemp, Warning, TEXT("DamageType[%s]"), *DamageType->GetName());
@@ -447,14 +439,6 @@ void ARougeCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UD
 	}
 }
 
-void ARougeCharacter::UpdateHealthHUD()
-{
-	//更改UMG
-	if(RougeDemoPlayerController)
-	{
-		RougeDemoPlayerController->SetHUDHealth(AttributeInfo.Health,AttributeInfo.MaxHealth);
-	}
-}
 
 void ARougeCharacter::PlayHitReactMontage(EMovementDirection HitDirection)
 {

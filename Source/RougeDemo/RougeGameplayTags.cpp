@@ -30,6 +30,15 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(Ability_Type_Action_Hammer, "Ability.Type.Action.Hammer", "Hammer Ability");
 	AddTag(Ability_Type_Attr_Heal, "Ability.Type.Attr.Heal", "Health Heal");
 
+	AddTag(Ability_Type_Magic_Warrior_ActiveAbility, "Ability.Type.Magic.Warrior.ActiveAbility", "Active Ability Group");
+	AddTag(Ability_Type_Magic_Warrior_PassiveAbility, "Ability.Type.Magic.Warrior.PassiveAbility", "Passive Ability Group");
+	AddTag(Ability_Type_Magic_Warrior_NormalAbility, "Ability.Type.Magic.Warrior.NormalAbility", "Normal Ability Group");
+	AddTag(Ability_Type_Magic_Warrior_AA_AA1_Level1, "Ability.Type.Magic.Warrior.ActiveAbility.AA1.Level1", "Active Ability1 Level1");
+	AddTag(Ability_Type_Magic_Warrior_AA_AA1_Level2, "Ability.Type.Magic.Warrior.ActiveAbility.AA1.Level2", "Active Ability1 Level2");
+	AddTag(Ability_Type_Magic_Warrior_AA_AA2_Level1, "Ability.Type.Magic.Warrior.ActiveAbility.AA2.Level1", "Active Ability2 Level1");
+	AddTag(Ability_Type_Magic_Warrior_PA_AA1_Level1, "Ability.Type.Magic.Warrior.PassiveAbility.PA1.Level1", "Passive Ability1 Level1");
+	AddTag(Ability_Type_Magic_Warrior_PA_AA2_Level1, "Ability.Type.Magic.Warrior.PassiveAbility.PA2.Level1", "Passive Ability2 Level2");
+
 	AddTag(InputTag_Move, "InputTag.Move", "Move input.");
 	AddTag(InputTag_Look_Mouse, "InputTag.Look.Mouse", "Look (mouse) input.");
 	AddTag(InputTag_Look_Stick, "InputTag.Look.Stick", "Look (stick) input.");

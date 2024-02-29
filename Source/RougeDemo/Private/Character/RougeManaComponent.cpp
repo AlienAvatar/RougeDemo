@@ -32,21 +32,21 @@ void URougeManaComponent::InitializeWithAbilitySystem(URougeAbilitySystemCompone
 
 	if (AbilitySystemComponent)
 	{
-		UE_LOG(LogTemp, Error, TEXT("RougeHealthComponent: Health component for owner [%s] has already been initialized with an ability system."), *GetNameSafe(Owner));
+		UE_LOG(LogTemp, Error, TEXT("RougeManaComponent: Health component for owner [%s] has already been initialized with an ability system."), *GetNameSafe(Owner));
 		return;
 	}
 
 	AbilitySystemComponent = InASC;
 	if (!AbilitySystemComponent)
 	{
-		UE_LOG(LogTemp, Error, TEXT("RougeHealthComponent: Cannot initialize health component for owner [%s] with NULL ability system."), *GetNameSafe(Owner));
+		UE_LOG(LogTemp, Error, TEXT("RougeManaComponent: Cannot initialize mana component for owner [%s] with NULL ability system."), *GetNameSafe(Owner));
 		return;
 	}
 
 	RougeSet = AbilitySystemComponent->GetSet<URougeHealthSet>();
 	if (!RougeSet)
 	{
-		UE_LOG(LogTemp, Error, TEXT("RougeHealthComponent: Cannot initialize health component for owner [%s] with NULL health set on the ability system."), *GetNameSafe(Owner));
+		UE_LOG(LogTemp, Error, TEXT("RougeManaComponent: Cannot initialize mana component for owner [%s] with NULL mana set on the ability system."), *GetNameSafe(Owner));
 		return;
 	}
 
