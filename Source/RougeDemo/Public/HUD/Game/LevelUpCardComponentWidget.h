@@ -26,8 +26,7 @@ class ROUGEDEMO_API ULevelUpCardComponentWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 	
-	void SetLevelUpCardComponentWidget(FText Name, int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility,
-	EPassiveAbilities PAbility, EAbilityType Type);
+	void SetLevelUpCardComponentWidget(FText Name, FText Level, FText Desc, UTexture2D* Icon, FText Type);
 
 	UPROPERTY(meta=(BindWidget))
 	UButton* Btn_Selected;

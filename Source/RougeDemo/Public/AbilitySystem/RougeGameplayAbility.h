@@ -29,6 +29,25 @@ enum class ERougeAbilityActivationPolicy : uint8
 	OnSpawn
 };
 
+// 播放一个蒙太奇动画当消息发送失败时
+USTRUCT(BlueprintType)
+struct FRougeAbilityMontageFailureMessage
+{
+	GENERATED_BODY()
+
+public:
+	
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<APlayerController> PlayerController = nullptr;
+
+	// All the reasons why this ability has failed
+	UPROPERTY(BlueprintReadWrite)
+	FGameplayTagContainer FailureTags;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UAnimMontage> FailureMontage = nullptr;
+};
+
 /**
  * ERougeAbilityActivationGroup
  *
@@ -68,7 +87,9 @@ public:
 	void TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;
 
 	ERougeAbilityActivationPolicy GetActivationPolicy() const { return ActivationPolicy; }
-
+	//返回已激活的Ability
+	ERougeAbilityActivationGroup GetActivationGroup() const { return ActivationGroup; }
+	
 	//获取RougeCharacter
 	UFUNCTION(BlueprintCallable, Category = "Rouge|Ability")
 	ARougeCharacter* GetRougeCharacterFromActorInfo() const;
@@ -81,6 +102,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = "Rouge|Ability", Meta = (ExpandBoolAsExecs = "ReturnValue"))
 	bool CanChangeActivationGroup(ERougeAbilityActivationGroup NewGroup) const;
+
+	void OnAbilityFailedToActivate(const FGameplayTagContainer& FailedReason) const
+	{
+		NativeOnAbilityFailedToActivate(FailedReason);
+	}
 protected:
 	//~UGameplayAbility interface
 	//是否可以激活此Ability
@@ -125,5 +151,12 @@ protected:
 
 	virtual void GetAbilitySource(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, float& OutSourceLevel, const IRougeAbilitySourceInterface*& OutAbilitySource, AActor*& OutEffectCauser) const;
 
+	// 当Ability激活失败的时候调用
+	virtual void NativeOnAbilityFailedToActivate(const FGameplayTagContainer& FailedReason) const;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Advanced")
+	TMap<FGameplayTag, FText> FailureTagToUserFacingMessages;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Advanced")
+	TMap<FGameplayTag, TObjectPtr<UAnimMontage>> FailureTagToAnimMontage;
 };

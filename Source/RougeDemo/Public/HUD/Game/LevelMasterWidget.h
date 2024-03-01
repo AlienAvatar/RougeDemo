@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
 #include "Enum/EAbilityType.h"
 #include "Enum/EActiveAbilities.h"
@@ -13,11 +14,13 @@ class ULevelUpCardComponentWidget;
 class UButton;
 class ULevelUpItemsComponentWidget;
 class UWidgetSwitcher;
+struct FGameplayTag;
+
 /**
  * 
  */
 
-DECLARE_DELEGATE_ThreeParams(FOnCloseDelegate, EAbilityType, EActiveAbilities, EPassiveAbilities);
+DECLARE_DELEGATE_OneParam(FOnCloseDelegate, FGameplayTag);
 DECLARE_DELEGATE(FOnReadyOnDelegate);
 
 UCLASS()
@@ -37,8 +40,7 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	ULevelUpItemsComponentWidget* WBP_LevelUpItems;
 
-	void AddSelection(FText Name, int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility,
-		EPassiveAbilities PAbility,EAbilityType Type);
+	void AddSelection(FText Name, FText Level, FText Desc, UTexture2D* Icon,  FText Type, FGameplayTag GameplayTag);
 
 	UPROPERTY(meta=(BindWidget))
 	UButton* Btn_Intro;
@@ -66,5 +68,5 @@ private:
 
 	EAbilityType Tmp_Type;
 
-	
+	FGameplayTag Tmp_GameplayTag;
 };

@@ -3,6 +3,7 @@
 
 #include "HUD/Game/LevelMasterWidget.h"
 
+#include "GameplayTagContainer.h"
 #include "Components/Button.h"
 #include "Components/VerticalBox.h"
 #include "Components/WidgetSwitcher.h"
@@ -21,8 +22,7 @@ void ULevelMasterWidget::ResetUI()
 	WS_LevelUp->SetActiveWidgetIndex(0);
 }
 
-void ULevelMasterWidget::AddSelection(FText Name, int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility,
-	EPassiveAbilities PAbility, EAbilityType Type)
+void ULevelMasterWidget::AddSelection(FText Name, FText Level, FText Desc, UTexture2D* Icon, FText Type, FGameplayTag GameplayTag)
 {
 	ULevelUpCardComponentWidget* LevelUpCardComponentWidget = CreateWidget<ULevelUpCardComponentWidget>(GetOwningPlayer(), LevelUpCardComponentClass);
 	LevelUpCardComponentWidget->SetLevelUpCardComponentWidget(
@@ -30,15 +30,12 @@ void ULevelMasterWidget::AddSelection(FText Name, int32 Level, FText Desc, UText
 		Level,
 		Desc,
 		Icon,
-		AAbility,
-		PAbility,
 		Type
 	);
 	WBP_LevelUpItems->VB_Items->AddChildToVerticalBox(LevelUpCardComponentWidget);
-
-	Tmp_AAbility = AAbility;
-	Tmp_PAbility = PAbility;
-	Tmp_Type = Type;
+	OnCloseDelegate.Execute(
+		GameplayTag
+	);
 	
 	//Bind on Selected
 	LevelUpCardComponentWidget->OnSelectedDelegate.BindUObject(this, &ULevelMasterWidget::OnSelectedDelegateEventFunction);
@@ -59,11 +56,7 @@ void ULevelMasterWidget::Btn_IntroClickedCallBack()
 
 void ULevelMasterWidget::Close()
 {
-	OnCloseDelegate.Execute(
-		Tmp_Type,
-		Tmp_AAbility,
-		Tmp_PAbility
-	);
+	
 	RemoveFromParent();
 }
 

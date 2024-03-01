@@ -22,8 +22,8 @@ class ULevelMasterWidget;
 class APlayerState;
 class ARougePlayerState;
 class URougeSettingsShared;
-
-
+struct FAbilityLevelUp;
+class URougeGameplayAbility;
 namespace Rouge
 {
 	namespace Input
@@ -113,6 +113,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="DataTable")
 	UDataTable* DT_PassiveAbilities;
+
+	UPROPERTY()
+	URougeGameplayAbility* CurrentGameplayAbility;
 protected:
 	UPROPERTY()
 	ARougeHUD* RougeDemoHUD;
@@ -173,7 +176,7 @@ private:
 
 	//创建主动技能的升级卡片
 	void CreateActiveCard(int32 Local_MaxCount, TArray<EActiveAbilities>& Local_AvailableActiveAbilities, TMap<EActiveAbilities, int32>& Local_ActiveAbilitiesMap);
-	void CreateActiveCard(FRougeGameplayTags RougeGameplayTags);
+	void CreateActiveCard(FAbilityLevelUp AbilityLevelUp,FGameplayTag GameplayTag, FText AbilityType);
 
 	//创建被动技能的升级卡片
 	void CreatePassiveCard(int32 Local_MaxCount, TArray<EPassiveAbilities>& Local_AvailablePassiveAbilities, TMap<EPassiveAbilities, int32>& Local_PassiveAbilitiesMap);
@@ -181,10 +184,11 @@ private:
 	bool CanAddActiveAbility = true;
 	bool CanAddPassiveAbility = true;
 
-	void ProcessLevelUp(EAbilityType Type, EActiveAbilities ActiveAbilities, EPassiveAbilities PassiveAbilities);
+	void ProcessLevelUp(FGameplayTag GameplayTag);
 
 	void AssignAbility(EAbilityType Type, EActiveAbilities ActiveAbilities, EPassiveAbilities PassiveAbilities);
-
+	void AssignAbility(FGameplayTag AbilityTag);
+	
 	virtual void UpdateHudHotbar(TMap<EActiveAbilities, int32> ActiveMap, TMap<EPassiveAbilities, int32> PassiveMap) override;
 
 	void BroadcastOnPlayerStateChanged();

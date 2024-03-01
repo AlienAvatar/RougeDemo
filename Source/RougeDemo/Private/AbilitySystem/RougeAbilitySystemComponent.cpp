@@ -238,6 +238,78 @@ bool URougeAbilitySystemComponent::IsActivationGroupBlocked(ERougeAbilityActivat
 	return bBlocked;
 }
 
+void URougeAbilitySystemComponent::AddAbilityToActivationGroup(ERougeAbilityActivationGroup Group,
+	URougeGameplayAbility* RougeAbility)
+{
+	check(RougeAbility);
+	check(ActivationGroupCounts[(uint8)Group] < INT32_MAX);
+
+	ActivationGroupCounts[(uint8)Group]++;
+
+	const bool bReplicateCancelAbility = false;
+	
+	
+	switch (Group)
+	{
+	case ERougeAbilityActivationGroup::Independent:
+		// Independent abilities do not cancel any other abilities.
+
+		break;
+
+	case ERougeAbilityActivationGroup::Exclusive_Replaceable:
+	case ERougeAbilityActivationGroup::Exclusive_Blocking:
+		CancelActivationGroupAbilities(ERougeAbilityActivationGroup::Exclusive_Replaceable, RougeAbility, bReplicateCancelAbility);
+		break;
+
+	default:
+		checkf(false, TEXT("AddAbilityToActivationGroup: Invalid ActivationGroup [%d]\n"), (uint8)Group);
+		break;
+	}
+
+	const int32 ExclusiveCount = ActivationGroupCounts[(uint8)ERougeAbilityActivationGroup::Exclusive_Replaceable] + ActivationGroupCounts[(uint8)ERougeAbilityActivationGroup::Exclusive_Blocking];
+	if (!ensure(ExclusiveCount <= 1))
+	{
+		UE_LOG(LogTemp, Error, TEXT("AddAbilityToActivationGroup: Multiple exclusive abilities are running."));
+	}
+}
+
+void URougeAbilitySystemComponent::RemoveAbilityFromActivationGroup(ERougeAbilityActivationGroup Group,
+	URougeGameplayAbility* RougeAbility)
+{
+	check(RougeAbility);
+	check(ActivationGroupCounts[(uint8)Group] > 0);
+
+	ActivationGroupCounts[(uint8)Group]--;
+}
+
+void URougeAbilitySystemComponent::CancelActivationGroupAbilities(ERougeAbilityActivationGroup Group,
+	URougeGameplayAbility* IgnoreRougeAbility, bool bReplicateCancelAbility)
+{
+	auto ShouldCancelFunc = [this, Group, IgnoreRougeAbility](const URougeGameplayAbility* RougeAbility, FGameplayAbilitySpecHandle Handle)
+	{
+		return ((RougeAbility->GetActivationGroup() == Group) && (RougeAbility != IgnoreRougeAbility));
+	};
+
+	CancelAbilitiesByFunc(ShouldCancelFunc, bReplicateCancelAbility);
+}
+
+
+void URougeAbilitySystemComponent::AddAbilityArr(FGameplayTag Tag, FGameplayAbilitySpec GameplayAbilitySpec)
+{
+	AbilityArr.Add(Tag);
+	//激活Ability
+	OnGiveAbility(GameplayAbilitySpec);
+}
+
+void URougeAbilitySystemComponent::TestAbilityArr()
+{
+	for(auto Ability : AbilityArr)
+	{
+		FString AbilityStr = Ability.ToString();
+
+		UE_LOG(LogTemp, Warning, TEXT("AbilityStr[%s]"),*AbilityStr);
+	}
+}
 
 // Called when the game starts
 void URougeAbilitySystemComponent::BeginPlay()
@@ -282,6 +354,124 @@ void URougeAbilitySystemComponent::AbilitySpecInputReleased(FGameplayAbilitySpec
 	{
 		// Invoke the InputReleased event. This is not replicated here. If someone is listening, they may replicate the InputReleased event to the server.
 		InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputReleased, Spec.Handle, Spec.ActivationInfo.GetActivationPredictionKey());
+	}
+}
+
+void URougeAbilitySystemComponent::NotifyAbilityActivated(const FGameplayAbilitySpecHandle Handle,
+	UGameplayAbility* Ability)
+{
+	Super::NotifyAbilityActivated(Handle, Ability);
+
+	URougeGameplayAbility* RougeAbility = CastChecked<URougeGameplayAbility>(Ability);
+
+	AddAbilityToActivationGroup(RougeAbility->GetActivationGroup(), RougeAbility);
+}
+
+void URougeAbilitySystemComponent::NotifyAbilityFailed(const FGameplayAbilitySpecHandle Handle,
+	UGameplayAbility* Ability, const FGameplayTagContainer& FailureReason)
+{
+	Super::NotifyAbilityFailed(Handle, Ability, FailureReason);
+
+	if (APawn* Avatar = Cast<APawn>(GetAvatarActor()))
+	{
+		if (!Avatar->IsLocallyControlled() && Ability->IsSupportedForNetworking())
+		{
+			ClientNotifyAbilityFailed(Ability, FailureReason);
+			return;
+		}
+	}
+
+	HandleAbilityFailed(Ability, FailureReason);
+}
+
+void URougeAbilitySystemComponent::NotifyAbilityEnded(FGameplayAbilitySpecHandle Handle, UGameplayAbility* Ability,
+	bool bWasCancelled)
+{
+	Super::NotifyAbilityEnded(Handle, Ability, bWasCancelled);
+
+	if (const URougeGameplayAbility* RougeAbility = Cast<const URougeGameplayAbility>(Ability))
+	{
+		//当Ability激活失败
+		//RougeAbility->OnGameplayAbilityEnded(FailureReason);
+	}	
+}
+
+void URougeAbilitySystemComponent::ApplyAbilityBlockAndCancelTags(const FGameplayTagContainer& AbilityTags,
+	UGameplayAbility* RequestingAbility, bool bEnableBlockTags, const FGameplayTagContainer& BlockTags,
+	bool bExecuteCancelTags, const FGameplayTagContainer& CancelTags)
+{
+	Super::ApplyAbilityBlockAndCancelTags(AbilityTags, RequestingAbility, bEnableBlockTags, BlockTags,
+	                                      bExecuteCancelTags, CancelTags);
+}
+
+void URougeAbilitySystemComponent::HandleChangeAbilityCanBeCanceled(const FGameplayTagContainer& AbilityTags,
+	UGameplayAbility* RequestingAbility, bool bCanBeCanceled)
+{
+	Super::HandleChangeAbilityCanBeCanceled(AbilityTags, RequestingAbility, bCanBeCanceled);
+
+	
+}
+
+void URougeAbilitySystemComponent::HandleAbilityFailed(const UGameplayAbility* Ability,
+                                                       const FGameplayTagContainer& FailureReason)
+{
+	if (const URougeGameplayAbility* RougeAbility = Cast<const URougeGameplayAbility>(Ability))
+	{
+		//当Ability激活失败
+		RougeAbility->OnAbilityFailedToActivate(FailureReason);
+	}	
+}
+
+void URougeAbilitySystemComponent::ClientNotifyAbilityFailed_Implementation(const UGameplayAbility* Ability,
+	const FGameplayTagContainer& FailureReason)
+{
+	HandleAbilityFailed(Ability, FailureReason);
+}
+
+void URougeAbilitySystemComponent::CancelAbilitiesByFunc(TShouldCancelAbilityFunc ShouldCancelFunc,
+                                                         bool bReplicateCancelAbility)
+{
+	ABILITYLIST_SCOPE_LOCK();
+	for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
+	{
+		if (!AbilitySpec.IsActive())
+		{
+			continue;
+		}
+
+		URougeGameplayAbility* RougeAbilityCDO = CastChecked<URougeGameplayAbility>(AbilitySpec.Ability);
+
+		if (RougeAbilityCDO->GetInstancingPolicy() != EGameplayAbilityInstancingPolicy::NonInstanced)
+		{
+			// Cancel all the spawned instances, not the CDO.
+			TArray<UGameplayAbility*> Instances = AbilitySpec.GetAbilityInstances();
+			for (UGameplayAbility* AbilityInstance : Instances)
+			{
+				URougeGameplayAbility* RougeAbilityInstance = CastChecked<URougeGameplayAbility>(AbilityInstance);
+
+				if (ShouldCancelFunc(RougeAbilityInstance, AbilitySpec.Handle))
+				{
+					if (RougeAbilityInstance->CanBeCanceled())
+					{
+						RougeAbilityInstance->CancelAbility(AbilitySpec.Handle, AbilityActorInfo.Get(), RougeAbilityInstance->GetCurrentActivationInfo(), bReplicateCancelAbility);
+					}
+					else
+					{
+						UE_LOG(LogTemp, Error, TEXT("CancelAbilitiesByFunc: Can't cancel ability [%s] because CanBeCanceled is false."), *RougeAbilityInstance->GetName());
+					}
+				}
+			}
+		}
+		else
+		{
+			// Cancel the non-instanced ability CDO.
+			if (ShouldCancelFunc(RougeAbilityCDO, AbilitySpec.Handle))
+			{
+				// Non-instanced abilities can always be canceled.
+				check(RougeAbilityCDO->CanBeCanceled());
+				RougeAbilityCDO->CancelAbility(AbilitySpec.Handle, AbilityActorInfo.Get(), FGameplayAbilityActivationInfo(), bReplicateCancelAbility);
+			}
+		}
 	}
 }
 

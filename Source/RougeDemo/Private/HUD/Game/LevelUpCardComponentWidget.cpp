@@ -14,21 +14,12 @@ void ULevelUpCardComponentWidget::NativeConstruct()
 	Btn_Selected->OnClicked.AddDynamic(this, &ULevelUpCardComponentWidget::Btn_SelectedCallBack);
 }
 
-void ULevelUpCardComponentWidget::SetLevelUpCardComponentWidget(FText Name, int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility,
-                                                                EPassiveAbilities PAbility,EAbilityType Type)
+void ULevelUpCardComponentWidget::SetLevelUpCardComponentWidget(FText Name, FText Level, FText Desc, UTexture2D* Icon, FText Type)
 {
 	TB_Name->SetText(Name);
 	TB_Desc->SetText(Desc);
 	Img_Icon->SetBrushFromTexture(Icon);
-	const FString LevelStr = Level == 0 ? TEXT("New") : FString::FromInt(Level);
-	const FText LevelText = FText::Format(FText::FromString("Level: {0}"), FText::FromString(LevelStr));
-	TB_Level->SetText(LevelText);
-
-	mAAbility = AAbility;
-	mPAbility = PAbility;
-	mType = Type;
-
-	
+	TB_Level->SetText(Level);
 }
 
 void ULevelUpCardComponentWidget::Btn_SelectedCallBack()

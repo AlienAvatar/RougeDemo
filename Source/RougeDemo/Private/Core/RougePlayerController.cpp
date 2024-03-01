@@ -27,6 +27,7 @@
 #include "RougeDemo/RougeDemo.h"
 #include "Struct/AbilityLevelUp.h"
 #include "Core/RougePlayerState.h"
+#include "Kismet/KismetArrayLibrary.h"
 #include "RougeDemo/RougeGameplayTags.h"
 #include "SaveGame/RougeSettingsShared.h"
 #include "Teams/RougeTeamAgentInterface.h"
@@ -370,7 +371,7 @@ void ARougePlayerController::ExecuteLevelUp()
 					LevelMasterWidget->AddSelection(
 						EvoAbilityText,
 						-1,
-						AbilityLevelUp->LevelUpText,
+						AbilityLevelUp->AbilityDesc,
 						URougeDemoFunctionLibary::FindActionIcon(Local_EvoAbility),
 						Local_EvoAbility,
 						EPassiveAbilities::EPA_AbilityDamage,
@@ -467,6 +468,12 @@ void ARougePlayerController::ExecuteLevelUp()
 	// int32 Num = UKismetSystemLibrary::MakeLiteralInt(-1);
 	// FText LevelNum = UKismetTextLibrary::Conv_IntToText(Num);
 	// FText SkillLevelText = FText::Format(FText::FromString(TEXT("{0}{1}")), EvoAbilityText, LevelNum);
+
+	FGameplayTagContainer Local_ActiveAbilitiesArr;
+	FGameplayTagContainer Local_PassiveAbilitiesArr;
+	FRougeGameplayTags GameplayTags = FRougeGameplayTags::Get();
+	FText AbilityType;
+	
 	TArray<FName> OutRowNames;
 	UDataTableFunctionLibrary::GetDataTableRowNames(DT_ActiveAbilities, OutRowNames);
 	for(FName RowName : OutRowNames)
@@ -475,28 +482,40 @@ void ARougePlayerController::ExecuteLevelUp()
 		FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
 		if(AbilityLevelUp->bActive)
 		{
-			AbilitiesArr.AppendTags(AbilityLevelUp->AbilityTag);
+			if(AbilityLevelUp->AbilityTag.HasTag(GameplayTags.Ability_Type_Magic_Warrior_ActiveAbility))
+			{
+				Local_ActiveAbilitiesArr.AppendTags(AbilityLevelUp->AbilityTag);
+				AbilityType = UKismetTextLibrary::Conv_StringToText("ActiveAbility");
+			}else if(AbilityLevelUp->AbilityTag.HasTag(GameplayTags.Ability_Type_Magic_Warrior_PassiveAbility))
+			{
+				Local_PassiveAbilitiesArr.AppendTags(AbilityLevelUp->AbilityTag);
+				AbilityType = UKismetTextLibrary::Conv_StringToText("PassiveAbility");
+			}
 		}
 	}
 	
-	if(AbilitiesArr.Num() > 0)
-	{
-		FRougeGameplayTags GameplayTags = FRougeGameplayTags::Get();
+	int RandomActiveIndex = UKismetMathLibrary::RandomInteger(Local_ActiveAbilitiesArr.Num());
+	FGameplayTag ActiveGameplayTag = Local_ActiveAbilitiesArr.GetByIndex(RandomActiveIndex);
 
-		FGameplayTagContainer Local_ActiveAbilitiesArr;
-		for(auto Ability : AbilitiesArr)
+	int RandomPassiveIndex =  UKismetMathLibrary::RandomInteger(Local_PassiveAbilitiesArr.Num());
+	FGameplayTag PassiveGameplayTag = Local_PassiveAbilitiesArr.GetByIndex(RandomPassiveIndex);
+	
+	for(FName RowName : OutRowNames)
+	{
+		FAbilityLevelUp* RandomAbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
+		if(RandomAbilityLevelUp)
 		{
-			//是否是ActiveAbility
-			if(Ability.MatchesTag(GameplayTags.Ability_Type_Magic_Warrior_ActiveAbility))
+			if(RandomAbilityLevelUp->AbilityTag.HasTag(ActiveGameplayTag))
 			{
-				Local_ActiveAbilitiesArr.AddTag(Ability);
-			//是否是PassiveAbility
-			}else if(Ability.MatchesTag(GameplayTags.Ability_Type_Magic_Warrior_PassiveAbility))
-			{
-				
+				CreateActiveCard(*RandomAbilityLevelUp, ActiveGameplayTag, AbilityType);
 			}
-			
+
+			if(RandomAbilityLevelUp->AbilityTag.HasTag(PassiveGameplayTag))
+			{
+				CreateActiveCard(*RandomAbilityLevelUp, PassiveGameplayTag, AbilityType);
+			}
 		}
+		
 	}
 }
 
@@ -731,7 +750,7 @@ void ARougePlayerController::CreateActiveCard(int32 Local_MaxCount, TArray<EActi
 				LevelMasterWidget->AddSelection(
 					EvoAbilityText,
 					Level,
-					AbilityLevelUp->LevelUpText,
+					AbilityLevelUp->AbilityDesc,
 					URougeDemoFunctionLibary::FindActionIcon(Local_ActiveAbility),
 					Local_ActiveAbility,
 					EPassiveAbilities::EPA_AbilityDamage,
@@ -745,16 +764,33 @@ void ARougePlayerController::CreateActiveCard(int32 Local_MaxCount, TArray<EActi
 	
 }
 
-void ARougePlayerController::CreateActiveCard(FRougeGameplayTags RougeGameplayTags)
+void ARougePlayerController::CreateActiveCard(FAbilityLevelUp AbilityLevelUp, FGameplayTag GameplayTag, FText AbilityType)
 {
-	//从DataTable中获取技能信息
+	FText AbilityName = AbilityLevelUp.AbilityName;
+	FText AbilityDesc = AbilityLevelUp.AbilityDesc;
+	UTexture2D* Icon = AbilityLevelUp.AbilityIcon;
+	FString Level = GameplayTag.ToString();
+	TArray<FString> LevelArr;
+	Level.ParseIntoArray(LevelArr, TEXT("."), false);
 	
+	FText LevelText = UKismetTextLibrary::Conv_StringToText(LevelArr[LevelArr.Num()-1]);
+
+	LevelMasterWidget->AddSelection(
+		AbilityName,
+		LevelText,
+		AbilityDesc,
+		Icon,
+		AbilityType,
+		GameplayTag
+	);
 }
+
+
 
 void ARougePlayerController::CreatePassiveCard(int32 Local_MaxCount,
                                                TArray<EPassiveAbilities>& Local_AvailablePassiveAbilities,TMap<EPassiveAbilities, int32>& Local_PassiveAbilitiesMap)
 {
-	//从本地数组中删除，这样我们就没有重复项了
+	/*//从本地数组中删除，这样我们就没有重复项了
 	EPassiveAbilities Local_PassiveAbility;
 	int32 RandomIndex = UKismetMathLibrary::RandomIntegerInRange(0, Local_AvailablePassiveAbilities.Num() - 1);
 				
@@ -798,7 +834,7 @@ void ARougePlayerController::CreatePassiveCard(int32 Local_MaxCount,
 				LevelMasterWidget->AddSelection(
 					EvoAbilityText,
 					Level,
-					AbilityLevelUp->LevelUpText,
+					AbilityLevelUp->AbilityDesc,
 					URougeDemoFunctionLibary::FindPassiveIcon(Local_PassiveAbility),
 					EActiveAbilities::EAA_Hammer,
 					Local_PassiveAbility,
@@ -807,14 +843,11 @@ void ARougePlayerController::CreatePassiveCard(int32 Local_MaxCount,
 				break;
 			}
 		}
-	}
+	}*/
 }
 
-void ARougePlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilities ActiveAbilities, EPassiveAbilities PassiveAbilities)
+void ARougePlayerController::ProcessLevelUp(FGameplayTag GameplayTag)
 {
-	FString EnumName = UEnum::GetValueAsString(Type);
-	UE_LOG(LogTemp, Warning, TEXT("EAbilityType[%s]"), *EnumName);
-
 	bLevelUpHudUp = false;
 	//是否触发了其他UI
 	
@@ -833,14 +866,16 @@ void ARougePlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilities 
 	
 	SetShowMouseCursor(false);
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
+	
 	//Level up ability
-	AssignAbility(Type, ActiveAbilities, PassiveAbilities);
-
+	//AssignAbility(Type, ActiveAbilities, PassiveAbilities);
+	AssignAbility(GameplayTag);
 	//更新UI
 	UpdateHotbar();
 	
 	//RefreshAbilities();
-	MagicComponent->RefreshAbilities();
+	
+	/*MagicComponent->RefreshAbilities();*/
 }
 
 void ARougePlayerController::AssignAbility(EAbilityType Type, EActiveAbilities ActiveAbilities,
@@ -896,6 +931,41 @@ void ARougePlayerController::AssignAbility(EAbilityType Type, EActiveAbilities A
 		case EAbilityType::EAT_Gold:
 			break;
 	}
+}
+
+void ARougePlayerController::AssignAbility(FGameplayTag AbilityTag)
+{
+	FRougeGameplayTags RougeGameplayTags = FRougeGameplayTags::Get();
+
+	ARougePlayerState* PS = GetPlayerState<ARougePlayerState>();
+	check(PS);
+
+	URougeAbilitySystemComponent* ASC = PS->GetRougeAbilitySystemComponent();
+	check(ASC);
+
+	TArray<FName> OutRowNames;
+	UDataTableFunctionLibrary::GetDataTableRowNames(DT_ActiveAbilities, OutRowNames);
+	for(FName RowName : OutRowNames)
+	{
+		//testAA
+		FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
+		if(AbilityLevelUp)
+		{
+			//是否是Active Ability
+			if(AbilityTag.MatchesTag(RougeGameplayTags.Ability_Type_Magic_Warrior_ActiveAbility))
+			{
+				UGameplayAbility* AbilityCDO = AbilityLevelUp->GameplayAbility.Ability->GetDefaultObject<UGameplayAbility>();
+				FGameplayAbilitySpec AbilitySpec(AbilityCDO);
+				const FGameplayAbilitySpecHandle AbilitySpecHandle = ASC->GiveAbility(AbilitySpec);
+				
+				//ASC->AddAbilityArr(AbilityTag, AbilitySpec);
+			}
+		}
+	}
+	
+	//是否是Passive Ability
+
+	
 }
 
 void ARougePlayerController::UpdateHudHotbar(TMap<EActiveAbilities, int32> ActiveMap,

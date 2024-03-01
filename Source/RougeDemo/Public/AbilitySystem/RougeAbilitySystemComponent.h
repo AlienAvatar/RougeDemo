@@ -43,7 +43,14 @@ public:
 
 	//是否会被激活的组别阻塞
 	bool IsActivationGroupBlocked(ERougeAbilityActivationGroup Group) const;
+	UFUNCTION(BlueprintCallable)
+	void AddAbilityToActivationGroup(ERougeAbilityActivationGroup Group, URougeGameplayAbility* RougeAbility);
+	void RemoveAbilityFromActivationGroup(ERougeAbilityActivationGroup Group, URougeGameplayAbility* RougeAbility);
+	void CancelActivationGroupAbilities(ERougeAbilityActivationGroup Group, URougeGameplayAbility* IgnoreRougeAbility, bool bReplicateCancelAbility);
 
+	typedef TFunctionRef<bool(const URougeGameplayAbility* RougeAbility, FGameplayAbilitySpecHandle Handle)> TShouldCancelAbilityFunc;
+	void CancelAbilitiesByFunc(TShouldCancelAbilityFunc ShouldCancelFunc, bool bReplicateCancelAbility);
+	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 							   FActorComponentTickFunction* ThisTickFunction) override;
@@ -60,6 +67,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveDynamicTagGameplayEffect(const FGameplayTag& Tag);
 
+	TArray<FGameplayTag> AbilityArr;
+
+	void AddAbilityArr(FGameplayTag Tag, FGameplayAbilitySpec GameplayAbilitySpec);
+	
+	UFUNCTION(BlueprintCallable)
+	void TestAbilityArr();
+	//TArray<FGameplayTag, UGameplayAbility> AbilityMap;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -83,4 +97,16 @@ protected:
 	virtual void AbilitySpecInputPressed(FGameplayAbilitySpec& Spec) override;
 	//复制事件替代，让WaitInputReleased可以工作
 	virtual void AbilitySpecInputReleased(FGameplayAbilitySpec& Spec) override;
+
+	virtual void NotifyAbilityActivated(const FGameplayAbilitySpecHandle Handle, UGameplayAbility* Ability) override;
+	virtual void NotifyAbilityFailed(const FGameplayAbilitySpecHandle Handle, UGameplayAbility* Ability, const FGameplayTagContainer& FailureReason) override;
+	virtual void NotifyAbilityEnded(FGameplayAbilitySpecHandle Handle, UGameplayAbility* Ability, bool bWasCancelled) override;
+	virtual void ApplyAbilityBlockAndCancelTags(const FGameplayTagContainer& AbilityTags, UGameplayAbility* RequestingAbility, bool bEnableBlockTags, const FGameplayTagContainer& BlockTags, bool bExecuteCancelTags, const FGameplayTagContainer& CancelTags) override;
+	virtual void HandleChangeAbilityCanBeCanceled(const FGameplayTagContainer& AbilityTags, UGameplayAbility* RequestingAbility, bool bCanBeCanceled) override;
+
+	void HandleAbilityFailed(const UGameplayAbility* Ability, const FGameplayTagContainer& FailureReason);
+
+	/** 通知客户端Ability激活失败 */
+	UFUNCTION(Client, Unreliable)
+	void ClientNotifyAbilityFailed(const UGameplayAbility* Ability, const FGameplayTagContainer& FailureReason);
 };

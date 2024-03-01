@@ -4,16 +4,20 @@
 #include "AbilitySystem/RougeGameplayAbility.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/RougeAbilitySimpleFailureMessage.h"
 #include "AbilitySystem/RougeAbilitySourceInterface.h"
 #include "AbilitySystem/RougeAbilitySystemComponent.h"
 #include "AbilitySystem/RougeGameplayEffectContext.h"
 #include "Character/RougeCharacter.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
 #include "Physics/PhysicalMaterialWithTag.h"
 #include "RougeDemo/RougeDemo.h"
 #include "RougeDemo/RougeGameplayTags.h"
 
 
 DEFINE_LOG_CATEGORY(LogAbility);
+UE_DEFINE_GAMEPLAY_TAG(TAG_ABILITY_SIMPLE_FAILURE_MESSAGE, "Ability.UserFacingSimpleActivateFail.Message");
+UE_DEFINE_GAMEPLAY_TAG(TAG_ABILITY_PLAY_MONTAGE_FAILURE_MESSAGE, "Ability.PlayMontageOnActivateFail.Message");
 
 URougeGameplayAbility::URougeGameplayAbility(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
@@ -267,6 +271,39 @@ void URougeGameplayAbility::GetAbilitySource(FGameplayAbilitySpecHandle Handle,
 	UObject* SourceObject = GetSourceObject(Handle, ActorInfo);
 
 	OutAbilitySource = Cast<IRougeAbilitySourceInterface>(SourceObject);
+}
+
+void URougeGameplayAbility::NativeOnAbilityFailedToActivate(const FGameplayTagContainer& FailedReason) const
+{
+	bool bSimpleFailureFound = false;
+	for (FGameplayTag Reason : FailedReason)
+	{
+		if (!bSimpleFailureFound)
+		{
+			if (const FText* pUserFacingMessage = FailureTagToUserFacingMessages.Find(Reason))
+			{
+				FRougeAbilitySimpleFailureMessage Message;
+				Message.PlayerController = GetActorInfo().PlayerController.Get();
+				Message.FailureTags = FailedReason;
+				Message.UserFacingReason = *pUserFacingMessage;
+
+				UGameplayMessageSubsystem& MessageSystem = UGameplayMessageSubsystem::Get(GetWorld());
+				MessageSystem.BroadcastMessage(TAG_ABILITY_SIMPLE_FAILURE_MESSAGE, Message);
+				bSimpleFailureFound = true;
+			}
+		}
+		
+		if (UAnimMontage* pMontage = FailureTagToAnimMontage.FindRef(Reason))
+		{
+			FRougeAbilityMontageFailureMessage Message;
+			Message.PlayerController = GetActorInfo().PlayerController.Get();
+			Message.FailureTags = FailedReason;
+			Message.FailureMontage = pMontage;
+
+			UGameplayMessageSubsystem& MessageSystem = UGameplayMessageSubsystem::Get(GetWorld());
+			MessageSystem.BroadcastMessage(TAG_ABILITY_PLAY_MONTAGE_FAILURE_MESSAGE, Message);
+		}
+	}
 }
 
 
