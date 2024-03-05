@@ -283,6 +283,8 @@ protected:
 	FTimerHandle AbilityLoopTimerHandle;
 
 	void AbilityLoopTimerHandleCallback();
+
+	bool bLightingEnemy = false;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -21,6 +21,12 @@ AGameManager::AGameManager()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+void AGameManager::UpdateLevel(float Percent)
+{
+	++mLevel;
+	UpdateCharactersXP(Percent, mLevel);
+}
+
 // Called when the game starts or when spawned
 void AGameManager::BeginPlay()
 {
@@ -56,6 +62,7 @@ void AGameManager::PrepareLevelUp()
 {
 	ARougePlayerController* RougeDemoPlayerController = Cast<ARougePlayerController>((UGameplayStatics::GetPlayerController(GetWorld(), 0)));
 	if(RougeDemoPlayerController == nullptr) { return; }
+
 	RougeDemoPlayerController->OnLevelUp();
 
 	//所有Controller

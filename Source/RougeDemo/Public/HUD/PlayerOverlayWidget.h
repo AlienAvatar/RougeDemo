@@ -4,8 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Enum/EActiveAbilities.h"
-#include "Enum/EPassiveAbilities.h"
+#include "Struct/AbilityLevelUp.h"
 #include "PlayerOverlayWidget.generated.h"
 
 class UAbilityTitleWidget;
@@ -13,6 +12,8 @@ class UHorizontalBox;
 class UVerticalBox;
 class UTextBlock;
 class UProgressBar;
+struct FGameplayTag;
+
 /**
  * 
  */
@@ -59,5 +60,8 @@ public:
 
 	void UpdateTime(FText Time);
 
-	void BuildHotbar(TMap<EActiveAbilities, int32> ActiveMap, TMap<EPassiveAbilities, int32> PassiveMap);
+	void BuildHotbar(TMap<FGameplayTag, FAbilityLevelUp> AbilityMap);
+
+	//更新经验条
+	void UpdateXP(float Percent);
 };

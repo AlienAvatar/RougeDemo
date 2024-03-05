@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Enum/EActiveAbilities.h"
-#include "Enum/EPassiveAbilities.h"
 #include "UObject/Interface.h"
+#include "Struct/AbilityLevelUp.h"
 #include "ControllerManagerInterface.generated.h"
+
+struct FGameplayTag;
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
@@ -33,6 +34,6 @@ public:
 	UFUNCTION()
 	virtual void UpdateTime(FText Time) = 0;
 
-	virtual void UpdateHudHotbar(TMap<EActiveAbilities, int32> ActiveMap, TMap<EPassiveAbilities, int32> PassiveMap) = 0;
+	virtual void UpdateHudUI(TMap<FGameplayTag, FAbilityLevelUp> AbilityMap) = 0;
 	
 };

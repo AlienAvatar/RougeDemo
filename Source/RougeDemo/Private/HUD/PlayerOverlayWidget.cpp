@@ -3,19 +3,22 @@
 
 #include "HUD/PlayerOverlayWidget.h"
 
+#include "GameplayTagContainer.h"
 #include "Components/HorizontalBox.h"
+#include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "HUD/Game/AbilityTitleWidget.h"
 #include "Lib/RougeDemoFunctionLibary.h"
 #include "RougeDemo/RougeDemo.h"
+
+#include "RougeDemo/RougeGameplayTags.h"
 
 void UPlayerOverlayWidget::UpdateTime(FText Time)
 {
 	TB_Time->SetText(Time);
 }
 
-void UPlayerOverlayWidget::BuildHotbar(TMap<EActiveAbilities, int32> ActiveMap,
-	TMap<EPassiveAbilities, int32> PassiveMap)
+void UPlayerOverlayWidget::BuildHotbar(TMap<FGameplayTag, FAbilityLevelUp> AbilityMap)
 {
 	if(AbilityTitleWidgetClass == nullptr)
 	{
@@ -23,35 +26,32 @@ void UPlayerOverlayWidget::BuildHotbar(TMap<EActiveAbilities, int32> ActiveMap,
 		return;
 	}
 	HB_Active->ClearChildren();
-	TArray<EActiveAbilities> AKeysArr;
-	ActiveMap.GetKeys(AKeysArr);
+	HB_Passive->ClearChildren();
+	FRougeGameplayTags GameplayTags = FRougeGameplayTags::Get();
 	
-	for(auto AKey : AKeysArr)
+	for(TPair<FGameplayTag, FAbilityLevelUp>& Ability : AbilityMap)
 	{
-		int32 Level = *ActiveMap.Find(AKey);
-		UTexture2D* Texture = URougeDemoFunctionLibary::FindActionIcon(AKey);
+		int Level = Ability.Value.Level;
+		UTexture2D* Texture = Ability.Value.AbilityIcon;
 		UUserWidget* Widget = CreateWidget<UUserWidget>(GetOwningPlayer(), AbilityTitleWidgetClass);
 		UAbilityTitleWidget* AbilityTitleWidget = Cast<UAbilityTitleWidget>(Widget);
 		if(AbilityTitleWidget)
 		{
 			AbilityTitleWidget->SetUp(Level, Texture);
-			HB_Active->AddChild(AbilityTitleWidget);
-		}
-	}
-
-	HB_Passive->ClearChildren();
-	TArray<EPassiveAbilities> PKeysArr;
-	PassiveMap.GetKeys(PKeysArr);
-	for(auto PKey : PKeysArr)
-	{
-		int32 Level = *PassiveMap.Find(PKey);
-		UTexture2D* Texture = URougeDemoFunctionLibary::FindPassiveIcon(PKey);
-		UAbilityTitleWidget* Widget = CreateWidget<UAbilityTitleWidget>(GetOwningPlayer(), AbilityTitleWidgetClass);
-		UAbilityTitleWidget* AbilityTitleWidget = Cast<UAbilityTitleWidget>(Widget);
-		if(AbilityTitleWidget)
-		{
-			AbilityTitleWidget->SetUp(Level, Texture);
-			HB_Passive->AddChild(AbilityTitleWidget);
+			if(Ability.Key.MatchesTag(GameplayTags.Ability_Type_Magic_Warrior_ActiveAbility)) 
+			{
+				HB_Active->AddChild(AbilityTitleWidget);
+			}else if(Ability.Key.MatchesTag(GameplayTags.Ability_Type_Magic_Warrior_PassiveAbility))
+			{
+				HB_Passive->AddChild(AbilityTitleWidget);
+			}
 		}
 	}
 }
+
+void UPlayerOverlayWidget::UpdateXP(float Percent)
+{
+	PB_XP->SetPercent(Percent);
+}
+
+

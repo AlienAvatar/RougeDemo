@@ -45,7 +45,7 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	UButton* Btn_Intro;
 
-	void OnSelectedDelegateEventFunction();
+	void OnSelectedDelegateEventFunction(FGameplayTag GameplayTag);
 
 	FOnCloseDelegate OnCloseDelegate;
 
@@ -61,12 +61,6 @@ private:
 	void Btn_IntroClickedCallBack();
 
 	void Close();
-
-	EActiveAbilities Tmp_AAbility;
-	
-	EPassiveAbilities Tmp_PAbility;
-
-	EAbilityType Tmp_Type;
 
 	FGameplayTag Tmp_GameplayTag;
 };

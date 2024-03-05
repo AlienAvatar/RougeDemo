@@ -30,12 +30,10 @@ void ULevelMasterWidget::AddSelection(FText Name, FText Level, FText Desc, UText
 		Level,
 		Desc,
 		Icon,
-		Type
-	);
-	WBP_LevelUpItems->VB_Items->AddChildToVerticalBox(LevelUpCardComponentWidget);
-	OnCloseDelegate.Execute(
+		Type,
 		GameplayTag
 	);
+	WBP_LevelUpItems->VB_Items->AddChildToVerticalBox(LevelUpCardComponentWidget);
 	
 	//Bind on Selected
 	LevelUpCardComponentWidget->OnSelectedDelegate.BindUObject(this, &ULevelMasterWidget::OnSelectedDelegateEventFunction);
@@ -56,12 +54,15 @@ void ULevelMasterWidget::Btn_IntroClickedCallBack()
 
 void ULevelMasterWidget::Close()
 {
-	
 	RemoveFromParent();
 }
 
-void ULevelMasterWidget::OnSelectedDelegateEventFunction()
+void ULevelMasterWidget::OnSelectedDelegateEventFunction(FGameplayTag GameplayTag)
 {
+	//TestLog
+	//UE_LOG(LogTemp, Warning, TEXT("GameplayTag[%s]"), *GameplayTag.ToString())
+
+	OnCloseDelegate.Execute(GameplayTag);
 	// Call OnClose()
 	Close();
 }

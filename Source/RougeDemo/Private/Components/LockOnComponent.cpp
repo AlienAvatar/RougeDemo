@@ -18,12 +18,6 @@ ULockOnComponent::ULockOnComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	FStringAssetReference MarketWidgetPath(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/RougeDemo/SRC/Blueprints/UI/Target/WBP_Mark.WBP_Mark'"));
-	UWidget* MarketWidgetObj = Cast<UWidget>(StaticLoadObject(UWidget::StaticClass(), nullptr, *MarketWidgetPath.ToString()));
-	if(MarketWidgetObj)
-	{
-		MarketWidgetClass = MarketWidgetObj->GetClass();
-	}
 	
 	// ...
 }
@@ -40,6 +34,13 @@ void ULockOnComponent::BeginPlay()
 
 void ULockOnComponent::Initialize()
 {
+	/*FStringAssetReference MarketWidgetPath(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/RougeDemo/SRC/Blueprints/UI/Target/WBP_Mark.WBP_Mark'"));
+	UWidget* MarketWidgetObj = Cast<UWidget>(StaticLoadObject(UWidget::StaticClass(), nullptr, *MarketWidgetPath.ToString()));
+	if(MarketWidgetObj)
+	{
+		MarketWidgetClass = MarketWidgetObj->GetClass();
+	}*/
+	
 	//只有玩家才能锁定
 	PlayerRougeDemoCharacter = Cast<ARougeCharacter>(GetOwner());
 

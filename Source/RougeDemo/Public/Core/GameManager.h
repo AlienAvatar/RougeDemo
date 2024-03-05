@@ -22,16 +22,6 @@ public:
 	// Sets default values for this actor's properties
 	AGameManager();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	TArray<ARougePlayerController*> PlayerControllerArr;
-
-	void GameSetUp();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UEnvQuery* EQSFindSpawnLocation;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -43,6 +33,21 @@ public:
 	void StartTimer();
 
 	void EndGame();
+
+	int mLevel = 1;
+
+	void UpdateLevel(float Percent);
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	TArray<ARougePlayerController*> PlayerControllerArr;
+
+	void GameSetUp();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UEnvQuery* EQSFindSpawnLocation;
+
 private:
 	void UpdateTimer();
 
@@ -99,4 +104,6 @@ private:
 	void ContinueSpawn();
 
 	int32 WaveIndex;
+
+
 };

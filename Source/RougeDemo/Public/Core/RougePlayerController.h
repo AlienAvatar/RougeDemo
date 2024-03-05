@@ -178,9 +178,6 @@ private:
 	void CreateActiveCard(int32 Local_MaxCount, TArray<EActiveAbilities>& Local_AvailableActiveAbilities, TMap<EActiveAbilities, int32>& Local_ActiveAbilitiesMap);
 	void CreateActiveCard(FAbilityLevelUp AbilityLevelUp,FGameplayTag GameplayTag, FText AbilityType);
 
-	//创建被动技能的升级卡片
-	void CreatePassiveCard(int32 Local_MaxCount, TArray<EPassiveAbilities>& Local_AvailablePassiveAbilities, TMap<EPassiveAbilities, int32>& Local_PassiveAbilitiesMap);
-
 	bool CanAddActiveAbility = true;
 	bool CanAddPassiveAbility = true;
 
@@ -188,8 +185,9 @@ private:
 
 	void AssignAbility(EAbilityType Type, EActiveAbilities ActiveAbilities, EPassiveAbilities PassiveAbilities);
 	void AssignAbility(FGameplayTag AbilityTag);
-	
-	virtual void UpdateHudHotbar(TMap<EActiveAbilities, int32> ActiveMap, TMap<EPassiveAbilities, int32> PassiveMap) override;
+
+	TMap<FGameplayTag, FAbilityLevelUp> mAbilityMap;
+	virtual void UpdateHudUI(TMap<FGameplayTag, FAbilityLevelUp> AbilityMap) override;
 
 	void BroadcastOnPlayerStateChanged();
 	

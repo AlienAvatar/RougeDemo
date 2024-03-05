@@ -32,4 +32,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRougeAbilitySet_GameplayAbility GameplayAbility;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Level = 1;
 };

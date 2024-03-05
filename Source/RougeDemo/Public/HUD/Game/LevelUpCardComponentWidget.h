@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
 #include "Enum/EActiveAbilities.h"
 #include "Enum/EPassiveAbilities.h"
@@ -12,9 +13,9 @@
 class UButton;
 class UTextBlock;
 class UImage;
+struct FGameplayTag;
 
-DECLARE_DELEGATE(FOnSelectedDelegate);
-
+DECLARE_DELEGATE_OneParam(FOnSelectedDelegate, FGameplayTag);
 /**
  * 
  */
@@ -26,7 +27,7 @@ class ROUGEDEMO_API ULevelUpCardComponentWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 	
-	void SetLevelUpCardComponentWidget(FText Name, FText Level, FText Desc, UTexture2D* Icon, FText Type);
+	void SetLevelUpCardComponentWidget(FText Name, FText Level, FText Desc, UTexture2D* Icon, FText Type, FGameplayTag GameplayTag);
 
 	UPROPERTY(meta=(BindWidget))
 	UButton* Btn_Selected;
@@ -43,11 +44,7 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	UImage* Img_Icon;
 
-	EActiveAbilities mAAbility;
-
-	EPassiveAbilities mPAbility;
-	
-	EAbilityType mType;
+	FGameplayTag CurrentGameplayTag;
 
 	FOnSelectedDelegate OnSelectedDelegate;
 protected:

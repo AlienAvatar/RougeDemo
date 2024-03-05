@@ -108,6 +108,10 @@ class ROUGEDEMO_API URougeAbilitySet : public UPrimaryDataAsset
 public:
 	void GiveToAbilitySystem(URougeAbilitySystemComponent* RougeASC, FRougeAbilitySet_GrantedHandles* OutGrantedHandles, UObject* SourceObject = nullptr) const;
 
+	TArray<FRougeAbilitySet_GameplayAbility> GetGrantedGameplayAbilities() { return GrantedGameplayAbilities; }
+
+	//void AddGrantedGameplayAbilities(URougeAbilitySystemComponent* RougeASC,FRougeAbilitySet_GrantedHandles* OutGrantedHandles, UObject* SourceObject);
+	
 protected:
 	// Gameplay abilities to grant when this ability set is granted.
 	// 一系列要赋予的Rouge Gameplay技能，以及赋予该技能的默认关卡和与该技能相关联的可选输入标签。

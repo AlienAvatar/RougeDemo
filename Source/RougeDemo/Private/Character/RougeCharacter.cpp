@@ -126,14 +126,19 @@ void ARougeCharacter::OnBeginPlay()
 		true
 	);
 
-	GetWorld()->GetTimerManager().SetTimer(
+	//没有Enemy不进行触发，第一次碰到Enemy进行触发
+	if(bLightingEnemy)
+	{
+		//生成碰撞盒，若碰到Enemy，更改bLightingEnemy=true，触发TimerHandler
+	}
+	/*GetWorld()->GetTimerManager().SetTimer(
 		StartTimerHandle,
 		this,
 		&ARougeCharacter::StartTimerHandleCallback,
 		0.2f,
 		false,
 		0
-	);
+	);*/
 }
 
 void ARougeCharacter::OnAbilitySystemInitialized()

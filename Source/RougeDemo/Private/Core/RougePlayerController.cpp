@@ -685,7 +685,7 @@ void ARougePlayerController::TestAction()
 		{
 			AGameManager* GameManager = Cast<AGameManager>(OutActorArr[0]);
 			Percent = Percent + 0.8f;
-			GameManager->UpdateCharactersXP(Percent, 2);
+			GameManager->UpdateCharactersXP(Percent,GameManager->mLevel);
 			if(Percent > 0.9)
 			{
 				Percent = 0.0f;
@@ -783,67 +783,12 @@ void ARougePlayerController::CreateActiveCard(FAbilityLevelUp AbilityLevelUp, FG
 		AbilityType,
 		GameplayTag
 	);
-}
 
+	/*URougeGameplayAbility* AbilityCDO = AbilityLevelUp->GameplayAbility.Ability->GetDefaultObject<URougeGameplayAbility>();
+	FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityLevelUp->Level);
+	AbilitySpec.DynamicAbilityTags.AddTag(RougeGameplayTags.InputTag_Test);
 
-
-void ARougePlayerController::CreatePassiveCard(int32 Local_MaxCount,
-                                               TArray<EPassiveAbilities>& Local_AvailablePassiveAbilities,TMap<EPassiveAbilities, int32>& Local_PassiveAbilitiesMap)
-{
-	/*//从本地数组中删除，这样我们就没有重复项了
-	EPassiveAbilities Local_PassiveAbility;
-	int32 RandomIndex = UKismetMathLibrary::RandomIntegerInRange(0, Local_AvailablePassiveAbilities.Num() - 1);
-				
-	Local_PassiveAbility = Local_AvailablePassiveAbilities[RandomIndex];
-	
-	Local_AvailablePassiveAbilities.Remove(Local_PassiveAbility);
-	CanAddPassiveAbility = !Local_AvailablePassiveAbilities.IsEmpty();
-	//检查升级的技能是否和表中的相等
-	TArray<FName> OutRowNames;
-	UDataTableFunctionLibrary::GetDataTableRowNames(DT_PassiveAbilities, OutRowNames);
-
-	for(FName RowName : OutRowNames)
-	{
-		FText RowNameText = UKismetTextLibrary::Conv_NameToText(RowName);
-		//CONTROLLER_LOG(Warning, TEXT("RowNameText[%s]"), *RowNameText.ToString());
-		
-		//设置Level
-		int32 Level = 0;
-		if(Local_PassiveAbilitiesMap.Contains(Local_PassiveAbility))
-		{
-			Level = Local_PassiveAbilitiesMap[Local_PassiveAbility];
-			++Level;
-		}
-					
-		FString EvoAbilityStr = UEnum::GetValueAsString(Local_PassiveAbility);
-		int32 Index_Local_PassiveAbility = EvoAbilityStr.Find("_");
-		EvoAbilityStr = UKismetStringLibrary::GetSubstring(EvoAbilityStr, Index_Local_PassiveAbility + 1,EvoAbilityStr.Len());
-		const FText EvoAbilityText = UKismetTextLibrary::Conv_StringToText(EvoAbilityStr);
-		// const FText LevelText = UKismetTextLibrary::Conv_IntToText(Level);
-		// FText SkillLevelText = FText::Format(FText::FromString(TEXT("{0}{1}")), EvoAbilityText, Level);
-		// CONTROLLER_LOG(Warning, TEXT("SkillLevelText[%s]"), *SkillLevelText.ToString());
-		
-		//相等的话，从DataTable中获取技能信息
-		if(EvoAbilityText.EqualTo(RowNameText))
-		{
-			FAbilityLevelUp* AbilityLevelUp = DT_PassiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
-
-			if(AbilityLevelUp)
-			{
-				//添加到UI
-				LevelMasterWidget->AddSelection(
-					EvoAbilityText,
-					Level,
-					AbilityLevelUp->AbilityDesc,
-					URougeDemoFunctionLibary::FindPassiveIcon(Local_PassiveAbility),
-					EActiveAbilities::EAA_Hammer,
-					Local_PassiveAbility,
-					EAbilityType::EAT_Passive
-				);
-				break;
-			}
-		}
-	}*/
+	const FGameplayAbilitySpecHandle AbilitySpecHandle = RougeASC->GiveAbility(AbilitySpec);*/
 }
 
 void ARougePlayerController::ProcessLevelUp(FGameplayTag GameplayTag)
@@ -940,9 +885,11 @@ void ARougePlayerController::AssignAbility(FGameplayTag AbilityTag)
 	ARougePlayerState* PS = GetPlayerState<ARougePlayerState>();
 	check(PS);
 
-	URougeAbilitySystemComponent* ASC = PS->GetRougeAbilitySystemComponent();
-	check(ASC);
+	URougeAbilitySystemComponent* RougeASC = PS->GetRougeAbilitySystemComponent();
+	check(RougeASC);
 
+	//UAbilitySystemComponent :: GiveAbility（...）方法将技能注册到AbilitySystemComponent
+	// 绑定
 	TArray<FName> OutRowNames;
 	UDataTableFunctionLibrary::GetDataTableRowNames(DT_ActiveAbilities, OutRowNames);
 	for(FName RowName : OutRowNames)
@@ -951,30 +898,37 @@ void ARougePlayerController::AssignAbility(FGameplayTag AbilityTag)
 		FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
 		if(AbilityLevelUp)
 		{
-			//是否是Active Ability
-			if(AbilityTag.MatchesTag(RougeGameplayTags.Ability_Type_Magic_Warrior_ActiveAbility))
+			//是否是
+			if(AbilityLevelUp->AbilityTag.HasTag(AbilityTag))
 			{
-				UGameplayAbility* AbilityCDO = AbilityLevelUp->GameplayAbility.Ability->GetDefaultObject<UGameplayAbility>();
-				FGameplayAbilitySpec AbilitySpec(AbilityCDO);
-				const FGameplayAbilitySpecHandle AbilitySpecHandle = ASC->GiveAbility(AbilitySpec);
+				URougeGameplayAbility* AbilityCDO = AbilityLevelUp->GameplayAbility.Ability->GetDefaultObject<URougeGameplayAbility>();
+				FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityLevelUp->Level);
 				
-				//ASC->AddAbilityArr(AbilityTag, AbilitySpec);
+				AbilitySpec.DynamicAbilityTags.AddTag(RougeGameplayTags.InputTag_Test);
+
+				FGameplayAbilitySpecHandle AbilitySpecHandle = RougeASC->GiveAbility(AbilitySpec);
+				mAbilityMap.Add(AbilityTag, *AbilityLevelUp);
 			}
 		}
 	}
-	
-	//是否是Passive Ability
-
-	
 }
 
-void ARougePlayerController::UpdateHudHotbar(TMap<EActiveAbilities, int32> ActiveMap,
-	TMap<EPassiveAbilities, int32> PassiveMap)
+void ARougePlayerController::UpdateHudUI(TMap<FGameplayTag, FAbilityLevelUp> AbilityMap)
 {
 	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeHUD>(GetHUD()) : RougeDemoHUD;
 	if(RougeDemoHUD->PlayerOverlayWidget)
 	{
-		RougeDemoHUD->PlayerOverlayWidget->BuildHotbar(ActiveMap, PassiveMap);
+		RougeDemoHUD->PlayerOverlayWidget->BuildHotbar(AbilityMap);
+		//RougeDemoHUD->PlayerOverlayWidget->UpdateXP(0.f);
+
+		TArray<AActor*> OutActorArr;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGameManager::StaticClass(), OutActorArr);
+		if(OutActorArr.Num() > 0)
+		{
+			AGameManager* GameManager = Cast<AGameManager>(OutActorArr[0]);
+			GameManager->UpdateLevel(0.f);
+		}
+		
 	}
 }
 
@@ -1017,11 +971,12 @@ void ARougePlayerController::OnPlayerStateChangedTeam(UObject* TeamAgent, int32 
 
 void ARougePlayerController::UpdateHotbar()
 {
-	if(MagicComponent == nullptr) { return; }
-	UpdateHudHotbar(
-		MagicComponent->ActiveAbilitiesMap,
-		MagicComponent->PassiveAbilitiesMap
-	);
+	if(mAbilityMap.Num() > 0)
+	{
+		UpdateHudUI(
+			mAbilityMap
+		);
+	}
 }
 
 URougeAbilitySystemComponent* ARougePlayerController::GetRougeAbilitySystemComponent() const

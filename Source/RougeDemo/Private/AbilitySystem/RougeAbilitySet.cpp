@@ -115,3 +115,40 @@ void URougeAbilitySet::GiveToAbilitySystem(URougeAbilitySystemComponent* RougeAS
 	}
 
 }
+
+/*void URougeAbilitySet::AddGrantedGameplayAbilities(URougeAbilitySystemComponent* RougeASC,FRougeAbilitySet_GrantedHandles* OutGrantedHandles, UObject* SourceObject)
+{
+	check(RougeASC);
+
+	//如果此组件的参与者具有权限，则返回true
+	if (!RougeASC->IsOwnerActorAuthoritative())
+	{
+		// Must be authoritative to give or take ability sets.
+		return;
+	}
+
+	//给予Gameplay Ability
+	for (int32 AbilityIndex = 0; AbilityIndex < GrantedGameplayAbilities.Num(); ++AbilityIndex)
+	{
+		const FRougeAbilitySet_GameplayAbility& AbilityToGrant = GrantedGameplayAbilities[AbilityIndex];
+
+		if (!IsValid(AbilityToGrant.Ability))
+		{
+			ABILITY_LOG(Error, TEXT("GrantedGameplayAbilities[%d] on ability set [%s] is not valid."), AbilityIndex, *GetNameSafe(this));
+			continue;
+		}
+
+		URougeGameplayAbility* AbilityCDO = AbilityToGrant.Ability->GetDefaultObject<URougeGameplayAbility>();
+
+		FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityToGrant.AbilityLevel);
+		AbilitySpec.SourceObject = SourceObject;
+		AbilitySpec.DynamicAbilityTags.AddTag(AbilityToGrant.InputTag);
+
+		const FGameplayAbilitySpecHandle AbilitySpecHandle = RougeASC->GiveAbility(AbilitySpec);
+
+		if (OutGrantedHandles)
+		{
+			OutGrantedHandles->AddAbilitySpecHandle(AbilitySpecHandle);
+		}
+	}
+}*/
