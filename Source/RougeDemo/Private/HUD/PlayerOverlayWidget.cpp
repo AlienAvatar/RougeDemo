@@ -27,25 +27,32 @@ void UPlayerOverlayWidget::BuildHotbar(TMap<FGameplayTag, FAbilityLevelUp> Abili
 	}
 	HB_Active->ClearChildren();
 	HB_Passive->ClearChildren();
+	
 	FRougeGameplayTags GameplayTags = FRougeGameplayTags::Get();
 	
 	for(TPair<FGameplayTag, FAbilityLevelUp>& Ability : AbilityMap)
 	{
-		int Level = Ability.Value.Level;
-		UTexture2D* Texture = Ability.Value.AbilityIcon;
-		UUserWidget* Widget = CreateWidget<UUserWidget>(GetOwningPlayer(), AbilityTitleWidgetClass);
-		UAbilityTitleWidget* AbilityTitleWidget = Cast<UAbilityTitleWidget>(Widget);
-		if(AbilityTitleWidget)
+		if(Ability.Value.bActive)
 		{
-			AbilityTitleWidget->SetUp(Level, Texture);
-			if(Ability.Key.MatchesTag(GameplayTags.Ability_Type_Magic_Warrior_ActiveAbility)) 
+			int Level = Ability.Value.Level;
+			UTexture2D* Texture = Ability.Value.AbilityIcon;
+
+			//创建技能UI
+			UUserWidget* Widget = CreateWidget<UUserWidget>(GetOwningPlayer(), AbilityTitleWidgetClass);
+			UAbilityTitleWidget* AbilityTitleWidget = Cast<UAbilityTitleWidget>(Widget);
+			if(AbilityTitleWidget)
 			{
-				HB_Active->AddChild(AbilityTitleWidget);
-			}else if(Ability.Key.MatchesTag(GameplayTags.Ability_Type_Magic_Warrior_PassiveAbility))
-			{
-				HB_Passive->AddChild(AbilityTitleWidget);
+				AbilityTitleWidget->SetUp(Level, Texture);
+				if(Ability.Key.MatchesTag(GameplayTags.Ability_Type_Magic_Warrior_ActiveAbility)) 
+				{
+					HB_Active->AddChild(AbilityTitleWidget);
+				}else if(Ability.Key.MatchesTag(GameplayTags.Ability_Type_Magic_Warrior_PassiveAbility))
+				{
+					HB_Passive->AddChild(AbilityTitleWidget);
+				}
 			}
 		}
+		
 	}
 }
 

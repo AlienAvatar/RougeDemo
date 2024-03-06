@@ -3,14 +3,14 @@
 #include "Engine/DataTable.h"
 #include "RougeDemo/RougeGameplayTags.h"
 
-#include "AbilityLevelUp.generated.h"
+#include "AbilityContext.generated.h"
 
 struct FGameplayTag;
 struct FGameplayTagContainer;
 class URougeGameplayAbility;
 
 USTRUCT(BlueprintType)
-struct FAbilityLevelUp : public FTableRowBase
+struct FAbilityContext : public FTableRowBase
 {
 	GENERATED_BODY()
 

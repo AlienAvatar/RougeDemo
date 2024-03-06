@@ -33,11 +33,27 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(Ability_Type_Magic_Warrior_ActiveAbility, "Ability.Type.Magic.Warrior.ActiveAbility", "Active Ability Group");
 	AddTag(Ability_Type_Magic_Warrior_PassiveAbility, "Ability.Type.Magic.Warrior.PassiveAbility", "Passive Ability Group");
 	AddTag(Ability_Type_Magic_Warrior_NormalAbility, "Ability.Type.Magic.Warrior.NormalAbility", "Normal Ability Group");
-	AddTag(Ability_Type_Magic_Warrior_AA_AA1_Level1, "Ability.Type.Magic.Warrior.ActiveAbility.AA1.Level1", "Active Ability1 Level1");
-	AddTag(Ability_Type_Magic_Warrior_AA_AA1_Level2, "Ability.Type.Magic.Warrior.ActiveAbility.AA1.Level2", "Active Ability1 Level2");
-	AddTag(Ability_Type_Magic_Warrior_AA_AA2_Level1, "Ability.Type.Magic.Warrior.ActiveAbility.AA2.Level1", "Active Ability2 Level1");
-	AddTag(Ability_Type_Magic_Warrior_PA_AA1_Level1, "Ability.Type.Magic.Warrior.PassiveAbility.PA1.Level1", "Passive Ability1 Level1");
-	AddTag(Ability_Type_Magic_Warrior_PA_AA2_Level1, "Ability.Type.Magic.Warrior.PassiveAbility.PA2.Level1", "Passive Ability2 Level2");
+	AddTag(Ability_Type_Magic_Warrior_AA_Q_Level1, "Ability.Type.Magic.Warrior.ActiveAbility.Q.Level1", "Active Ability1 Level1");
+	AddTag(Ability_Type_Magic_Warrior_AA_Q_Level2, "Ability.Type.Magic.Warrior.ActiveAbility.Q.Level2", "Active Ability1 Level2");
+	AddTag(Ability_Type_Magic_Warrior_AA_Q_Level3, "Ability.Type.Magic.Warrior.ActiveAbility.Q.Level3", "Active Ability1 Level3");
+	AddTag(Ability_Type_Magic_Warrior_AA_Q_Level4, "Ability.Type.Magic.Warrior.ActiveAbility.Q.Level4", "Active Ability1 Level4");
+	AddTag(Ability_Type_Magic_Warrior_AA_E_Level1, "Ability.Type.Magic.Warrior.ActiveAbility.E.Level1", "Active Ability1 Level1");
+	AddTag(Ability_Type_Magic_Warrior_AA_E_Level2, "Ability.Type.Magic.Warrior.ActiveAbility.E.Level2", "Active Ability2 Level2");
+	AddTag(Ability_Type_Magic_Warrior_AA_E_Level3, "Ability.Type.Magic.Warrior.ActiveAbility.E.Level3", "Active Ability2 Level3");
+	AddTag(Ability_Type_Magic_Warrior_AA_E_Level4, "Ability.Type.Magic.Warrior.ActiveAbility.E.Level4", "Active Ability2 Level4");
+	AddTag(Ability_Type_Magic_Warrior_AA_Shift_Level1, "Ability.Type.Magic.Warrior.ActiveAbility.Shift.Level1", "Active Ability1 Level1");
+	AddTag(Ability_Type_Magic_Warrior_AA_Shift_Level2, "Ability.Type.Magic.Warrior.ActiveAbility.Shift.Level2", "Active Ability2 Level2");
+	AddTag(Ability_Type_Magic_Warrior_AA_Shift_Level3, "Ability.Type.Magic.Warrior.ActiveAbility.Shift.Level3", "Active Ability2 Level3");
+	AddTag(Ability_Type_Magic_Warrior_AA_Shift_Level4, "Ability.Type.Magic.Warrior.ActiveAbility.Shift.Level4", "Active Ability2 Level4");
+
+	AddTag(Ability_Type_Magic_Warrior_AA_R_Level1, "Ability.Type.Magic.Warrior.ActiveAbility.R.Level1", "Active Ability1 Level1");
+	AddTag(Ability_Type_Magic_Warrior_AA_R_Level2, "Ability.Type.Magic.Warrior.ActiveAbility.R.Level2", "Active Ability2 Level2");
+	AddTag(Ability_Type_Magic_Warrior_AA_R_Level3, "Ability.Type.Magic.Warrior.ActiveAbility.R.Level3", "Active Ability2 Level3");
+	AddTag(Ability_Type_Magic_Warrior_AA_R_Level4, "Ability.Type.Magic.Warrior.ActiveAbility.R.Level4", "Active Ability2 Level4");
+
+	
+	AddTag(Ability_Type_Magic_Warrior_PA_X1_Level1, "Ability.Type.Magic.Warrior.PassiveAbility.X1.Level1", "Passive Ability1 Level1");
+	AddTag(Ability_Type_Magic_Warrior_PA_X2_Level1, "Ability.Type.Magic.Warrior.PassiveAbility.X2.Level1", "Passive Ability2 Level2");
 
 	AddTag(InputTag_Move, "InputTag.Move", "Move input.");
 	AddTag(InputTag_Look_Mouse, "InputTag.Look.Mouse", "Look (mouse) input.");
@@ -46,6 +62,11 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(InputTag_AutoRun, "InputTag.AutoRun", "Auto-run input.");
 	AddTag(InputTag_Sprint, "InputTag.Sprint", "Sprint input.");
 	AddTag(InputTag_Test, "InputTag.Test", "Test input.");
+	
+	AddTag(InputTag_Ability_Q, "InputTag.Ability.Q", "Ability1 input.");
+	AddTag(InputTag_Ability_E, "InputTag.Ability.E", "Ability2 input.");
+	AddTag(InputTag_Ability_Shift, "InputTag.Ability.Shift", "Ability3 input.");
+	AddTag(InputTag_Ability_R, "InputTag.Ability.R", "Ability4 input.");
 
 	AddMovementModeTag(Movement_Mode_Walking, "Movement.Mode.Walking", MOVE_Walking);
 	AddMovementModeTag(Movement_Mode_NavWalking, "Movement.Mode.NavWalking", MOVE_NavWalking);

@@ -106,7 +106,6 @@ void ARougePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	//InputComponent->BindAction("Test", IE_Pressed, this, &ARougePlayerController::TestAction);
 }
 
 void ARougePlayerController::SetHUDHealth(float Health, float MaxHealth)
@@ -309,214 +308,58 @@ void ARougePlayerController::PrepareLevelUp()
 		LevelMasterWidget = CreateWidget<ULevelMasterWidget>(this, LevelMasterWidgetClass);
 		//暂停
 		SetPause(true);
-		
-		//添加卡片
-		ExecuteLevelUp();
-		//Bind Event to On Ready
-		LevelMasterWidget->OnReadyDelegate.BindUObject(this, &ARougePlayerController::ExecuteLevelUp);
-		//ProcessLevelup Bind to OnClose 处理点击选择后
-		LevelMasterWidget->OnCloseDelegate.BindUObject(this, &ARougePlayerController::ProcessLevelUp);
 	}else
 	{
 		LevelMasterWidget->ResetUI();
 	}
 	LevelMasterWidget->AddToViewport();
+
+	//添加卡片
+	ExecuteLevelUp();
+	//Bind Event to On Ready
+	LevelMasterWidget->OnReadyDelegate.BindUObject(this, &ARougePlayerController::ExecuteLevelUp);
+	//ProcessLevelup Bind to OnClose 处理点击选择后
+	LevelMasterWidget->OnCloseDelegate.BindUObject(this, &ARougePlayerController::ProcessLevelUp);
 	//只能UI
 	UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(this, LevelMasterWidget);
 }
 
 void ARougePlayerController::ExecuteLevelUp()
 {
-	/*if(MagicComponent == nullptr) { return; }
+	TArray<FAbilityLevelUp> Local_ActiveAbilitiesArr;
+	TArray<FAbilityLevelUp> Local_PassiveAbilitiesArr;
 
-	//保存为本地变量，记录角色每个技能的技能情况
-	TMap<EActiveAbilities, int32> Local_ActiveAbilitiesMap = MagicComponent->ActiveAbilitiesMap;
-	TMap<EPassiveAbilities, int32> Local_PassiveAbilitiesMap = MagicComponent->PassiveAbilitiesMap;
-	int32 Local_MaxAbilityLevel = MagicComponent->MaxAbilityLevel;
-
-	//检查是否有可以升级的主动技能
-	EActiveAbilities Local_EvoAbility;
-	bool bLocal_EvoReady = CheckIfEVOReady(Local_EvoAbility);
-
-	//设置最大的展示CardList
-	int32 Local_MaxCount = 4;
-
-	int Local_CardCount = 0;
-	
-	//如果Local_EvoReady = true， 升级技能
-	if(bLocal_EvoReady)
-	{
-		++Local_CardCount;
-
-		//检查升级的技能是否和表中的相等
-		TArray<FName> OutRowNames;
-		UDataTableFunctionLibrary::GetDataTableRowNames(DT_ActiveAbilities, OutRowNames);
-		
-		for(FName RowName : OutRowNames)
-		{
-			FText RowNameText = UKismetTextLibrary::Conv_NameToText(RowName);
-			
-			FString EvoAbilityStr = UEnum::GetValueAsString(Local_EvoAbility);
-			const FText EvoAbilityText = UKismetTextLibrary::Conv_StringToText(EvoAbilityStr);
-			int32 Num = UKismetSystemLibrary::MakeLiteralInt(-1);
-			FText LevelNum = UKismetTextLibrary::Conv_IntToText(Num);
-			FText SkillLevelText = FText::Format(FText::FromString(TEXT("{0}{1}")), EvoAbilityText, LevelNum);
-
-			//相等的话，获取表中数据
-			if(SkillLevelText.EqualTo(RowNameText))
-			{
-				FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
-				if(AbilityLevelUp)
-				{
-					LevelMasterWidget->AddSelection(
-						EvoAbilityText,
-						-1,
-						AbilityLevelUp->AbilityDesc,
-						URougeDemoFunctionLibary::FindActionIcon(Local_EvoAbility),
-						Local_EvoAbility,
-						EPassiveAbilities::EPA_AbilityDamage,
-						EAbilityType::EAT_Evolution
-					);
-				}
-			}
-		}
-	}
-
-	//获得其他技能，防止满级技能出现
-	CanAddActiveAbility = true;
-	//传入Local_MaxAbilityLevel = 5
-	TArray<EActiveAbilities> Local_AvailableActiveAbilities = CheckActiveAbilities(Local_ActiveAbilitiesMap, Local_MaxAbilityLevel);
-	//如果Local_AvailableActiveAbilities为空，证明所有主动技能都学习到满级
-	if(Local_AvailableActiveAbilities.IsEmpty())
-	{
-		CanAddActiveAbility = false;
-	}
-	
-	//检查被动技能
-	CanAddPassiveAbility = true;
-	TArray<EPassiveAbilities> Local_AvailablePassiveAbilities = CheckPassiveAbilities(Local_PassiveAbilitiesMap, Local_MaxAbilityLevel);
-	if(Local_AvailablePassiveAbilities.IsEmpty())
-	{
-		CanAddPassiveAbility = false;
-	}
-	
-	//运行循环，直到我们打出我们想要的卡牌或不能添加被动/主动技能
-	while((Local_CardCount < Local_MaxCount) && (CanAddActiveAbility || CanAddPassiveAbility))
-	{
-		++Local_CardCount;
-		//CONTROLLER_LOG(Warning, TEXT("Local_CardCount[%d]"), Local_CardCount); 4
-		//确定主动或被动的随机bool，如果不允许，则为failsafe, 50%概率添加4个主动技能或4个被动技能
-		//当主动技能添加满时（所有主动技能都是满级），则添加被动技能
-		//Test
-		// if(CanAddPassiveAbility)
-		// {
-		// 	CreatePassiveCard(
-		// 		Local_MaxCount,
-		// 		Local_AvailablePassiveAbilities,
-		// 		Local_PassiveAbilitiesMap
-		// 	);
-		// }
-		
-		if(UKismetMathLibrary::RandomBoolWithWeight(0.5))
-		{
-			if(CanAddActiveAbility)
-			{
-				//4, 
-				CreateActiveCard(
-					Local_MaxCount,
-					Local_AvailableActiveAbilities,
-					Local_ActiveAbilitiesMap
-				);
-			}else
-			{
-				CreatePassiveCard(
-					Local_MaxCount,
-					Local_AvailablePassiveAbilities,
-					Local_PassiveAbilitiesMap
-				);
-			}
-		}else
-		{
-			if(CanAddPassiveAbility)
-			{
-				CreatePassiveCard(
-					Local_MaxCount,
-					Local_AvailablePassiveAbilities,
-					Local_PassiveAbilitiesMap
-				);
-			}else
-			{
-				CreateActiveCard(
-					Local_MaxCount,
-					Local_AvailableActiveAbilities,
-					Local_ActiveAbilitiesMap
-				);
-			}
-		}
-	}
-	//如果没有技能可以添加，就加血*/
-
-
-	//RougeGameplayTagAbilitySystem
-
-	/*TArray<FGameplayTag> GameplayTagArr;
-	AbilitiesArr->GetGameplayTagArray(GameplayTagArr);*/
-	
-	// 	
-	// FString EvoAbilityStr = UEnum::GetValueAsString(Local_EvoAbility);
-	// const FText EvoAbilityText = UKismetTextLibrary::Conv_StringToText(EvoAbilityStr);
-	// int32 Num = UKismetSystemLibrary::MakeLiteralInt(-1);
-	// FText LevelNum = UKismetTextLibrary::Conv_IntToText(Num);
-	// FText SkillLevelText = FText::Format(FText::FromString(TEXT("{0}{1}")), EvoAbilityText, LevelNum);
-
-	FGameplayTagContainer Local_ActiveAbilitiesArr;
-	FGameplayTagContainer Local_PassiveAbilitiesArr;
 	FRougeGameplayTags GameplayTags = FRougeGameplayTags::Get();
 	FText AbilityType;
-	
-	TArray<FName> OutRowNames;
-	UDataTableFunctionLibrary::GetDataTableRowNames(DT_ActiveAbilities, OutRowNames);
-	for(FName RowName : OutRowNames)
+
+	//添加Active下的Local_ActiveAbilitiesArr
+	for(FAbilityLevelUp AbilityLevelUp : ActiveAbilitiesArr)
 	{
-		//testAA
-		FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
-		if(AbilityLevelUp->bActive)
+		if(AbilityLevelUp.bActive)
 		{
-			if(AbilityLevelUp->AbilityTag.HasTag(GameplayTags.Ability_Type_Magic_Warrior_ActiveAbility))
-			{
-				Local_ActiveAbilitiesArr.AppendTags(AbilityLevelUp->AbilityTag);
-				AbilityType = UKismetTextLibrary::Conv_StringToText("ActiveAbility");
-			}else if(AbilityLevelUp->AbilityTag.HasTag(GameplayTags.Ability_Type_Magic_Warrior_PassiveAbility))
-			{
-				Local_PassiveAbilitiesArr.AppendTags(AbilityLevelUp->AbilityTag);
-				AbilityType = UKismetTextLibrary::Conv_StringToText("PassiveAbility");
-			}
+			Local_ActiveAbilitiesArr.Add(AbilityLevelUp);
+		}
+	}
+
+	for(FAbilityLevelUp AbilityLevelUp : PassiveAbilitiesArr)
+	{
+		if(AbilityLevelUp.bActive)
+		{
+			Local_PassiveAbilitiesArr.Add(AbilityLevelUp);
 		}
 	}
 	
 	int RandomActiveIndex = UKismetMathLibrary::RandomInteger(Local_ActiveAbilitiesArr.Num());
-	FGameplayTag ActiveGameplayTag = Local_ActiveAbilitiesArr.GetByIndex(RandomActiveIndex);
-
-	int RandomPassiveIndex =  UKismetMathLibrary::RandomInteger(Local_PassiveAbilitiesArr.Num());
-	FGameplayTag PassiveGameplayTag = Local_PassiveAbilitiesArr.GetByIndex(RandomPassiveIndex);
+	FAbilityLevelUp CurrentActiveAbility = Local_ActiveAbilitiesArr[RandomActiveIndex];
 	
-	for(FName RowName : OutRowNames)
-	{
-		FAbilityLevelUp* RandomAbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
-		if(RandomAbilityLevelUp)
-		{
-			if(RandomAbilityLevelUp->AbilityTag.HasTag(ActiveGameplayTag))
-			{
-				CreateActiveCard(*RandomAbilityLevelUp, ActiveGameplayTag, AbilityType);
-			}
-
-			if(RandomAbilityLevelUp->AbilityTag.HasTag(PassiveGameplayTag))
-			{
-				CreateActiveCard(*RandomAbilityLevelUp, PassiveGameplayTag, AbilityType);
-			}
-		}
-		
-	}
+	int RandomPassiveIndex =  UKismetMathLibrary::RandomInteger(Local_PassiveAbilitiesArr.Num());
+	FAbilityLevelUp CurrentPassiveAbility = Local_PassiveAbilitiesArr[RandomPassiveIndex];
+	
+	FText ActiveAbilityType = UKismetTextLibrary::Conv_StringToText("ActiveAbility");
+	FText PassiveAbilityType = UKismetTextLibrary::Conv_StringToText("PassiveAbility");
+	
+	CreateActiveCard(CurrentActiveAbility, CurrentActiveAbility.AbilityTag.GetByIndex(0), ActiveAbilityType);
+	CreateActiveCard(CurrentPassiveAbility, CurrentPassiveAbility.AbilityTag.GetByIndex(0), PassiveAbilityType);
 }
 
 bool ARougePlayerController::CheckIfEVOReady(EActiveAbilities& Ability)
@@ -685,6 +528,7 @@ void ARougePlayerController::TestAction()
 		{
 			AGameManager* GameManager = Cast<AGameManager>(OutActorArr[0]);
 			Percent = Percent + 0.8f;
+			Percent = UKismetMathLibrary::NormalizeToRange(Percent, 0.0f, 1.0f);
 			GameManager->UpdateCharactersXP(Percent,GameManager->mLevel);
 			if(Percent > 0.9)
 			{
@@ -772,7 +616,6 @@ void ARougePlayerController::CreateActiveCard(FAbilityLevelUp AbilityLevelUp, FG
 	FString Level = GameplayTag.ToString();
 	TArray<FString> LevelArr;
 	Level.ParseIntoArray(LevelArr, TEXT("."), false);
-	
 	FText LevelText = UKismetTextLibrary::Conv_StringToText(LevelArr[LevelArr.Num()-1]);
 
 	LevelMasterWidget->AddSelection(
@@ -783,12 +626,6 @@ void ARougePlayerController::CreateActiveCard(FAbilityLevelUp AbilityLevelUp, FG
 		AbilityType,
 		GameplayTag
 	);
-
-	/*URougeGameplayAbility* AbilityCDO = AbilityLevelUp->GameplayAbility.Ability->GetDefaultObject<URougeGameplayAbility>();
-	FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityLevelUp->Level);
-	AbilitySpec.DynamicAbilityTags.AddTag(RougeGameplayTags.InputTag_Test);
-
-	const FGameplayAbilitySpecHandle AbilitySpecHandle = RougeASC->GiveAbility(AbilitySpec);*/
 }
 
 void ARougePlayerController::ProcessLevelUp(FGameplayTag GameplayTag)
@@ -813,7 +650,6 @@ void ARougePlayerController::ProcessLevelUp(FGameplayTag GameplayTag)
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
 	
 	//Level up ability
-	//AssignAbility(Type, ActiveAbilities, PassiveAbilities);
 	AssignAbility(GameplayTag);
 	//更新UI
 	UpdateHotbar();
@@ -823,63 +659,10 @@ void ARougePlayerController::ProcessLevelUp(FGameplayTag GameplayTag)
 	/*MagicComponent->RefreshAbilities();*/
 }
 
-void ARougePlayerController::AssignAbility(EAbilityType Type, EActiveAbilities ActiveAbilities,
-	EPassiveAbilities PassiveAbilities)
-{
-	switch (Type)
-	{
-		case EAbilityType::EAT_Active:
-			switch (ActiveAbilities)
-			{
-				case EActiveAbilities::EAA_Hammer:
-					MagicComponent->LevelUpHammer();
-					break;
-				case EActiveAbilities::EAA_FireBall:
-					
-					break;
-				case EActiveAbilities::EAA_Lightning:
-					MagicComponent->LevelUpLightning();
-					break;
-				case EActiveAbilities::EAA_FrostBolt:
-					MagicComponent->LevelUpFrostBolt();
-					break;
-			}
-			break;
-		case EAbilityType::EAT_Passive:
-			switch (PassiveAbilities)
-			{
-				case EPassiveAbilities::EPA_Health:
-					MagicComponent->LevelUpMaxHealth(false);
-					break;
-				case EPassiveAbilities::EPA_Speed:
-					MagicComponent->LevelUpWalkSpeed(false);
-					break;
-				case EPassiveAbilities::EPA_AbilityDamage:
-					MagicComponent->LevelUpAbilityDamage(false);
-					break;
-				case EPassiveAbilities::EPA_CooldownReduction:
-					MagicComponent->LevelUpTimerReduction(false);
-					break;
-			}
-			break;
-		case EAbilityType::EAT_Evolution:
-			break;
-		case EAbilityType::EAT_Health:
-			{
-				ICharacterInterface* CharacterImpl = Cast<ICharacterInterface>(GetPawn());
-				if(CharacterImpl)
-				{
-					CharacterImpl->RestoreHealth(10.f);
-				}
-				break;
-			}
-		case EAbilityType::EAT_Gold:
-			break;
-	}
-}
-
 void ARougePlayerController::AssignAbility(FGameplayTag AbilityTag)
 {
+	UE_LOG(LogTemp, Warning, TEXT("AssignAbility().AbilityTag[%s]"), *AbilityTag.ToString());
+	
 	FRougeGameplayTags RougeGameplayTags = FRougeGameplayTags::Get();
 
 	ARougePlayerState* PS = GetPlayerState<ARougePlayerState>();
@@ -887,33 +670,50 @@ void ARougePlayerController::AssignAbility(FGameplayTag AbilityTag)
 
 	URougeAbilitySystemComponent* RougeASC = PS->GetRougeAbilitySystemComponent();
 	check(RougeASC);
-
+	
 	//UAbilitySystemComponent :: GiveAbility（...）方法将技能注册到AbilitySystemComponent
-	// 绑定
-	TArray<FName> OutRowNames;
-	UDataTableFunctionLibrary::GetDataTableRowNames(DT_ActiveAbilities, OutRowNames);
-	for(FName RowName : OutRowNames)
+	//在Datatable对应的Ability
+	FAbilityLevelUp Current_AbilityLevelUp;
+	for(FAbilityLevelUp& AbilityLevelUp : ActiveAbilitiesArr)
 	{
-		//testAA
-		FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
-		if(AbilityLevelUp)
+		if(AbilityLevelUp.AbilityTag.HasTagExact(AbilityTag))
 		{
-			//是否是
-			if(AbilityLevelUp->AbilityTag.HasTag(AbilityTag))
-			{
-				URougeGameplayAbility* AbilityCDO = AbilityLevelUp->GameplayAbility.Ability->GetDefaultObject<URougeGameplayAbility>();
-				FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityLevelUp->Level);
-				
-				AbilitySpec.DynamicAbilityTags.AddTag(RougeGameplayTags.InputTag_Test);
+			Current_AbilityLevelUp = AbilityLevelUp;
+			URougeGameplayAbility* AbilityCDO = AbilityLevelUp.GameplayAbility.Ability->GetDefaultObject<URougeGameplayAbility>();
+			FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityLevelUp.Level);
 
-				FGameplayAbilitySpecHandle AbilitySpecHandle = RougeASC->GiveAbility(AbilitySpec);
-				mAbilityMap.Add(AbilityTag, *AbilityLevelUp);
+			//绑定按键
+			FGameplayTag InputTag = AbilityLevelUp.InputTag.GetByIndex(0);
+			UE_LOG(LogTemp, Warning, TEXT("InputTag[%s]"), *InputTag.ToString());
+			if(InputTag.IsValid())
+			{
+				AbilitySpec.DynamicAbilityTags.AddTag(AbilityLevelUp.InputTag.GetByIndex(0));
 			}
+			//AbilitySpec.DynamicAbilityTags.AddTag(RougeGameplayTags.InputTag_Ability_E);
+			
+			//赋予Ability
+			RougeASC->GiveAbility(AbilitySpec);
+			
+			mAbilityMap.Add(AbilityTag, AbilityLevelUp);
+
+			//设置激活为false，代表已激活过
+			AbilityLevelUp.bActive = false;
+		}
+	}
+	
+	//下一个Level为true
+	for(FAbilityLevelUp& LevelAbility : ActiveAbilitiesArr)
+	{
+		FString bActiveStr = LevelAbility.bActive ? "LevelAbility.true" : "LevelAbility.false";
+		UE_LOG(LogTemp, Warning, TEXT("LevelAbility[%s], LevelAbility.bActive[%s]"),*LevelAbility.AbilityTag.ToString() ,*bActiveStr);
+		if(LevelAbility.AbilityTag.HasTagExact(Current_AbilityLevelUp.NextLevelAbilityTag.GetByIndex(0)))
+		{
+			LevelAbility.bActive = true;
 		}
 	}
 }
 
-void ARougePlayerController::UpdateHudUI(TMap<FGameplayTag, FAbilityLevelUp> AbilityMap)
+void ARougePlayerController::UpdateHudUI(TMap<FGameplayTag, FAbilityLevelUp>& AbilityMap)
 {
 	RougeDemoHUD = RougeDemoHUD == nullptr ? Cast<ARougeHUD>(GetHUD()) : RougeDemoHUD;
 	if(RougeDemoHUD->PlayerOverlayWidget)

@@ -111,6 +111,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="DataTable")
 	UDataTable* DT_ActiveAbilities;
 
+	TArray<FAbilityLevelUp> ActiveAbilitiesArr;
+	TArray<FAbilityLevelUp> PassiveAbilitiesArr;
+	
 	UPROPERTY(EditDefaultsOnly, Category="DataTable")
 	UDataTable* DT_PassiveAbilities;
 
@@ -183,11 +186,10 @@ private:
 
 	void ProcessLevelUp(FGameplayTag GameplayTag);
 
-	void AssignAbility(EAbilityType Type, EActiveAbilities ActiveAbilities, EPassiveAbilities PassiveAbilities);
 	void AssignAbility(FGameplayTag AbilityTag);
 
 	TMap<FGameplayTag, FAbilityLevelUp> mAbilityMap;
-	virtual void UpdateHudUI(TMap<FGameplayTag, FAbilityLevelUp> AbilityMap) override;
+	virtual void UpdateHudUI(TMap<FGameplayTag, FAbilityLevelUp>& AbilityMap) override;
 
 	void BroadcastOnPlayerStateChanged();
 	

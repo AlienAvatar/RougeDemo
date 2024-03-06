@@ -34,6 +34,6 @@ public:
 	UFUNCTION()
 	virtual void UpdateTime(FText Time) = 0;
 
-	virtual void UpdateHudUI(TMap<FGameplayTag, FAbilityLevelUp> AbilityMap) = 0;
+	virtual void UpdateHudUI(TMap<FGameplayTag, FAbilityLevelUp>& AbilityMap) = 0;
 	
 };

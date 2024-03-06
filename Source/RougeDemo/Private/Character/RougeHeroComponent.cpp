@@ -16,6 +16,7 @@
 #include "Input/RougeInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "HUD/RougeHUD.h"
+#include "Kismet/DataTableFunctionLibrary.h"
 
 const FName URougeHeroComponent::NAME_BindInputsNow("BindInputsNow");
 const FName URougeHeroComponent::NAME_ActorFeatureName("Hero");
@@ -160,8 +161,31 @@ void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* 
 				RougePC->LevelMasterWidgetClass = PawnData->LevelMasterWidgetClass;
 
 				//Init Data table
-				RougePC->DT_ActiveAbilities = PawnData->DT_ActiveAbilities;
-				RougePC->DT_PassiveAbilities = PawnData->DT_PassiveAbilities;
+				
+				UDataTable* DT_ActiveAbilities = PawnData->DT_ActiveAbilities;
+				UDataTable* DT_PassiveAbilities = PawnData->DT_PassiveAbilities;
+			
+				TArray<FName> OutActiveRowNames;
+				UDataTableFunctionLibrary::GetDataTableRowNames(DT_ActiveAbilities, OutActiveRowNames);
+				for(FName RowName : OutActiveRowNames)
+				{
+					FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
+					if(AbilityLevelUp)
+					{
+						RougePC->ActiveAbilitiesArr.Add(*AbilityLevelUp);
+					}
+				}
+
+				TArray<FName> OutPassiveRowNames;
+				UDataTableFunctionLibrary::GetDataTableRowNames(DT_PassiveAbilities, OutPassiveRowNames);
+				for(FName RowName : OutPassiveRowNames)
+				{
+					FAbilityLevelUp* AbilityLevelUp = DT_PassiveAbilities->FindRow<FAbilityLevelUp>(RowName, "");
+					if(AbilityLevelUp)
+					{
+						RougePC->PassiveAbilitiesArr.Add(*AbilityLevelUp);
+					}
+				}
 			}
 		}
 	}

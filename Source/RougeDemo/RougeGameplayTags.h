@@ -31,11 +31,25 @@ public:
 	FGameplayTag Ability_Type_Magic_Warrior_ActiveAbility;
 	FGameplayTag Ability_Type_Magic_Warrior_PassiveAbility;
 	FGameplayTag Ability_Type_Magic_Warrior_NormalAbility;
-	FGameplayTag Ability_Type_Magic_Warrior_AA_AA1_Level1;
-	FGameplayTag Ability_Type_Magic_Warrior_AA_AA1_Level2;
-	FGameplayTag Ability_Type_Magic_Warrior_AA_AA2_Level1;
-	FGameplayTag Ability_Type_Magic_Warrior_PA_AA1_Level1;
-	FGameplayTag Ability_Type_Magic_Warrior_PA_AA2_Level1;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_Q_Level1;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_Q_Level2;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_Q_Level3;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_Q_Level4;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_E_Level1;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_E_Level2;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_E_Level3;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_E_Level4;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_Shift_Level1;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_Shift_Level2;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_Shift_Level3;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_Shift_Level4;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_R_Level1;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_R_Level2;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_R_Level3;
+	FGameplayTag Ability_Type_Magic_Warrior_AA_R_Level4;
+	
+	FGameplayTag Ability_Type_Magic_Warrior_PA_X1_Level1;
+	FGameplayTag Ability_Type_Magic_Warrior_PA_X2_Level1;
 	
 	FGameplayTag Ability_Type_Attr_Heal;
 	
@@ -46,7 +60,11 @@ public:
 	FGameplayTag InputTag_AutoRun;
 	FGameplayTag InputTag_Sprint;
 	FGameplayTag InputTag_Test;
-	
+
+	FGameplayTag InputTag_Ability_Q;
+	FGameplayTag InputTag_Ability_E;
+	FGameplayTag InputTag_Ability_Shift;
+	FGameplayTag InputTag_Ability_R;
 	// Initialization states for the GameFrameworkComponentManager, these are registered in order by LyraGameInstance and some actors will skip right to GameplayReady
 
 	/** 功能已完成生成和初始复制，从 BeginPlay 调用*/

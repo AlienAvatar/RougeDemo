@@ -33,6 +33,7 @@ void ULevelMasterWidget::AddSelection(FText Name, FText Level, FText Desc, UText
 		Type,
 		GameplayTag
 	);
+	
 	WBP_LevelUpItems->VB_Items->AddChildToVerticalBox(LevelUpCardComponentWidget);
 	
 	//Bind on Selected
@@ -54,6 +55,7 @@ void ULevelMasterWidget::Btn_IntroClickedCallBack()
 
 void ULevelMasterWidget::Close()
 {
+	WBP_LevelUpItems->VB_Items->ClearChildren();
 	RemoveFromParent();
 }
 
