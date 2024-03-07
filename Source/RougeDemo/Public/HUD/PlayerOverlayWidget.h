@@ -23,11 +23,9 @@ class ROUGEDEMO_API UPlayerOverlayWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	/*
-	UPROPERTY(meta=(BindWidget))
-	UProgressBar* HealthBar;
-	*/
 
+	void NativeConstruct() override;
+	
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* HealthText;
 
@@ -64,4 +62,6 @@ public:
 
 	//更新经验条
 	void UpdateXP(float Percent);
+
+	
 };

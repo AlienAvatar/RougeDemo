@@ -33,6 +33,8 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(Ability_Type_Magic_Warrior_ActiveAbility, "Ability.Type.Magic.Warrior.ActiveAbility", "Active Ability Group");
 	AddTag(Ability_Type_Magic_Warrior_PassiveAbility, "Ability.Type.Magic.Warrior.PassiveAbility", "Passive Ability Group");
 	AddTag(Ability_Type_Magic_Warrior_NormalAbility, "Ability.Type.Magic.Warrior.NormalAbility", "Normal Ability Group");
+	AddTag(Ability_Type_Magic_Warrior_Max, "Ability.Type.Magic.Warrior.Max", "Current Ability Max");
+	
 	AddTag(Ability_Type_Magic_Warrior_AA_Q_Level1, "Ability.Type.Magic.Warrior.ActiveAbility.Q.Level1", "Active Ability1 Level1");
 	AddTag(Ability_Type_Magic_Warrior_AA_Q_Level2, "Ability.Type.Magic.Warrior.ActiveAbility.Q.Level2", "Active Ability1 Level2");
 	AddTag(Ability_Type_Magic_Warrior_AA_Q_Level3, "Ability.Type.Magic.Warrior.ActiveAbility.Q.Level3", "Active Ability1 Level3");

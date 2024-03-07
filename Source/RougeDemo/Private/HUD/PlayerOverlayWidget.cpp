@@ -7,11 +7,21 @@
 #include "Components/HorizontalBox.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Core/RougePlayerController.h"
 #include "HUD/Game/AbilityTitleWidget.h"
+#include "Kismet/GameplayStatics.h"
 #include "Lib/RougeDemoFunctionLibary.h"
 #include "RougeDemo/RougeDemo.h"
 
 #include "RougeDemo/RougeGameplayTags.h"
+
+void UPlayerOverlayWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	/*ARougePlayerController* PC = Cast<ARougePlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	PC->LevelMasterWidget;*/
+}
 
 void UPlayerOverlayWidget::UpdateTime(FText Time)
 {
@@ -45,6 +55,7 @@ void UPlayerOverlayWidget::BuildHotbar(TMap<FGameplayTag, FAbilityLevelUp> Abili
 				AbilityTitleWidget->SetUp(Level, Texture);
 				if(Ability.Key.MatchesTag(GameplayTags.Ability_Type_Magic_Warrior_ActiveAbility)) 
 				{
+					UE_LOG(LogTemp, Warning, TEXT("Ability.Key[%s]"), *Ability.Key.ToString());
 					HB_Active->AddChild(AbilityTitleWidget);
 				}else if(Ability.Key.MatchesTag(GameplayTags.Ability_Type_Magic_Warrior_PassiveAbility))
 				{

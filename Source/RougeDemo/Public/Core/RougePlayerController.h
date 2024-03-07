@@ -70,7 +70,6 @@ public:
 	
 	void SetHUDHealth(float Health, float MaxHealth);
 	void SetHUDScore(float Score);
-	void SetHUDSkillValue(float SkillValue,float MaxSkillValue);
 
 	virtual void OnLevelUp() override;
 
@@ -178,7 +177,6 @@ private:
 	virtual void UpdateTime(FText Time) override;
 
 	//创建主动技能的升级卡片
-	void CreateActiveCard(int32 Local_MaxCount, TArray<EActiveAbilities>& Local_AvailableActiveAbilities, TMap<EActiveAbilities, int32>& Local_ActiveAbilitiesMap);
 	void CreateActiveCard(FAbilityLevelUp AbilityLevelUp,FGameplayTag GameplayTag, FText AbilityType);
 
 	bool CanAddActiveAbility = true;
@@ -204,4 +202,5 @@ private:
 
 	UPROPERTY()
 	FOnRougeTeamIndexChangedDelegate OnTeamChangedDelegate;
+
 };

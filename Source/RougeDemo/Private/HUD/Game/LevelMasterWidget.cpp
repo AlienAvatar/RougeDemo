@@ -13,13 +13,6 @@
 void ULevelMasterWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
-	Btn_Intro->OnClicked.AddDynamic(this, &ULevelMasterWidget::Btn_IntroClickedCallBack);
-}
-
-void ULevelMasterWidget::ResetUI()
-{
-	WS_LevelUp->SetActiveWidgetIndex(0);
 }
 
 void ULevelMasterWidget::AddSelection(FText Name, FText Level, FText Desc, UTexture2D* Icon, FText Type, FGameplayTag GameplayTag)
@@ -45,12 +38,6 @@ void ULevelMasterWidget::ResetLevelUpItems()
 	WBP_LevelUpItems->VB_Items->ClearChildren();
 	//Call On Ready
 	OnReadyDelegate.Execute();
-}
-
-void ULevelMasterWidget::Btn_IntroClickedCallBack()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Btn_IntroCallBack"));
-	WS_LevelUp->SetActiveWidgetIndex(1);
 }
 
 void ULevelMasterWidget::Close()

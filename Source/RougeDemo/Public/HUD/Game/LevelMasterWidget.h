@@ -32,18 +32,9 @@ public:
 	virtual void NativeConstruct() override;
 	
 	UPROPERTY(meta=(BindWidget))
-	UWidgetSwitcher* WS_LevelUp;
-
-	UFUNCTION()
-	void ResetUI();
-
-	UPROPERTY(meta=(BindWidget))
 	ULevelUpItemsComponentWidget* WBP_LevelUpItems;
 
 	void AddSelection(FText Name, FText Level, FText Desc, UTexture2D* Icon,  FText Type, FGameplayTag GameplayTag);
-
-	UPROPERTY(meta=(BindWidget))
-	UButton* Btn_Intro;
 
 	void OnSelectedDelegateEventFunction(FGameplayTag GameplayTag);
 
@@ -56,9 +47,6 @@ protected:
 
 private:
 	void ResetLevelUpItems();
-
-	UFUNCTION()
-	void Btn_IntroClickedCallBack();
 
 	void Close();
 

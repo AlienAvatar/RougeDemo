@@ -28,9 +28,12 @@ public:
 	FGameplayTag Ability_Type_Action_Hammer;
 	FGameplayTag Ability_Type_Action_Test;
 
+
 	FGameplayTag Ability_Type_Magic_Warrior_ActiveAbility;
 	FGameplayTag Ability_Type_Magic_Warrior_PassiveAbility;
 	FGameplayTag Ability_Type_Magic_Warrior_NormalAbility;
+	FGameplayTag Ability_Type_Magic_Warrior_Max;
+	
 	FGameplayTag Ability_Type_Magic_Warrior_AA_Q_Level1;
 	FGameplayTag Ability_Type_Magic_Warrior_AA_Q_Level2;
 	FGameplayTag Ability_Type_Magic_Warrior_AA_Q_Level3;
