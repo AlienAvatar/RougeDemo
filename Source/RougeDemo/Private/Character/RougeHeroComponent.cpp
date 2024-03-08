@@ -160,10 +160,11 @@ void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* 
 				//set LevelUp UI
 				RougePC->LevelMasterWidgetClass = PawnData->LevelMasterWidgetClass;
 
-				//Init Data table
-				
+				//Init Ability Data table
 				UDataTable* DT_ActiveAbilities = PawnData->DT_ActiveAbilities;
 				UDataTable* DT_PassiveAbilities = PawnData->DT_PassiveAbilities;
+				UDataTable* DT_UltimateAbilities = PawnData->DT_UltimateAbilities;
+				UDataTable* DT_NormalAbilities = PawnData->DT_NormalAbilities;
 			
 				TArray<FName> OutActiveRowNames;
 				UDataTableFunctionLibrary::GetDataTableRowNames(DT_ActiveAbilities, OutActiveRowNames);
@@ -184,6 +185,28 @@ void URougeHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* 
 					if(AbilityLevelUp)
 					{
 						RougePC->PassiveAbilitiesArr.Add(*AbilityLevelUp);
+					}
+				}
+
+				TArray<FName> OutUltimateRowNames;
+				UDataTableFunctionLibrary::GetDataTableRowNames(DT_UltimateAbilities, OutUltimateRowNames);
+				for(FName RowName : OutUltimateRowNames)
+				{
+					FAbilityLevelUp* AbilityLevelUp = DT_UltimateAbilities->FindRow<FAbilityLevelUp>(RowName, "");
+					if(AbilityLevelUp)
+					{
+						RougePC->UltimateAbilitiesArr.Add(*AbilityLevelUp);
+					}
+				}
+
+				TArray<FName> OutNormalRowNames;
+				UDataTableFunctionLibrary::GetDataTableRowNames(DT_NormalAbilities, OutNormalRowNames);
+				for(FName RowName : OutNormalRowNames)
+				{
+					FAbilityLevelUp* AbilityLevelUp = DT_NormalAbilities->FindRow<FAbilityLevelUp>(RowName, "");
+					if(AbilityLevelUp)
+					{
+						RougePC->NormalAbilitiesArr.Add(*AbilityLevelUp);
 					}
 				}
 			}

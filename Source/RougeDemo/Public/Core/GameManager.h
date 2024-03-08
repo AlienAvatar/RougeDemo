@@ -37,10 +37,13 @@ public:
 	int mLevel = 1;
 
 	void UpdateLevel(float Percent);
+
+	int GetLevel() { return mLevel; }
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
 	TArray<ARougePlayerController*> PlayerControllerArr;
 
 	void GameSetUp();

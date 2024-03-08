@@ -69,11 +69,14 @@ public:
 
 	TArray<FGameplayTag> AbilityArr;
 
-	void AddAbilityArr(FGameplayTag Tag, FGameplayAbilitySpec GameplayAbilitySpec);
-	
 	UFUNCTION(BlueprintCallable)
 	void TestAbilityArr();
 	//TArray<FGameplayTag, UGameplayAbility> AbilityMap;
+
+	//把Unbind方法从protected提高至public
+	//virtual void OnRemoveAbility(FGameplayAbilitySpec& AbilitySpec) override;
+
+	void ClearAbility(const FGameplayAbilitySpecHandle& Handle);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

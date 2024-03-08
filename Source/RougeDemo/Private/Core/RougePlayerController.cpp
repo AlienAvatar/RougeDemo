@@ -53,8 +53,6 @@ void ARougePlayerController::BeginPlay()
 	RougeDemoHUD = Cast<ARougeHUD>(GetHUD());
 
 	FRougeGameplayTags GameplayTags = FRougeGameplayTags::Get();
-
-	
 }
 
 void ARougePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -183,8 +181,6 @@ void ARougePlayerController::SetPlayer(UPlayer* InPlayer)
 
 		OnSettingsChanged(UserSettings);
 	}
-
-	
 }
 
 void ARougePlayerController::PreProcessInput(const float DeltaTime, const bool bGamePaused)
@@ -310,47 +306,40 @@ void ARougePlayerController::PrepareLevelUp()
 
 void ARougePlayerController::ExecuteLevelUp()
 {
-	TArray<FAbilityLevelUp> Local_ActiveAbilitiesArr;
-	TArray<FAbilityLevelUp> Local_PassiveAbilitiesArr;
 
-	//获取Rouge标签
-	FRougeGameplayTags GameplayTags = FRougeGameplayTags::Get();
+	TArray<FAbilityLevelUp> Local_UltimateAbilitiesArr;
 
-	//添加Active下的Local_ActiveAbilitiesArr
-	for(FAbilityLevelUp AbilityLevelUp : ActiveAbilitiesArr)
+	TArray<AActor*> OutActorArr;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGameManager::StaticClass(), OutActorArr);
+	if(OutActorArr.Num() > 0)
 	{
-		//当前可升级的Ability是否为True状态，且不为最后一个Ability
-		if(AbilityLevelUp.bActive)
+		AGameManager* GameManager = Cast<AGameManager>(OutActorArr[0]);
+
+		if(GameManager->GetLevel() == 6 || GameManager->GetLevel() == 12 || GameManager->GetLevel() == 18)
 		{
-			Local_ActiveAbilitiesArr.Add(AbilityLevelUp);
-		}
-	}
+			for(FAbilityLevelUp AbilityLevelUp : UltimateAbilitiesArr)
+			{
+				if(AbilityLevelUp.bActive)
+				{
+					Local_UltimateAbilitiesArr.Add(AbilityLevelUp);
+				}
+			}
 
-	for(FAbilityLevelUp AbilityLevelUp : PassiveAbilitiesArr)
-	{
-		if(AbilityLevelUp.bActive)
-		{
-			Local_PassiveAbilitiesArr.Add(AbilityLevelUp);
-		}
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Local_ActiveAbilitiesArr.Num[%d]"), Local_ActiveAbilitiesArr.Num());
-	if(Local_ActiveAbilitiesArr.Num() > 0)
-	{
-		int RandomActiveIndex = UKismetMathLibrary::RandomInteger(Local_ActiveAbilitiesArr.Num());
-		FAbilityLevelUp CurrentActiveAbility = Local_ActiveAbilitiesArr[RandomActiveIndex];
-
-		FText ActiveAbilityType = UKismetTextLibrary::Conv_StringToText("ActiveAbility");
-		CreateActiveCard(CurrentActiveAbility, CurrentActiveAbility.AbilityTag.GetByIndex(0), ActiveAbilityType);
-	}
-
-	if(Local_PassiveAbilitiesArr.Num() > 0)
-	{
-		int RandomPassiveIndex =  UKismetMathLibrary::RandomInteger(Local_PassiveAbilitiesArr.Num());
-		FAbilityLevelUp CurrentPassiveAbility = Local_PassiveAbilitiesArr[RandomPassiveIndex];
+			if(Local_UltimateAbilitiesArr.Num() > 0)
+			{
+				int RandomUltimateIndex =  UKismetMathLibrary::RandomInteger(Local_UltimateAbilitiesArr.Num());
+				FAbilityLevelUp CurrentUltimateAbility = Local_UltimateAbilitiesArr[RandomUltimateIndex];
 	
-		FText PassiveAbilityType = UKismetTextLibrary::Conv_StringToText("PassiveAbility");
-		CreateActiveCard(CurrentPassiveAbility, CurrentPassiveAbility.AbilityTag.GetByIndex(0), PassiveAbilityType);
+				FText UltimateAbilityType = UKismetTextLibrary::Conv_StringToText("UltimateAbility");
+				CreateActiveCard(CurrentUltimateAbility, CurrentUltimateAbility.AbilityTag.GetByIndex(0), UltimateAbilityType);
+			}
+		}else
+		{
+			//添加Active下的Local_ActiveAbilitiesArr
+			RandomAndCreateCard(ActiveAbilitiesArr, "ActiveAbility");
+			RandomAndCreateCard(PassiveAbilitiesArr, "PassiveAbility");
+			RandomAndCreateCard(NormalAbilitiesArr, "PassiveAbility");
+		}
 	}
 }
 
@@ -592,7 +581,6 @@ void ARougePlayerController::ProcessLevelUp(FGameplayTag GameplayTag)
 void ARougePlayerController::AssignAbility(FGameplayTag AbilityTag)
 {
 	UE_LOG(LogTemp, Warning, TEXT("AssignAbility().AbilityTag[%s]"), *AbilityTag.ToString());
-	
 	FRougeGameplayTags RougeGameplayTags = FRougeGameplayTags::Get();
 
 	ARougePlayerState* PS = GetPlayerState<ARougePlayerState>();
@@ -600,9 +588,13 @@ void ARougePlayerController::AssignAbility(FGameplayTag AbilityTag)
 
 	URougeAbilitySystemComponent* RougeASC = PS->GetRougeAbilitySystemComponent();
 	check(RougeASC);
-	
+
+	RougeASC->ClearAllAbilities();
 	//UAbilitySystemComponent :: GiveAbility（...）方法将技能注册到AbilitySystemComponent
 	FAbilityLevelUp Current_AbilityLevelUp;
+
+	//绑定按键
+	FGameplayTag InputTag;
 	// 遍历整个主动Ability表
 	for(FAbilityLevelUp& AbilityLevelUp : ActiveAbilitiesArr)
 	{
@@ -610,43 +602,62 @@ void ARougePlayerController::AssignAbility(FGameplayTag AbilityTag)
 		if(AbilityLevelUp.AbilityTag.HasTagExact(AbilityTag))
 		{
 			Current_AbilityLevelUp = AbilityLevelUp;
-	
-			URougeGameplayAbility* AbilityCDO = AbilityLevelUp.GameplayAbility.Ability->GetDefaultObject<URougeGameplayAbility>();
-			FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityLevelUp.Level);
+			URougeGameplayAbility* AbilityCDO = Current_AbilityLevelUp.GameplayAbility.Ability->GetDefaultObject<URougeGameplayAbility>();
+			FGameplayAbilitySpec AbilitySpec = {AbilityCDO, Current_AbilityLevelUp.Level};
 
-			//绑定按键
-			FGameplayTag InputTag = AbilityLevelUp.InputTag.GetByIndex(0);
-			//Log绑定按键
-			//UE_LOG(LogTemp, Warning, TEXT("InputTag[%s]"), *InputTag.ToString());
-			if(InputTag.IsValid())
+			//判断InputTag是否有效
+			if(Current_AbilityLevelUp.InputTag.IsValid())
 			{
-				AbilitySpec.DynamicAbilityTags.AddTag(AbilityLevelUp.InputTag.GetByIndex(0));
+				//获取InputTag
+				InputTag = Current_AbilityLevelUp.InputTag.GetByIndex(0);
+			}
+
+			FString Current_AbilityLevelUpString = *Current_AbilityLevelUp.AbilityTag.ToString();
+
+			int32 DotIndex = 0;
+			Current_AbilityLevelUpString.FindLastChar('.', DotIndex);
+			if (DotIndex != INDEX_NONE)
+			{
+				FString SubString = Current_AbilityLevelUpString.Left(DotIndex); // 截取点号之前的子字符串
+				GameplayAbilitySpecMap.Add(SubString, AbilitySpec);
 			}
 			
-			//赋予GameplayAbility
-			RougeASC->GiveAbility(AbilitySpec);
-
-			mAbilityMap.Add(AbilityTag, AbilityLevelUp);
 			
+			//判断InputTag是否有效
+			if(Current_AbilityLevelUp.InputTag.IsValid())
+			{
+				//获取InputTag
+				InputTag = Current_AbilityLevelUp.InputTag.GetByIndex(0);
+			}
+			GameplayAbilitySpecContainer.Items.Add(AbilitySpec);
+
+			//UE_LOG(LogTemp, Warning, TEXT("GetTagName[%s]"),*AbilityLevelUp.AbilityTag.GetByIndex(0).GetGameplayTagParents().GetByIndex(0).GetTagName().ToString());
+			ActivedAbilityMap.Add(AbilityTag, AbilityLevelUp);
+
 			//设置激活为false，代表已激活过
 			AbilityLevelUp.bActive = false;
 		}
-	}
-	
-	//下一个Level为true
-	for(FAbilityLevelUp& NextLevelAbility : ActiveAbilitiesArr)
-	{
+
 		//Log
 		//FString bActiveStr = LevelAbility.bActive ? "LevelAbility.true" : "LevelAbility.false";
 		//UE_LOG(LogTemp, Warning, TEXT("LevelAbility[%s], LevelAbility.bActive[%s]"),*LevelAbility.AbilityTag.ToString() ,*bActiveStr);
-		//更新下个Level的技能为true && !AbilityLevelUp.NextLevelAbilityTag.HasTagExact(GameplayTags.Ability_Type_Magic_Warrior_Max)
-		if(NextLevelAbility.AbilityTag.HasTagExact(RougeGameplayTags.Ability_Type_Magic_Warrior_Max))
+		//更新下个Level的技能为true
+		if(AbilityLevelUp.AbilityTag.HasTagExact(RougeGameplayTags.Ability_Type_Magic_Warrior_Max))
 		{
 			continue;
-		}else if(NextLevelAbility.AbilityTag.HasTagExact(Current_AbilityLevelUp.NextLevelAbilityTag.GetByIndex(0)))
+		}else if(AbilityLevelUp.AbilityTag.HasTagExact(Current_AbilityLevelUp.NextLevelAbilityTag.GetByIndex(0)))
 		{
-			NextLevelAbility.bActive = true;
+			AbilityLevelUp.bActive = true;
 		}
+	}
+
+	//UE_LOG(LogTemp, Warning, TEXT("GameplayAbilitySpecMap[%d]"),GameplayAbilitySpecMap.Num());
+	for(TPair<FString, FGameplayAbilitySpec>& Ability : GameplayAbilitySpecMap)
+	{
+		//绑定按键
+		Ability.Value.DynamicAbilityTags.AddTag(InputTag);
+		//赋予GameplayAbility
+		RougeASC->GiveAbility(Ability.Value);
 	}
 }
 
@@ -706,12 +717,39 @@ void ARougePlayerController::OnPlayerStateChangedTeam(UObject* TeamAgent, int32 
 	ConditionalBroadcastTeamChanged(this, IntegerToGenericTeamId(OldTeam), IntegerToGenericTeamId(NewTeam));
 }
 
+void ARougePlayerController::RandomAndCreateCard(TArray<FAbilityLevelUp> AbilityLevelUpArr, FString AbilityType)
+{
+	TArray<FAbilityLevelUp> Local_AbilitiesArr;
+
+	for(FAbilityLevelUp AbilityLevelUp : AbilityLevelUpArr)
+	{
+		//当前可升级的Ability是否为True状态，且不为最后一个Ability
+		if(AbilityLevelUp.bActive)
+		{
+			Local_AbilitiesArr.Add(AbilityLevelUp);
+		}
+	}
+	
+	if(Local_AbilitiesArr.Num() > 0)
+	{
+		int RandomActiveIndex = UKismetMathLibrary::RandomInteger(Local_AbilitiesArr.Num());
+		FAbilityLevelUp CurrentActiveAbility = Local_AbilitiesArr[RandomActiveIndex];
+
+		if(CurrentActiveAbility.AbilityTag.IsValid())
+		{
+			FText ActiveAbilityType = UKismetTextLibrary::Conv_StringToText(AbilityType);
+			CreateActiveCard(CurrentActiveAbility, CurrentActiveAbility.AbilityTag.GetByIndex(0), ActiveAbilityType);
+		}
+	}
+}
+
+
 void ARougePlayerController::UpdateHotbar()
 {
-	if(mAbilityMap.Num() > 0)
+	if(ActivedAbilityMap.Num() > 0)
 	{
 		UpdateHudUI(
-			mAbilityMap
+		ActivedAbilityMap
 		);
 	}
 }

@@ -293,14 +293,6 @@ void URougeAbilitySystemComponent::CancelActivationGroupAbilities(ERougeAbilityA
 	CancelAbilitiesByFunc(ShouldCancelFunc, bReplicateCancelAbility);
 }
 
-
-void URougeAbilitySystemComponent::AddAbilityArr(FGameplayTag Tag, FGameplayAbilitySpec GameplayAbilitySpec)
-{
-	AbilityArr.Add(Tag);
-	//激活Ability
-	OnGiveAbility(GameplayAbilitySpec);
-}
-
 void URougeAbilitySystemComponent::TestAbilityArr()
 {
 	for(auto Ability : AbilityArr)
@@ -309,6 +301,31 @@ void URougeAbilitySystemComponent::TestAbilityArr()
 
 		UE_LOG(LogTemp, Warning, TEXT("AbilityStr[%s]"),*AbilityStr);
 	}
+}
+
+void URougeAbilitySystemComponent::ClearAbility(const FGameplayAbilitySpecHandle& Handle)
+{
+	check(AbilityScopeLockCount == 0);	// We should never be calling this from a scoped lock situation.
+
+	if (!IsOwnerActorAuthoritative())
+	{
+		ABILITY_LOG(Error, TEXT("Attempted to call ClearAllAbilities() without authority."));
+
+		return;
+	}
+
+	// Note we aren't marking any old abilities pending kill. This shouldn't matter since they will be garbage collected.
+	ABILITYLIST_SCOPE_LOCK();
+	for (FGameplayAbilitySpec& Spec : ActivatableAbilities.Items)
+	{
+		OnRemoveAbility(Spec);
+	}
+
+	/*ActivatableAbilities.Items.Empty(ActivatableAbilities.Items.Num());
+	ActivatableAbilities.MarkArrayDirty();
+	bIsNetDirty = true;
+
+	CheckForClearedAbilities();*/
 }
 
 // Called when the game starts

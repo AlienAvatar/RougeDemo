@@ -112,6 +112,8 @@ public:
 
 	TArray<FAbilityLevelUp> ActiveAbilitiesArr;
 	TArray<FAbilityLevelUp> PassiveAbilitiesArr;
+	TArray<FAbilityLevelUp> UltimateAbilitiesArr;
+	TArray<FAbilityLevelUp> NormalAbilitiesArr;
 	
 	UPROPERTY(EditDefaultsOnly, Category="DataTable")
 	UDataTable* DT_PassiveAbilities;
@@ -186,7 +188,9 @@ private:
 
 	void AssignAbility(FGameplayTag AbilityTag);
 
-	TMap<FGameplayTag, FAbilityLevelUp> mAbilityMap;
+	//已激活的所有Ability
+	TMap<FGameplayTag, FAbilityLevelUp> ActivedAbilityMap;
+	
 	virtual void UpdateHudUI(TMap<FGameplayTag, FAbilityLevelUp>& AbilityMap) override;
 
 	void BroadcastOnPlayerStateChanged();
@@ -203,4 +207,10 @@ private:
 	UPROPERTY()
 	FOnRougeTeamIndexChangedDelegate OnTeamChangedDelegate;
 
+	FGameplayAbilitySpecContainer GameplayAbilitySpecContainer;
+
+	//随机一个bActived的Ability，并创建Card UI
+	void RandomAndCreateCard(TArray<FAbilityLevelUp> AbilityLevelUpArr, FString AbilityType);
+
+	TMap<FString, FGameplayAbilitySpec> GameplayAbilitySpecMap;
 };

@@ -52,7 +52,14 @@ public:
 	FGameplayTag Ability_Type_Magic_Warrior_AA_R_Level4;
 	
 	FGameplayTag Ability_Type_Magic_Warrior_PA_X1_Level1;
+	FGameplayTag Ability_Type_Magic_Warrior_PA_X1_Level2;
 	FGameplayTag Ability_Type_Magic_Warrior_PA_X2_Level1;
+	FGameplayTag Ability_Type_Magic_Warrior_PA_X2_Level2;
+
+	FGameplayTag Ability_Type_Magic_Warrior_NA_X1_Level1;
+	FGameplayTag Ability_Type_Magic_Warrior_NA_X1_Level2;
+	FGameplayTag Ability_Type_Magic_Warrior_NA_X2_Level1;
+	FGameplayTag Ability_Type_Magic_Warrior_NA_X2_Level2;
 	
 	FGameplayTag Ability_Type_Attr_Heal;
 	

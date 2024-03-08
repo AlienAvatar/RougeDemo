@@ -47,15 +47,20 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(Ability_Type_Magic_Warrior_AA_Shift_Level2, "Ability.Type.Magic.Warrior.ActiveAbility.Shift.Level2", "Active Ability2 Level2");
 	AddTag(Ability_Type_Magic_Warrior_AA_Shift_Level3, "Ability.Type.Magic.Warrior.ActiveAbility.Shift.Level3", "Active Ability2 Level3");
 	AddTag(Ability_Type_Magic_Warrior_AA_Shift_Level4, "Ability.Type.Magic.Warrior.ActiveAbility.Shift.Level4", "Active Ability2 Level4");
-
 	AddTag(Ability_Type_Magic_Warrior_AA_R_Level1, "Ability.Type.Magic.Warrior.ActiveAbility.R.Level1", "Active Ability1 Level1");
 	AddTag(Ability_Type_Magic_Warrior_AA_R_Level2, "Ability.Type.Magic.Warrior.ActiveAbility.R.Level2", "Active Ability2 Level2");
 	AddTag(Ability_Type_Magic_Warrior_AA_R_Level3, "Ability.Type.Magic.Warrior.ActiveAbility.R.Level3", "Active Ability2 Level3");
-	AddTag(Ability_Type_Magic_Warrior_AA_R_Level4, "Ability.Type.Magic.Warrior.ActiveAbility.R.Level4", "Active Ability2 Level4");
 
 	
 	AddTag(Ability_Type_Magic_Warrior_PA_X1_Level1, "Ability.Type.Magic.Warrior.PassiveAbility.X1.Level1", "Passive Ability1 Level1");
-	AddTag(Ability_Type_Magic_Warrior_PA_X2_Level1, "Ability.Type.Magic.Warrior.PassiveAbility.X2.Level1", "Passive Ability2 Level2");
+	AddTag(Ability_Type_Magic_Warrior_PA_X1_Level2, "Ability.Type.Magic.Warrior.PassiveAbility.X1.Level2", "Passive Ability1 Level2");
+	AddTag(Ability_Type_Magic_Warrior_PA_X2_Level1, "Ability.Type.Magic.Warrior.PassiveAbility.X2.Level1", "Passive Ability2 Level1");
+	AddTag(Ability_Type_Magic_Warrior_PA_X2_Level1, "Ability.Type.Magic.Warrior.PassiveAbility.X2.Level2", "Passive Ability2 Level2");
+
+	AddTag(Ability_Type_Magic_Warrior_NA_X1_Level1, "Ability.Type.Magic.Warrior.NormalAbility.X1.Level1", "Normal Ability1 Level1");
+	AddTag(Ability_Type_Magic_Warrior_NA_X1_Level2, "Ability.Type.Magic.Warrior.NormalAbility.X1.Level2", "Normal Ability1 Level2");
+	AddTag(Ability_Type_Magic_Warrior_NA_X2_Level1, "Ability.Type.Magic.Warrior.NormalAbility.X2.Level1", "Normal Ability2 Level1");
+	AddTag(Ability_Type_Magic_Warrior_NA_X2_Level1, "Ability.Type.Magic.Warrior.NormalAbility.X2.Level2", "Normal Ability2 Level2");
 
 	AddTag(InputTag_Move, "InputTag.Move", "Move input.");
 	AddTag(InputTag_Look_Mouse, "InputTag.Look.Mouse", "Look (mouse) input.");

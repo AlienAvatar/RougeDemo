@@ -42,11 +42,17 @@ public:
 	UPROPERTY(EditAnywhere, Category="PlayerHUD")
 	TSubclassOf<ULevelMasterWidget> LevelMasterWidgetClass;
 
-	UPROPERTY(EditAnywhere, Category="PlayerHUD")
+	UPROPERTY(EditAnywhere, Category="Data")
 	UDataTable* DT_ActiveAbilities;
 
-	UPROPERTY(EditAnywhere, Category="PlayerHUD")
+	UPROPERTY(EditAnywhere, Category="Data")
 	UDataTable* DT_PassiveAbilities;
+
+	UPROPERTY(EditAnywhere, Category="Data")
+	UDataTable* DT_UltimateAbilities;
+
+	UPROPERTY(EditAnywhere, Category="Data")
+	UDataTable* DT_NormalAbilities;
 protected:
 
 
