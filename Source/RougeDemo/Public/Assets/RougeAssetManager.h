@@ -36,6 +36,7 @@ protected:
 	//UAssetManager Interface
 	virtual void StartInitialLoading() override;
 
+	//读取资源碎片百分比
 	void UpdateInitialGameContentLoadPercent(float GameContentPercent);
 	static UObject* SynchronousLoadAsset(const FSoftObjectPath& AssetPath);
 	static bool ShouldLogAssetLoads();

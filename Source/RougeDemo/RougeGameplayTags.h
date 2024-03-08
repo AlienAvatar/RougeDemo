@@ -28,6 +28,9 @@ public:
 	FGameplayTag Ability_Type_Action_Hammer;
 	FGameplayTag Ability_Type_Action_Test;
 
+	//攻击分类
+	FGameplayTag Ability_Type_Action_Melee_Light;
+	FGameplayTag Ability_Type_Action_Melee_Heavy;
 
 	FGameplayTag Ability_Type_Magic_Warrior_ActiveAbility;
 	FGameplayTag Ability_Type_Magic_Warrior_PassiveAbility;

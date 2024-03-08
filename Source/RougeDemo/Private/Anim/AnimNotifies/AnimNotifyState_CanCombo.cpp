@@ -1,31 +1,28 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Anim/AnimNotifies/AnimNotifyState_BackSwing.h"
+#include "Anim/AnimNotifies/AnimNotifyState_CanCombo.h"
 
 #include "AbilitySystem/RougeAbilitySystemComponent.h"
+#include "AbilitySystem/RougeGameplayEffectContext.h"
 #include "Character/RougeCharacter.h"
-#include "Core/RougePlayerState.h"
 
-void UAnimNotifyState_BackSwing::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
+void UAnimNotifyState_CanCombo::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
                                              float TotalDuration)
 {
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration);
 
-	/*check(GameplayEffectClass);
-	
-	ARougeCharacter* RougeCharacter = Cast<ARougeCharacter>(MeshComp->GetOwner());
+	/*ARougeCharacter* RougeCharacter = Cast<ARougeCharacter>(MeshComp->GetOwner());
 	check(RougeCharacter);
 	
 	URougeAbilitySystemComponent* RougeASC = RougeCharacter->GetRougeAbilitySystemComponent();
 	check(RougeASC);
-
 	
 	const FGameplayEffectContextHandle GameplayEffectContextHandle = {};
 	RougeASC->BP_ApplyGameplayEffectToSelf(GameplayEffectClass, 0.f, GameplayEffectContextHandle);*/
 	
 }
-void UAnimNotifyState_BackSwing::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+void UAnimNotifyState_CanCombo::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	Super::NotifyEnd(MeshComp, Animation);
 

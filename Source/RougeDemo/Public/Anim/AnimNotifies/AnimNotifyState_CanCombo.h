@@ -4,16 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "AnimNotifyState_BackSwing.generated.h"
+#include "AnimNotifyState_CanCombo.generated.h"
 
-/**
- * 攻击后摇
- * 这段时间也是连击的窗口期
- */
 class UGameplayEffect;
-
+/**
+ * 
+ */
 UCLASS()
-class ROUGEDEMO_API UAnimNotifyState_BackSwing : public UAnimNotifyState
+class ROUGEDEMO_API UAnimNotifyState_CanCombo : public UAnimNotifyState
 {
 	GENERATED_BODY()
 

@@ -29,6 +29,8 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(Ability_Type_Action_Test, "Ability.Type.Action.Testing", "Test");
 	AddTag(Ability_Type_Action_Hammer, "Ability.Type.Action.Hammer", "Hammer Ability");
 	AddTag(Ability_Type_Attr_Heal, "Ability.Type.Attr.Heal", "Health Heal");
+	AddTag(Ability_Type_Action_Melee_Light, "Ability.Type.Action.Melee.Light", "Light Melee");
+	AddTag(Ability_Type_Action_Melee_Heavy, "Ability.Type.Action.Melee.Heavy", "Heavy Melee");
 
 	AddTag(Ability_Type_Magic_Warrior_ActiveAbility, "Ability.Type.Magic.Warrior.ActiveAbility", "Active Ability Group");
 	AddTag(Ability_Type_Magic_Warrior_PassiveAbility, "Ability.Type.Magic.Warrior.PassiveAbility", "Passive Ability Group");
