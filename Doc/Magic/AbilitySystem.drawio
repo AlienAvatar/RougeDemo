@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2024-03-07T03:45:07.035Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="wq5Ln7VGju_miUc_L9f_" version="22.0.3" type="device">
+<mxfile host="Electron" modified="2024-03-12T02:42:55.133Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="goPG-8FDvsNOtbDsfsS5" version="22.0.3" type="device">
   <diagram name="第 1 页" id="naipP5yu4KR9WeXx8-Vf">
-    <mxGraphModel dx="3730" dy="2677" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="3005" dy="2008" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -8,7 +8,7 @@
           <mxGeometry x="450" y="715" width="170" height="60" as="geometry" />
         </mxCell>
         <mxCell id="cDjMF4OTFLS3c3BJaFkV-2" value="UGamplayAbility" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="450" y="540" width="170" height="60" as="geometry" />
+          <mxGeometry x="450" y="380" width="170" height="60" as="geometry" />
         </mxCell>
         <mxCell id="cDjMF4OTFLS3c3BJaFkV-3" value="Extends" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="cDjMF4OTFLS3c3BJaFkV-1" target="cDjMF4OTFLS3c3BJaFkV-2" edge="1">
           <mxGeometry width="160" relative="1" as="geometry">
@@ -17,7 +17,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="cDjMF4OTFLS3c3BJaFkV-4" value="GA_AbilityWithWidget" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="450" y="880" width="170" height="60" as="geometry" />
+          <mxGeometry x="450" y="1060" width="170" height="60" as="geometry" />
         </mxCell>
         <mxCell id="cDjMF4OTFLS3c3BJaFkV-5" value="Extends" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="cDjMF4OTFLS3c3BJaFkV-4" edge="1">
           <mxGeometry width="160" relative="1" as="geometry">
@@ -26,12 +26,12 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="cDjMF4OTFLS3c3BJaFkV-6" value="GA_Hero_Desh" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="450" y="1040" width="170" height="60" as="geometry" />
+          <mxGeometry x="450" y="1220" width="170" height="60" as="geometry" />
         </mxCell>
         <mxCell id="cDjMF4OTFLS3c3BJaFkV-7" value="Extends" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="cDjMF4OTFLS3c3BJaFkV-6" edge="1">
           <mxGeometry width="160" relative="1" as="geometry">
-            <mxPoint x="535" y="1045" as="sourcePoint" />
-            <mxPoint x="535" y="940" as="targetPoint" />
+            <mxPoint x="535" y="1225" as="sourcePoint" />
+            <mxPoint x="535" y="1120" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="GC5rKUr2KKgXfRCcTe5S-1" value="从UGameplayAbility类扩展而来，可提供额外的实用程序和与Rouge框架连接的接口" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
@@ -53,22 +53,22 @@
           <mxGeometry x="1654" y="10" width="528" height="362" as="geometry" />
         </mxCell>
         <mxCell id="C4zlomJ-OiE5PHFrh7Xk-1" value="URougeAbilitySourceInterface" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="-310" y="520" width="360" height="60" as="geometry" />
+          <mxGeometry x="-680" y="510" width="360" height="60" as="geometry" />
         </mxCell>
         <mxCell id="C4zlomJ-OiE5PHFrh7Xk-2" value="UInterface" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="-310" y="360" width="360" height="60" as="geometry" />
+          <mxGeometry x="-680" y="350" width="360" height="60" as="geometry" />
         </mxCell>
         <mxCell id="C4zlomJ-OiE5PHFrh7Xk-3" value="Extends" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="C4zlomJ-OiE5PHFrh7Xk-1" target="C4zlomJ-OiE5PHFrh7Xk-2" edge="1">
           <mxGeometry width="160" relative="1" as="geometry">
-            <mxPoint x="-200" y="500" as="sourcePoint" />
-            <mxPoint x="-40" y="500" as="targetPoint" />
+            <mxPoint x="-570" y="490" as="sourcePoint" />
+            <mxPoint x="-410" y="490" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="C4zlomJ-OiE5PHFrh7Xk-4" value="计算衰减" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="-400" y="540" width="60" height="30" as="geometry" />
+          <mxGeometry x="-770" y="530" width="60" height="30" as="geometry" />
         </mxCell>
         <mxCell id="C4zlomJ-OiE5PHFrh7Xk-5" value="URougeAbilitySystemComponent" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="10" y="710" width="260" height="60" as="geometry" />
+          <mxGeometry x="30" y="715" width="260" height="60" as="geometry" />
         </mxCell>
         <mxCell id="C4zlomJ-OiE5PHFrh7Xk-6" value="" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="C4zlomJ-OiE5PHFrh7Xk-5" target="cDjMF4OTFLS3c3BJaFkV-1" edge="1">
           <mxGeometry width="160" relative="1" as="geometry">
@@ -124,10 +124,10 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="vhLqi8wvM6naZy6BySO_-6" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="C4zlomJ-OiE5PHFrh7Xk-7">
+        <mxCell id="vhLqi8wvM6naZy6BySO_-6" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="C4zlomJ-OiE5PHFrh7Xk-7" vertex="1">
           <mxGeometry x="105" y="640" width="10" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="vhLqi8wvM6naZy6BySO_-7" value="ExecuteLevelUp()" style="html=1;align=left;spacingLeft=2;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;curved=0;rounded=0;" edge="1" target="vhLqi8wvM6naZy6BySO_-6" parent="C4zlomJ-OiE5PHFrh7Xk-7" source="C4zlomJ-OiE5PHFrh7Xk-23">
+        <mxCell id="vhLqi8wvM6naZy6BySO_-7" value="ExecuteLevelUp()" style="html=1;align=left;spacingLeft=2;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;curved=0;rounded=0;" parent="C4zlomJ-OiE5PHFrh7Xk-7" source="C4zlomJ-OiE5PHFrh7Xk-23" target="vhLqi8wvM6naZy6BySO_-6" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="110" y="620" as="sourcePoint" />
             <Array as="points">
@@ -207,25 +207,25 @@
         <mxCell id="C4zlomJ-OiE5PHFrh7Xk-37" value="绑定按键" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="110" y="2210" width="70" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="vhLqi8wvM6naZy6BySO_-1" value="&lt;h1&gt;Ability Level 流程&lt;/h1&gt;&lt;p&gt;1. 初始化表中数据，在HeroComponent初始化时，会把DataTable中的数据填充到Controller中&lt;/p&gt;&lt;p&gt;2.用户输入，积攒Experience，根据一个GameManager Actor来管理全局的Level，当经验条满时，创建LevelMasterUI，触发ExecuteLevelUp&lt;/p&gt;&lt;p&gt;3. 在ExecuteLevelUp中，选择bActive为true的Ability，并随机一个Ability创建Card&lt;/p&gt;&lt;p&gt;4.为Card绑定选择委托，当Card选择后，关闭LevelMasterUI，通过ASC激活GameplayAbility并添加到Map中&lt;/p&gt;&lt;p&gt;5. Map来重新初始化PlayerOverWidgetUI&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+        <mxCell id="vhLqi8wvM6naZy6BySO_-1" value="&lt;h1&gt;Ability Level 流程&lt;/h1&gt;&lt;p&gt;1. 初始化表中数据，在HeroComponent初始化时，会把DataTable中的数据填充到Controller中&lt;/p&gt;&lt;p&gt;2.用户输入，积攒Experience，根据一个GameManager Actor来管理全局的Level，当经验条满时，创建LevelMasterUI，触发ExecuteLevelUp&lt;/p&gt;&lt;p&gt;3. 在ExecuteLevelUp中，选择bActive为true的Ability，并随机一个Ability创建Card&lt;/p&gt;&lt;p&gt;4.为Card绑定选择委托，当Card选择后，关闭LevelMasterUI，通过ASC激活GameplayAbility并添加到Map中&lt;/p&gt;&lt;p&gt;5. Map来重新初始化PlayerOverWidgetUI&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="-480" y="1070" width="240" height="400" as="geometry" />
         </mxCell>
-        <mxCell id="vhLqi8wvM6naZy6BySO_-2" value="添加XP" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="vhLqi8wvM6naZy6BySO_-2" value="添加XP" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="190" y="1520" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="vhLqi8wvM6naZy6BySO_-3" value="当XP满时，遍历所有Controller进行LevelUp" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="vhLqi8wvM6naZy6BySO_-3" value="当XP满时，遍历所有Controller进行LevelUp" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="90" y="1585" width="260" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="vhLqi8wvM6naZy6BySO_-4" value="创建Level Up UI" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="vhLqi8wvM6naZy6BySO_-4" value="创建Level Up UI" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="130" y="1770" width="110" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="vhLqi8wvM6naZy6BySO_-5" value="Bind Close ProcessLevelUp()" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;" edge="1" parent="1">
+        <mxCell id="vhLqi8wvM6naZy6BySO_-5" value="Bind Close ProcessLevelUp()" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;" parent="1" edge="1">
           <mxGeometry width="160" relative="1" as="geometry">
             <mxPoint x="835" y="2168" as="sourcePoint" />
             <mxPoint x="5" y="2168" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="vhLqi8wvM6naZy6BySO_-8" value="CreateActiveCard() 创建Ability Card" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;" edge="1" parent="1" source="vhLqi8wvM6naZy6BySO_-6" target="C4zlomJ-OiE5PHFrh7Xk-26">
+        <mxCell id="vhLqi8wvM6naZy6BySO_-8" value="CreateActiveCard() 创建Ability Card" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;" parent="1" source="vhLqi8wvM6naZy6BySO_-6" target="C4zlomJ-OiE5PHFrh7Xk-26" edge="1">
           <mxGeometry x="-0.0003" width="80" relative="1" as="geometry">
             <mxPoint x="10" y="2100" as="sourcePoint" />
             <mxPoint x="840" y="2100" as="targetPoint" />
@@ -235,20 +235,47 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="vhLqi8wvM6naZy6BySO_-9" value="URougeGameplayAbility" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="1">
+        <mxCell id="vhLqi8wvM6naZy6BySO_-9" value="URougeGameplayAbility" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="1" vertex="1">
           <mxGeometry x="340" y="2200" width="220" height="480" as="geometry" />
         </mxCell>
-        <mxCell id="vhLqi8wvM6naZy6BySO_-10" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="vhLqi8wvM6naZy6BySO_-9">
+        <mxCell id="vhLqi8wvM6naZy6BySO_-10" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="vhLqi8wvM6naZy6BySO_-9" vertex="1">
           <mxGeometry x="105" y="120" width="10" height="200" as="geometry" />
         </mxCell>
-        <mxCell id="vhLqi8wvM6naZy6BySO_-12" value="GiveAbility()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;" edge="1" parent="1">
+        <mxCell id="vhLqi8wvM6naZy6BySO_-12" value="GiveAbility()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;" parent="1" edge="1">
           <mxGeometry width="80" relative="1" as="geometry">
             <mxPoint x="5" y="2367" as="sourcePoint" />
             <mxPoint x="445" y="2367" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="vhLqi8wvM6naZy6BySO_-13" value="激活当前GameplayAbility" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="vhLqi8wvM6naZy6BySO_-13" value="激活当前GameplayAbility" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="110" y="2318" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="D5K91npSn9kKQk8MZ88G-1" value="ARougePlayerState" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="550" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="D5K91npSn9kKQk8MZ88G-2" value="" style="endArrow=diamondThin;endFill=1;endSize=24;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="C4zlomJ-OiE5PHFrh7Xk-5" target="D5K91npSn9kKQk8MZ88G-1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="210" y="670" as="sourcePoint" />
+            <mxPoint x="370" y="670" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="D5K91npSn9kKQk8MZ88G-3" value="ARougeCharacter" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="-170" y="555" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="D5K91npSn9kKQk8MZ88G-5" value="" style="endArrow=open;endFill=1;endSize=12;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="D5K91npSn9kKQk8MZ88G-3" target="D5K91npSn9kKQk8MZ88G-1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="-80" y="583" as="sourcePoint" />
+            <mxPoint x="80" y="583" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="D5K91npSn9kKQk8MZ88G-6" value="PlayerState" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="75" y="380" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="D5K91npSn9kKQk8MZ88G-7" value="Extends" style="endArrow=block;endSize=16;endFill=0;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="D5K91npSn9kKQk8MZ88G-1" target="D5K91npSn9kKQk8MZ88G-6">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="-360" y="680" as="sourcePoint" />
+            <mxPoint x="-200" y="680" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>

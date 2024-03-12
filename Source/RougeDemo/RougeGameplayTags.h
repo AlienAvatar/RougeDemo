@@ -73,6 +73,10 @@ public:
 	FGameplayTag InputTag_AutoRun;
 	FGameplayTag InputTag_Sprint;
 	FGameplayTag InputTag_Test;
+	FGameplayTag InputTag_Melee_Light;
+	FGameplayTag InputTag_Melee_Light_1;
+	FGameplayTag InputTag_Melee_Heavy;
+	FGameplayTag InputTag_Melee_Combo;
 
 	FGameplayTag InputTag_Ability_Q;
 	FGameplayTag InputTag_Ability_E;
