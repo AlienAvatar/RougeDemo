@@ -30,6 +30,14 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(Ability_Type_Action_Hammer, "Ability.Type.Action.Hammer", "Hammer Ability");
 	AddTag(Ability_Type_Attr_Heal, "Ability.Type.Attr.Heal", "Health Heal");
 	AddTag(Ability_Type_Action_Melee_Light, "Ability.Type.Action.Melee.Light", "Light Melee");
+	AddTag(Ability_Type_Action_Melee_State_Combo1, "Ability.Type.Action.Melee.State.Combo1", "Combo1");
+	AddTag(Ability_Type_Action_Melee_State_Combo2, "Ability.Type.Action.Melee.State.Combo2", "Combo2");
+	AddTag(Ability_Type_Action_Melee_State_Combo3, "Ability.Type.Action.Melee.State.Combo3", "Combo3");
+	AddTag(Ability_Type_Action_Melee_State_Next, "Ability.Type.Action.Melee.State.Next", "Next");
+	AddTag(Ability_Type_Action_Melee_Ready_Combo1, "Ability.Type.Action.Melee.Ready.Combo1", "Combo1");
+	AddTag(Ability_Type_Action_Melee_Ready_Combo2, "Ability.Type.Action.Melee.Ready.Combo2", "Combo2");
+	AddTag(Ability_Type_Action_Melee_Ready_Combo3, "Ability.Type.Action.Melee.Ready.Combo3", "Combo3");
+	
 	AddTag(Ability_Type_Action_Melee_Heavy, "Ability.Type.Action.Melee.Heavy", "Heavy Melee");
 
 	AddTag(Ability_Type_Magic_Warrior_ActiveAbility, "Ability.Type.Magic.Warrior.ActiveAbility", "Active Ability Group");
@@ -72,7 +80,6 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(InputTag_Sprint, "InputTag.Sprint", "Sprint input.");
 	AddTag(InputTag_Test, "InputTag.Test", "Test input.");
 	AddTag(InputTag_Melee_Light, "InputTag.Melee.Light", "Light Melee");
-	AddTag(InputTag_Melee_Light_1, "InputTag.Melee.Light.1", "Light Melee1");
 	AddTag(InputTag_Melee_Heavy, "InputTag.Melee.Heavy", "Heavy Melee");
 	AddTag(InputTag_Melee_Combo, "InputTag.Melee.Combo", "Combo Melee");
 	
