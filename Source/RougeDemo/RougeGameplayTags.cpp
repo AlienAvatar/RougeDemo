@@ -29,17 +29,27 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(Ability_Type_Action_Test, "Ability.Type.Action.Testing", "Test");
 	AddTag(Ability_Type_Action_Hammer, "Ability.Type.Action.Hammer", "Hammer Ability");
 	AddTag(Ability_Type_Attr_Heal, "Ability.Type.Attr.Heal", "Health Heal");
-	AddTag(Ability_Type_Action_Melee_Light, "Ability.Type.Action.Melee.Light", "Light Melee");
-	AddTag(Ability_Type_Action_Melee_State_Combo1, "Ability.Type.Action.Melee.State.Combo1", "Combo1");
-	AddTag(Ability_Type_Action_Melee_State_Combo2, "Ability.Type.Action.Melee.State.Combo2", "Combo2");
-	AddTag(Ability_Type_Action_Melee_State_Combo3, "Ability.Type.Action.Melee.State.Combo3", "Combo3");
-	AddTag(Ability_Type_Action_Melee_State_Next, "Ability.Type.Action.Melee.State.Next", "Next");
-	AddTag(Ability_Type_Action_Melee_Ready_Combo1, "Ability.Type.Action.Melee.Ready.Combo1", "Combo1");
-	AddTag(Ability_Type_Action_Melee_Ready_Combo2, "Ability.Type.Action.Melee.Ready.Combo2", "Combo2");
-	AddTag(Ability_Type_Action_Melee_Ready_Combo3, "Ability.Type.Action.Melee.Ready.Combo3", "Combo3");
 	
-	AddTag(Ability_Type_Action_Melee_Heavy, "Ability.Type.Action.Melee.Heavy", "Heavy Melee");
+	AddTag(Ability_Type_Action_Melee_Light, "Ability.Type.Action.Melee.Light", "Light Melee");
+	AddTag(Ability_Type_Action_Melee_Light_State_Combo1, "Ability.Type.Action.Melee.Light.State.Combo1", "Light Combo1");
+	AddTag(Ability_Type_Action_Melee_Light_State_Combo2, "Ability.Type.Action.Melee.Light.State.Combo2", "Light Combo2");
+	AddTag(Ability_Type_Action_Melee_Light_State_Combo3, "Ability.Type.Action.Melee.Light.State.Combo3", "Light Combo3");
+	AddTag(Ability_Type_Action_Melee_Light_State_Next, "Ability.Type.Action.Melee.Light.State.Next", "Light Next");
+	AddTag(Ability_Type_Action_Melee_Heavy_State_Next, "Ability.Type.Action.Melee.Heavy.State.Next", "Heavy Next");
+	AddTag(Ability_Type_Action_Melee_Light_Ready_Combo1, "Ability.Type.Action.Melee.Light.Ready.Combo1", "Light Ready Combo1");
+	AddTag(Ability_Type_Action_Melee_Light_Ready_Combo2, "Ability.Type.Action.Melee.Light.Ready.Combo2", "Light Ready Combo2");
+	AddTag(Ability_Type_Action_Melee_Light_Ready_Combo3, "Ability.Type.Action.Melee.Light.Ready.Combo3", "Light Ready Combo3");
 
+	AddTag(Ability_Type_Action_Melee_Heavy, "Ability.Type.Action.Melee.Heavy", "Heavy Melee");
+	AddTag(Ability_Type_Action_Melee_Heavy_State_Combo1, "Ability.Type.Action.Melee.Heavy.State.Combo1", "Heavy Combo1");
+	AddTag(Ability_Type_Action_Melee_Heavy_State_Combo2, "Ability.Type.Action.Melee.Heavy.State.Combo2", "Heavy Combo2");
+	AddTag(Ability_Type_Action_Melee_Heavy_State_Combo3, "Ability.Type.Action.Melee.Heavy.State.Combo3", "Heavy Combo3");
+	AddTag(Ability_Type_Action_Melee_Heavy_State_Next, "Ability.Type.Action.Melee.Heavy.State.Next", "Heavy Next");
+	AddTag(Ability_Type_Action_Melee_Heavy_State_Next, "Ability.Type.Action.Melee.Heavy.State.Next", "Heavy Next");
+	AddTag(Ability_Type_Action_Melee_Heavy_Ready_Combo1, "Ability.Type.Action.Melee.Heavy.Ready.Combo1", "Heavy Ready Combo1");
+	AddTag(Ability_Type_Action_Melee_Heavy_Ready_Combo2, "Ability.Type.Action.Melee.Heavy.Ready.Combo2", "Heavy Ready Combo2");
+	AddTag(Ability_Type_Action_Melee_Heavy_Ready_Combo3, "Ability.Type.Action.Melee.Heavy.Ready.Combo3", "Heavy Ready Combo3");
+	
 	AddTag(Ability_Type_Magic_Warrior_ActiveAbility, "Ability.Type.Magic.Warrior.ActiveAbility", "Active Ability Group");
 	AddTag(Ability_Type_Magic_Warrior_PassiveAbility, "Ability.Type.Magic.Warrior.PassiveAbility", "Passive Ability Group");
 	AddTag(Ability_Type_Magic_Warrior_NormalAbility, "Ability.Type.Magic.Warrior.NormalAbility", "Normal Ability Group");

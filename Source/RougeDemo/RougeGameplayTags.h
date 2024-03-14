@@ -30,14 +30,22 @@ public:
 
 	//攻击分类
 	FGameplayTag Ability_Type_Action_Melee_Light;
-	FGameplayTag Ability_Type_Action_Melee_State_Combo1;
-	FGameplayTag Ability_Type_Action_Melee_State_Combo2;
-	FGameplayTag Ability_Type_Action_Melee_State_Combo3;
-	FGameplayTag Ability_Type_Action_Melee_State_Next;
-	FGameplayTag Ability_Type_Action_Melee_Ready_Combo1;
-	FGameplayTag Ability_Type_Action_Melee_Ready_Combo2;
-	FGameplayTag Ability_Type_Action_Melee_Ready_Combo3;
+	FGameplayTag Ability_Type_Action_Melee_Light_State_Combo1;
+	FGameplayTag Ability_Type_Action_Melee_Light_State_Combo2;
+	FGameplayTag Ability_Type_Action_Melee_Light_State_Combo3;
+	FGameplayTag Ability_Type_Action_Melee_Light_State_Next;
+	FGameplayTag Ability_Type_Action_Melee_Light_Ready_Combo1;
+	FGameplayTag Ability_Type_Action_Melee_Light_Ready_Combo2;
+	FGameplayTag Ability_Type_Action_Melee_Light_Ready_Combo3;
+	
 	FGameplayTag Ability_Type_Action_Melee_Heavy;
+	FGameplayTag Ability_Type_Action_Melee_Heavy_State_Combo1;
+	FGameplayTag Ability_Type_Action_Melee_Heavy_State_Combo2;
+	FGameplayTag Ability_Type_Action_Melee_Heavy_State_Combo3;
+	FGameplayTag Ability_Type_Action_Melee_Heavy_State_Next;
+	FGameplayTag Ability_Type_Action_Melee_Heavy_Ready_Combo1;
+	FGameplayTag Ability_Type_Action_Melee_Heavy_Ready_Combo2;
+	FGameplayTag Ability_Type_Action_Melee_Heavy_Ready_Combo3;
 
 	FGameplayTag Ability_Type_Magic_Warrior_ActiveAbility;
 	FGameplayTag Ability_Type_Magic_Warrior_PassiveAbility;
