@@ -89,7 +89,8 @@ public:
 	FGameplayTag InputTag_Sprint;
 	FGameplayTag InputTag_Test;
 	FGameplayTag InputTag_Melee_Light;
-	FGameplayTag InputTag_Melee_Heavy;
+	FGameplayTag InputTag_Melee_Heavy_Combo;
+	FGameplayTag InputTag_Melee_Heavy_Hold;
 	FGameplayTag InputTag_Melee_Combo;
 
 	FGameplayTag InputTag_Ability_Q;

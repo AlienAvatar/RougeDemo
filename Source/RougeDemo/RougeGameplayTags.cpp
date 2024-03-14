@@ -90,7 +90,8 @@ void FRougeGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	AddTag(InputTag_Sprint, "InputTag.Sprint", "Sprint input.");
 	AddTag(InputTag_Test, "InputTag.Test", "Test input.");
 	AddTag(InputTag_Melee_Light, "InputTag.Melee.Light", "Light Melee");
-	AddTag(InputTag_Melee_Heavy, "InputTag.Melee.Heavy", "Heavy Melee");
+	AddTag(InputTag_Melee_Heavy_Combo, "InputTag.Melee.Heavy.Combo", "Heavy Melee Combo");
+	AddTag(InputTag_Melee_Heavy_Hold, "InputTag.Melee.Heavy.Hold", "Heavy Melee Hold");
 	AddTag(InputTag_Melee_Combo, "InputTag.Melee.Combo", "Combo Melee");
 	
 	AddTag(InputTag_Ability_Q, "InputTag.Ability.Q", "Ability1 input.");
