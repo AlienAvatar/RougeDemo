@@ -220,10 +220,6 @@ protected:
 
 	bool bIsSprint = false;
 
-	float MoveF;
-
-	float MoveR;
-
 	FRotator DeltaDirectRotation;
 
 	float ZYaw;
@@ -351,4 +347,9 @@ public:
 	virtual void RestoreHealth(float Health) override;
 
 	USpringArmComponent* GetCameraBoom() { return CameraBoom; }
+
+	float MoveF;
+
+	float MoveR;
+
 };

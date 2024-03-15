@@ -15,6 +15,7 @@
 #include "Core/RougePlayerController.h"
 #include "Input/RougeInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Character/RougeCharacter.h"
 #include "HUD/RougeHUD.h"
 #include "Kismet/DataTableFunctionLibrary.h"
 
@@ -417,6 +418,13 @@ void URougeHeroComponent::Input_Move(const FInputActionValue& InputActionValue)
 		{
 			const FVector MovementDirection = MovementRotation.RotateVector(FVector::ForwardVector);
 			Pawn->AddMovementInput(MovementDirection, Value.Y);
+		}
+
+		ARougeCharacter* Character = Cast<ARougeCharacter>(Pawn);
+		if(Character)
+		{
+			Character->MoveF = Value.X;
+			Character->MoveR = Value.Y;
 		}
 	}
 }
