@@ -42,10 +42,10 @@ void URougeAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	//每帧进行更新
 	UpdateCharacterInfo(DeltaSeconds);
-	
+	UpdateAimingValues(DeltaSeconds);
 	
 	/*UpdateLayerValues(DeltaSeconds);
-	UpdateAimingValues(DeltaSeconds);
+	
 	
 	switch (MovementState)
 	{
@@ -125,11 +125,13 @@ void URougeAnimInstance::UpdateCharacterInfo(float DeltaTime)
 	RotationMode = RougeDemoCharacter->GetRotationMode();
 	Stance = RougeDemoCharacter->GetStance();
 	OverlayState = RougeDemoCharacter->GetOverlayState();
+
+	
 }
 
 void URougeAnimInstance::UpdateAimingValues(float DeltaTime)
 {
-	//平滑处理角色旋转，即使镜头旋转速度比当前Actor Rotation快，也能平滑处理，不受当前角色的旋转变化影响
+	/*//平滑处理角色旋转，即使镜头旋转速度比当前Actor Rotation快，也能平滑处理，不受当前角色的旋转变化影响
 	SmoothedAimingRotation = UKismetMathLibrary::RInterpTo(SmoothedAimingRotation,AimingRotation,DeltaTime,SmoothedAimingRotationInterpSpeed);
 
 	//计算AimingRotation和ActorRotation的差值，包括平滑差值
@@ -184,7 +186,15 @@ void URougeAnimInstance::UpdateAimingValues(float DeltaTime)
 		180.f,
 		0.f,
 		1.f
-	);
+	);*/
+
+	/*StandingRate = UKismetMathLibrary::MapRangeClamped(
+	   Speed,
+	   0.f,
+	   600.f,
+	   0.5f,
+	   1.f
+   );*/
 }
 
 void URougeAnimInstance::UpdateRotationValues()
