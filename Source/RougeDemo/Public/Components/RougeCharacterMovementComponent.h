@@ -6,6 +6,24 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "RougeCharacterMovementComponent.generated.h"
 
+USTRUCT(BlueprintType)
+struct FRougeCharacterGroundInfo
+{
+	GENERATED_BODY()
+
+	FRougeCharacterGroundInfo()
+		: LastUpdateFrame(0)
+		, GroundDistance(0.0f)
+	{}
+
+	uint64 LastUpdateFrame;
+
+	UPROPERTY(BlueprintReadOnly)
+	FHitResult GroundHitResult;
+
+	UPROPERTY(BlueprintReadOnly)
+	float GroundDistance;
+};
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ROUGEDEMO_API URougeCharacterMovementComponent : public UCharacterMovementComponent
@@ -14,12 +32,16 @@ class ROUGEDEMO_API URougeCharacterMovementComponent : public UCharacterMovement
 
 public:
 	// Sets default values for this component's properties
-	URougeCharacterMovementComponent();
+	URougeCharacterMovementComponent(const FObjectInitializer& ObjectInitializer);
 
+	UFUNCTION(BlueprintCallable, Category = "Rouge|CharacterMovement")
+	const FRougeCharacterGroundInfo& GetGroundInfo();
+	
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	virtual void InitializeComponent() override;
 
+	// Cached ground info for the character.  Do not access this directly!  It's only updated when accessed via GetGroundInfo().
+	FRougeCharacterGroundInfo CachedGroundInfo;
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,

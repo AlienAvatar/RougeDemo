@@ -2,28 +2,73 @@
 
 
 #include "Components/RougeCharacterMovementComponent.h"
-
+#include "Components/CapsuleComponent.h"
+#include "CharacterMovementComponentAsync.h"
+#include "GameFramework/Character.h"
 #include "AbilitySystem/RougeAbilitySystemComponent.h"
 
-
-// Sets default values for this component's properties
-URougeCharacterMovementComponent::URougeCharacterMovementComponent()
+namespace RougeCharacter
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	static float GroundTraceDistance = 100000.0f;
+	FAutoConsoleVariableRef CVar_GroundTraceDistance(TEXT("RougeCharacter.GroundTraceDistance"), GroundTraceDistance, TEXT("Distance to trace down when generating ground information."), ECVF_Cheat);
+};
 
-	// ...
+
+URougeCharacterMovementComponent::URougeCharacterMovementComponent(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
 }
 
-
-// Called when the game starts
-void URougeCharacterMovementComponent::BeginPlay()
+const FRougeCharacterGroundInfo& URougeCharacterMovementComponent::GetGroundInfo()
 {
-	Super::BeginPlay();
+	if (!CharacterOwner || (GFrameCounter == CachedGroundInfo.LastUpdateFrame))
+	{
+		return CachedGroundInfo;
+	}
 
-	// ...
-	
+	if (MovementMode == MOVE_Walking)
+	{
+		CachedGroundInfo.GroundHitResult = CurrentFloor.HitResult;
+		CachedGroundInfo.GroundDistance = 0.0f;
+	}
+	else
+	{
+		const UCapsuleComponent* CapsuleComp = CharacterOwner->GetCapsuleComponent();
+		check(CapsuleComp);
+
+		const float CapsuleHalfHeight = CapsuleComp->GetUnscaledCapsuleHalfHeight();
+		const ECollisionChannel CollisionChannel = (UpdatedComponent ? UpdatedComponent->GetCollisionObjectType() : ECC_Pawn);
+		const FVector TraceStart(GetActorLocation());
+		const FVector TraceEnd(TraceStart.X, TraceStart.Y, (TraceStart.Z - RougeCharacter::GroundTraceDistance - CapsuleHalfHeight));
+
+		FCollisionQueryParams QueryParams(SCENE_QUERY_STAT(RougeCharacterMovementComponent_GetGroundInfo), false, CharacterOwner);
+		FCollisionResponseParams ResponseParam;
+		InitCollisionParams(QueryParams, ResponseParam);
+
+		FHitResult HitResult;
+		GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, CollisionChannel, QueryParams, ResponseParam);
+
+		CachedGroundInfo.GroundHitResult = HitResult;
+		CachedGroundInfo.GroundDistance = RougeCharacter::GroundTraceDistance;
+
+		if (MovementMode == MOVE_NavWalking)
+		{
+			CachedGroundInfo.GroundDistance = 0.0f;
+		}
+		else if (HitResult.bBlockingHit)
+		{
+			CachedGroundInfo.GroundDistance = FMath::Max((HitResult.Distance - CapsuleHalfHeight), 0.0f);
+		}
+	}
+
+	CachedGroundInfo.LastUpdateFrame = GFrameCounter;
+
+	return CachedGroundInfo;
+}
+
+void URougeCharacterMovementComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
 }
 
 
