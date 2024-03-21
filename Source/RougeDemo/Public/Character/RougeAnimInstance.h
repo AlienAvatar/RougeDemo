@@ -83,6 +83,9 @@ private:
 	FVector2D LeanAmount;
 
 	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
+	float Lean;
+	
+	UPROPERTY(BlueprintReadOnly, Category=Character, meta=(AllowPrivateAccess = "true"))
 	bool bShouldMove;
 	
 	FRotator AimingRotation;

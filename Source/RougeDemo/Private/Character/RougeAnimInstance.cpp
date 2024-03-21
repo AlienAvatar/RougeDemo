@@ -33,17 +33,25 @@ void URougeAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	}
 
-	/*CharacterRotationLastFrame = CharacterRotation;
+	CharacterRotationLastFrame = CharacterRotation;
 	CharacterRotation = RougeDemoCharacter->GetActorRotation();
 	const FRotator Delta = UKismetMathLibrary::NormalizedDeltaRotator(CharacterRotation,CharacterRotationLastFrame);
 	const float Target = Delta.Yaw / DeltaSeconds;
 	const float Interp = FMath::FInterpTo(Lean,Target,DeltaSeconds,6.f);
-	Lean = FMath::Clamp(Interp,-90.f,90.f);*/
+	Lean = FMath::Clamp(Interp,-90.f,90.f);
 
+	/*FRotator ControlRotation = RougeDemoCharacter->GetControlRotation();
+	FRotator ActorRotation = RougeDemoCharacter->GetActorRotation();
+	const FRotator Delta = UKismetMathLibrary::NormalizedDeltaRotator(ControlRotation,ActorRotation);
+	const float Target = Delta.Yaw / DeltaSeconds;
+	const float Interp = FMath::FInterpTo(Lean, Target,DeltaSeconds,6.f);
+	Lean = FMath::Clamp(Interp,-90.f,90.f);*/
+	
 	//每帧进行更新
 	UpdateCharacterInfo(DeltaSeconds);
 	UpdateAimingValues(DeltaSeconds);
 	
+	UpdateMovementValues(DeltaSeconds);
 	/*UpdateLayerValues(DeltaSeconds);
 	
 	
