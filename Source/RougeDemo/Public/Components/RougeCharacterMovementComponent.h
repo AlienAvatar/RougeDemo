@@ -34,17 +34,25 @@ public:
 	// Sets default values for this component's properties
 	URougeCharacterMovementComponent(const FObjectInitializer& ObjectInitializer);
 
+	//模拟移动
+	virtual void SimulateMovement(float DeltaTime) override;
+	
 	UFUNCTION(BlueprintCallable, Category = "Rouge|CharacterMovement")
 	const FRougeCharacterGroundInfo& GetGroundInfo();
+
+	void SetReplicatedAcceleration(const FVector& InAcceleration);
+
+	//~UMovementComponent interface
+	virtual FRotator GetDeltaRotation(float DeltaTime) const override;
+	virtual float GetMaxSpeed() const override;
+	//~End of UMovementComponent interface
 	
 protected:
 	virtual void InitializeComponent() override;
 
 	// Cached ground info for the character.  Do not access this directly!  It's only updated when accessed via GetGroundInfo().
 	FRougeCharacterGroundInfo CachedGroundInfo;
-public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
 
+	UPROPERTY(Transient)
+	bool bHasReplicatedAcceleration = false;
 };

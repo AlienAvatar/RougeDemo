@@ -2,10 +2,16 @@
 
 
 #include "Components/RougeCharacterMovementComponent.h"
+
+#include "AbilitySystemGlobals.h"
 #include "Components/CapsuleComponent.h"
 #include "CharacterMovementComponentAsync.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystem/RougeAbilitySystemComponent.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(RougeCharacterMovementComponent)
+
+UE_DEFINE_GAMEPLAY_TAG(TAG_Gameplay_MovementStopped, "Gameplay.MovementStopped");
 
 namespace RougeCharacter
 {
@@ -17,6 +23,21 @@ namespace RougeCharacter
 URougeCharacterMovementComponent::URougeCharacterMovementComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+}
+
+void URougeCharacterMovementComponent::SimulateMovement(float DeltaTime)
+{
+	if (bHasReplicatedAcceleration)
+	{
+		// Preserve our replicated acceleration
+		const FVector OriginalAcceleration = Acceleration;
+		Super::SimulateMovement(DeltaTime);
+		Acceleration = OriginalAcceleration;
+	}
+	else
+	{
+		Super::SimulateMovement(DeltaTime);
+	}
 }
 
 const FRougeCharacterGroundInfo& URougeCharacterMovementComponent::GetGroundInfo()
@@ -66,19 +87,41 @@ const FRougeCharacterGroundInfo& URougeCharacterMovementComponent::GetGroundInfo
 	return CachedGroundInfo;
 }
 
+void URougeCharacterMovementComponent::SetReplicatedAcceleration(const FVector& InAcceleration)
+{
+	bHasReplicatedAcceleration = true;
+	Acceleration = InAcceleration;
+}
+
+FRotator URougeCharacterMovementComponent::GetDeltaRotation(float DeltaTime) const
+{
+	if (UAbilitySystemComponent* ASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwner()))
+	{
+		if (ASC->HasMatchingGameplayTag(TAG_Gameplay_MovementStopped))
+		{
+			return FRotator(0,0,0);
+		}
+	}
+
+	return Super::GetDeltaRotation(DeltaTime);
+}
+
+float URougeCharacterMovementComponent::GetMaxSpeed() const
+{
+	if (UAbilitySystemComponent* ASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwner()))
+	{
+		if (ASC->HasMatchingGameplayTag(TAG_Gameplay_MovementStopped))
+		{
+			return 0;
+		}
+	}
+
+	return Super::GetMaxSpeed();
+}
+
 void URougeCharacterMovementComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
-}
-
-
-// Called every frame
-void URougeCharacterMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                                     FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
 
